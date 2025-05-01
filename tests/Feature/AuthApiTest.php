@@ -8,24 +8,27 @@ use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 use App\Models\User;
+use Database\Seeders\PassportSeeder;
 
 class AuthApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $email = "alfadjri28@gmail.com";
+    protected $email = "dev@gmail.com";
     protected $password = "12345678";
     protected $phone = "087718611101";
     /**
      * A basic feature test example.
      */
-    protected function setUp(): void
+
+     protected function setUp(): void
     {
         parent::setUp();
-        // Jalankan passport:install hanya saat testing
-        $this->artisan('passport:client --personal');
 
+        // Jalankan Passport seeder
+        $this->seed(PassportSeeder::class);
     }
+   
     public function test_user_can_register_with_valid_data(): void
     {
         $data = [
@@ -64,7 +67,7 @@ class AuthApiTest extends TestCase
     public function test_user_can_login_with_valid_credentials(): void{
         $user = User::factory()->create([
             'email' => $this->email,
-            'password' => $this->password,
+            'password' => Hash::make($this->password),
         ]);
 
         $response = $this->postJson('/api/login', [

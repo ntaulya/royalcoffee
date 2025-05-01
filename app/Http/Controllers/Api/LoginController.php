@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 
 
+
 // controller user
 use App\Http\Controllers\Component\User\userController as C_User;
 
@@ -24,6 +25,7 @@ use App\Http\Resources\Default\ResponseLogin as R_Login;
 use App\Http\Resources\Default\Failed\ResponseFailedLogin as R_F_login;
 use App\Http\Resources\Default\ResponseSuccess as R_Success;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -46,7 +48,7 @@ class LoginController extends Controller
         ResetPassword::updateOrCreate(
             ['email' => $value['email']],
             [
-                'token' => bcrypt($otp),
+                'token' => Hash::make($otp),
                 'created_at' => now(),
             ]
         );
