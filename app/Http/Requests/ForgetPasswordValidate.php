@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
+
 
 class ForgetPasswordValidate extends FormRequest
 {
@@ -26,12 +28,22 @@ class ForgetPasswordValidate extends FormRequest
             'email' => ['required','string','exists:users,email'],
         ];
     }
-    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator){
-        throw new HttpResponseException(response()->json([
-            'status' => false,
-            'messange' => "Email tidak di temukan silahkan check kembali",
-        ],400));
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email wajib diisi.',
+            'email.exists' => 'Silakan periksa email Anda. Jika terdaftar, Anda akan menerima OTP.'
+        ];
     }
 
+    public function failedValidation(Validator $validator)
+    {
+        $errors = $validator->errors();
+
+        throw new HttpResponseException(response()->json([
+            'status' => false,
+            'message' => $errors->first(), 
+        ], 400)); 
+    }
 
 }
