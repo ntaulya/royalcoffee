@@ -5,9 +5,8 @@ namespace App\Http\Requests\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Propaganistas\LaravelPhone\PhoneNumber;
 
-class RegisterValidate extends FormRequest
+class UpdateValidate extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +24,10 @@ class RegisterValidate extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_lengkap' => ['required','string'],
-            'email' => ['required','email','unique:users,email'],
-            'phone' => ['required','phone:id'],
+            'user_id' => ['nullable','string'],
+            'nama_lengkap' => ['nullable','string'],
+            'email' => ['nullable','email'],
+            'phone' => ['nullable','phone:id'],
             'password' => ['nullable','string','min:8'],
         ];
     }
@@ -38,7 +38,7 @@ class RegisterValidate extends FormRequest
             'phone.required' => "phone wajib di isi",
             'password.required'=> 'password wajib di isi',
             'email.required' => 'Email wajib diisi.',
-            'email.unique' => 'Email wajib diisi',
+            'email.email' => 'Format tidak sesuai',
         ];
     }
     public function failedValidation(Validator $validator)
@@ -50,5 +50,4 @@ class RegisterValidate extends FormRequest
             'message' => $errors->first(), 
         ], 422)); 
     }
-
 }

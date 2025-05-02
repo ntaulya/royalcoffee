@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Component\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 //  model 
 use App\Models\User as User;
 use App\Models\Profile as Profile;
@@ -51,45 +49,62 @@ class userController extends Controller
 
 
 
-    public function updateProfile($id_user,$nama_lengkap = null,$email = null,$no_handphone = null,$password = null){
+    public function updateProfile($id_user = null, $nama_lengkap = null, $email = null, $no_handphone = null, $password = null)
+    {
+        $authUser = Auth::user();
 
-       $user = User::findOrFail($id_user);
-       if($nama_lengkap != null){
-            $user->profile->update([
-                'nama_lengkap' => $nama_lengkap,
-            ]);
+        $targetUserId = $id_user ?? $authUser->id;
+        if ($authUser->id !== $targetUserId && !$authUser->hasRole('admin')) {
+            return 403;
         }
-       if($no_handphone != null){
-            $user->profile->update([
-                'no_handphone' => $no_handphone,
-            ]);
+
+       
+
+        $user = User::with('profile')->findOrFail($targetUserId);
+        if (!$user) {
+            return false;
+        } 
+        if ($email !== null && $email !== $user->email) {
+            if (User::where('email', $email)->where('id', '!=', $targetUserId)->exists()) {
+                return false;
+            }
+            $user->email = $email;
         }
-        if($email != null){
-            $user->update([
-                'email' => $email,
-            ]);
+        
+        if ($password !== null) {
+            $user->password = Hash::make($password);
         }
-        if($password != null){
-            $user->update([
-                'password' => Hash::make($password),
-            ]);
+        
+        $user->save();
+        
+        $profileData = [];
+        if ($nama_lengkap !== null) {
+            $profileData['nama_lengkap'] = $nama_lengkap;
+        }
+        if ($no_handphone !== null) {
+            $profileData['no_handphone'] = $no_handphone;
+        }
+        
+        if (!empty($profileData)) {
+            $user->profile->update($profileData);
         }
         return true;
-        
     }
 
     public function detail($id_user = null){
-        if(is_null($id_user)){
-            $user = Auth::user();
-        }else{
-            $user = User::findOrFail($id_user);
+        $authUser = Auth::user();
+
+        if (!is_null($id_user) && !$authUser->hasRole('admin') && $authUser->id != $id_user) {
+           return 403; 
         }
-        $dataUser = [
+
+        $user = is_null($id_user) ? $authUser : User::findOrFail($id_user);
+        $data = [
             'email' => $user->email,
             'nama_lengkap' => $user->profile->nama_lengkap,
             'phone' => $user->profile->no_handphone,
             'role' => $user->getRoleNames()->toArray(),
         ];
-        return $dataUser;
+        return $data;
     }
 }

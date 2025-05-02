@@ -11,9 +11,12 @@ class KategoriController extends Controller
 {
     
     public function getCategori($kategori_id = null , $page = 1 , $limit = 2){
-        if(is_null($kategori_id)){
-            return Kategori::select(['id','nama_kategori as nama'])->paginate($limit);
+        $query = Kategori::select(['id','nama_kategori as nama']);
+    
+        if (is_null($kategori_id)) {
+            return $query->paginate($limit)->toArray(); // return array
         }
-        return Kategori::findOrFail($kategori_id);
+    
+        return $query->findOrFail($kategori_id)->toArray(); // return array juga
     }
 }

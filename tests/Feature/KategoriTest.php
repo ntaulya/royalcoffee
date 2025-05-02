@@ -13,11 +13,16 @@ class KategoriTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function it_can_get_all_kategori(){
-        Kategori::factory()->count(100)->create();
+    public function test_it_can_get_all_kategori(){
+        Kategori::factory()->count(4)->create();
 
-        $response = $this->getJson('api/categori');
+        // Make GET request to the API with parameters
+        $response = $this->getJson('api/categori?id=&page=1');
+        // Check if the response status is 200
         $response->assertStatus(200);
-        $response->assertJson(100);
+        $response->assertJsonFragment([
+            'status' => 'success',
+            'message' => 'Berhasil Mengambil Data',
+        ]);
     }
 }

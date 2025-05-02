@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Default;
+namespace App\Http\Resources\Default\Failed;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ResponseLogin extends JsonResource
+class ReponseForbidden extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,15 +15,12 @@ class ResponseLogin extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-                'status' => "success",
-                'message' => "User berhasil login",
-                'data' => [
-                    'token' => $this['token'],
-                ]
+            'status' => false,
+            'message' => 'Forbidden. Anda tidak punya akses.',
         ];
     }
     public function withResponse($request, $response)
     {
-        $response->setStatusCode(200);
+        $response->setStatusCode(403);
     }
 }

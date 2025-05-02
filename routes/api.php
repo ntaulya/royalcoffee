@@ -21,8 +21,11 @@ Route::post('/verifyOtp',[Login::class,'verifyOtp']);
 
 Route::group(['middleware' => ['auth:api']],function(){
     Route::group(['prefix' => "user"],function(){
-        Route::get('/',[UserController::class,'serachUser']);
+        Route::get('/',[UserController::class,'serachUser'])->middleware('role:admin');
+        Route::get('/roles',[UserController::class,'getListRole'])->middleware('role:admin');
+        Route::post('/update/roles',[UserController::class,'updateRole'])->middleware('role:admin');
         Route::get('/detail',[UserController::class,'detailUser']);
+        Route::patch('/detail',[UserController::class,'updateUser']);
     });
     Route::group(['prefix' => "product"],function(){
         Route::post('/create',[ProductController::class,'createProduct'])->middleware(['role:admin']);

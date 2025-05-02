@@ -26,8 +26,8 @@ class KategoriController extends Controller
             'id' => ['nullable','string','exists:kategoris,id'],
             'page' => ['nullable','numeric'],
         ]);
-        $value['id'] = (is_null($value['id'])) ? null : $value['id'];
-        $value['page'] = (is_null($value['page'])) ? null : $value['page'];
+        $value['id'] = (is_null($value['id'])) ?? null ;
+        $value['page'] = (is_null($value['page'])) ?? 1;
         $data = $this->kategoriController->getCategori($value['id'],$value['page']);
         return new R_Reponse(['data' => $data]);
     }
