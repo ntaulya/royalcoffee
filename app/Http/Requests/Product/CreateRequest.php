@@ -25,7 +25,7 @@ class CreateRequest extends FormRequest
                 'nama_product' => ["required","string","max:255"],
                 'harga_product' => ["required","integer","min:0"],
                 'description_product' => ["required","string"],
-                'kategori_id' => ["required","exists:kategoris,id"],
+                'kategori_id' => ["required","string","exists:kategoris,id"],
                 'varian_product.*' => ["required","array","min:1"],
                 'varian_product.*.nama_varian' => ["required","string","max:100"],
                 'varian_product.*.harga_varian' => ["required","integer","min:0"],

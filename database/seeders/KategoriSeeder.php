@@ -14,10 +14,10 @@ class KategoriSeeder extends Seeder
      */
     public function run(): void
     {
-        $data = ["coffe","Non-Coffe","Snack","Food"];
+        $data = ["coffee","Non-Coffe","Snack","Food"];
 
-        foreach( $data as $value){
-            Kategori::create(['nama_kategori' => $value]);
+        foreach($data as $value){
+            Kategori::firstOrCreate(['nama_kategori' => $value]);
         }
 
     }

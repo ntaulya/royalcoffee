@@ -15,7 +15,6 @@ class KategoriTest extends TestCase
      */
     public function test_it_can_get_all_kategori(){
         Kategori::factory()->count(4)->create();
-
         // Make GET request to the API with parameters
         $response = $this->getJson('api/categori?id=&page=1');
         // Check if the response status is 200

@@ -2,11 +2,15 @@
 
 namespace Tests;
 
+use Database\Seeders\KategoriSeeder;
 use Database\Seeders\PassportSeeder;
 use Database\Seeders\RoleSeed;
 use Database\Seeders\UserDump;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Storage;
+
+
 abstract class TestCase extends BaseTestCase
 {
     use RefreshDatabase;
@@ -19,6 +23,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        Storage::fake('private');
         // Jalankan seeder umum
         $this->seed(PassportSeeder::class);
         $this->seed(RoleSeed::class);

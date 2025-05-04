@@ -19,7 +19,7 @@ class Log_Product extends Model
         'variant_id',
         'user_id',
         'status_upload',
-        'qty_chnage',
+        'qty_change',
         'note',
     ];
 

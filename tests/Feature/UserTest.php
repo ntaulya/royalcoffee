@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\KategoriSeeder;
 use Tests\TestCase;
 
 class UserTest extends TestCase

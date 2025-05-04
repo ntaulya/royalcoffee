@@ -38,7 +38,7 @@ class ProductController extends Controller
 
     public function create_log($varian_id,$user_id,$status_upload,$stock,$notes){
         L_Product::create([
-            "varian_id" => $varian_id,
+            "variant_id" => $varian_id,
             "user_id" => $user_id,
             "status_upload" => "in",
             "qty_change" => $stock,

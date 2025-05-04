@@ -20,9 +20,8 @@ class VarianController extends Controller
     }
 
     private function createImage($varian_id,$image_file,$is_primary = 0){
-        $file = $image_file->file('image');
-        $filename = time() ."_". $file->getClientOriginalName();
-        $path = $file->storeAs("product",$filename,"private");
+        $filename = time() ."_". $image_file->getClientOriginalName();
+        $path = $image_file->storeAs("product",$filename,"private");
 
         ProductImage::create([
             'variant_id' => $varian_id,
