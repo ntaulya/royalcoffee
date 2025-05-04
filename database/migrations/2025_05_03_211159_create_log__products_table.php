@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('log__products', function (Blueprint $table) {
             $table->id();
-            $table->uuid('product_id');
-            $table->foreign('product_id')->references('id')->on('products');
+            $table->unsignedBigInteger('variant_id');
+            $table->foreign('variant_id')->references('id')->on('varian__products')->onDelete('cascade');
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->enum('status_upload',['in','out','adjust']);
-            $table->integer('qty_chnage');
+            $table->integer('qty_change');
             $table->text("note")->nullable(true );
             $table->timestamps();
         });

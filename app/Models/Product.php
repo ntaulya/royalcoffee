@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
-use App\Models\Log_Product as L_Product;
+use App\Models\Varian_Product as ProductVariant;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 
 class Product extends Model
 {
-    use HasFactory;
-
+    use HasFactory,HasUlids;
+    public $incrementing = false;
     protected $primaryKey = 'id';
     
     protected $fillable = [
@@ -24,7 +25,8 @@ class Product extends Model
     ];
 
 
-    public function log_product() : HasMany{
-        return $this->hasMany(L_Product::class,'product_id','id');
+   
+    public function variants() {
+        return $this->hasMany(ProductVariant::class,'id','id');
     }
 }

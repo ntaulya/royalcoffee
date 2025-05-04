@@ -7,10 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-use App\Models\Product as Product;
-
+use App\Models\Varian_Product as ProductVariants;
 use App\Models\User as User;
-
 class Log_Product extends Model
 {
     use HasFactory;
@@ -18,18 +16,18 @@ class Log_Product extends Model
     protected $primaryKey = 'id';
     
     protected $fillable = [
-        'product_id',
+        'variant_id',
         'user_id',
         'status_upload',
         'qty_chnage',
         'note',
     ];
 
-    public function product() : BelongsTo{
-        return $this->belongsTo(Product::class,'product_id','id');
+    public function variant(): BelongsTo {
+        return $this->belongsTo(ProductVariants::class, 'variant_id','variant_id');
     }
 
     public function user() : BelongsTo{
-        return $this->belongsTo(User::class,'user_id','id');
+        return $this->belongsTo(User::class,'user_id','user_id');
     }
 }

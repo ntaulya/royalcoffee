@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 // Controller
 use App\Http\Controllers\Component\Product\ProductController as C_Product;
-
+use App\Http\Controllers\Component\Product\VarianController as C_Varian;
 
 // Request
 use App\Http\Requests\Product\CreateRequest as V_Create;
@@ -20,19 +20,42 @@ use App\Http\Resources\Default\ResponseSuccess as R_Success;
 
 class ProductController extends Controller
 {
-    protected $productController , $kategoriController;
+    protected $productController , $kategoriController , $varianController;
     public function __construct(){
         $this->productController = new C_Product();
+        $this->varianController = new C_Varian();
     }
 
     public function createProduct(V_Create $request){
         $value = $request->validated();
         // user id 
         $user = Auth::user()->id;
-        // upload image
 
         // upload barang 
-        $this->productController->create($user , $value['nama_product'],$value['harga_product'],$value['description_product'],$value['stock'],$value['kategori_id']);
+        $product = $this->productController->create(
+             $value['nama_product'],
+             $value['harga_product'],
+             $value['kategori_id'],
+             $value['description_product'],
+        );
+        $varians = $value['varian_product'];
+        foreach($varians as $value){
+            $varian = $this->varianController->create(
+                $product->id,
+                $value['nama_varian'],
+                $value['harga_varian'],
+                $value['stock_varian'],
+                $value['image_varian'],
+                $value['is_primary'] == true ? 1 : 0,
+            );
+            $this->productController->create_log(
+                $varian->id,
+                $user,
+                "in",
+                $value['stock_varian'],
+                "Barang Baru",
+            );
+        }
         return new R_Success(['message' => 'Product berhasil dibuat']);
     }
 
