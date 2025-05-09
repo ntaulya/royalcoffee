@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth:api']],function(){
         Route::patch('/detail',[UserController::class,'updateUser']);
     });
     Route::group(['prefix' => "product"],function(){
+        Route::get('/',[ProductController::class,'searchProduct']);
         Route::post('/create',[ProductController::class,'createProduct'])->middleware(['role:admin']);
     });
 });
