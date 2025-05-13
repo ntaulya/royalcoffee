@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/home/home-coffee.dart';
 
 class AuthController {
   // Login Controllers
@@ -23,9 +24,10 @@ class AuthController {
     String password = loginPasswordController.text;
 
     if (email == 'admin@mail.com' && password == 'admin123') {
-      ScaffoldMessenger.of(
+      Navigator.pushReplacement(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Login Sukses')));
+        MaterialPageRoute(builder: (context) => const HomeCoffee()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Email atau Password Salah')),
@@ -67,17 +69,20 @@ class AuthController {
     ).showSnackBar(SnackBar(content: Text('Link reset dikirim ke $email')));
   }
 
-  verifyOtp(BuildContext context, String otpCode) {
-    if (otpCode.length == 4) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('OTP $otpCode diverifikasi')));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Kode OTP harus 4 digit')));
-    }
+  bool verifyOtp(BuildContext context, String otpCode) {
+  if (otpCode.length == 4) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('OTP $otpCode diverifikasi')),
+    );
+    return true; // <- Tambahkan ini
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Kode OTP harus 4 digit')),
+    );
+    return false; // <- Tambahkan ini
   }
+}
+
 
   void dispose() {
     loginEmailController.dispose();

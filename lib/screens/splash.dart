@@ -31,7 +31,6 @@ class _SplashState extends State<Splash> {
             children: [
               SizedBox(height: 20),
               Image.asset('assets/images/royalcafelogo.png', height: 107),
-              SizedBox(height: 20),
               Image.asset('assets/images/royalcafetext.png', height: 107),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../controllers/reset_pass_controller.dart';
+import '../screens/auth.dart';
 
 class ResetPass extends StatefulWidget {
   const ResetPass({super.key, this.title = 'Reset Password'});
@@ -46,12 +47,12 @@ class _ResetPassState extends State<ResetPass> {
               ),
 
               const SizedBox(height: 20),
-              
+
               const Text(
                 'Atur Password Baru',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              
+
               const SizedBox(height: 20),
 
               TextField(
@@ -62,7 +63,11 @@ class _ResetPassState extends State<ResetPass> {
                   hintText: 'Masukkan password baru Anda',
                   border: const UnderlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_controller.obscurePassword ? Icons.visibility : Icons.visibility_off),
+                    icon: Icon(
+                      _controller.obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
                     onPressed: () {
                       setState(() {
                         _controller.togglePasswordVisibility();
@@ -82,7 +87,11 @@ class _ResetPassState extends State<ResetPass> {
                   hintText: 'Masukkan ulang password baru Anda',
                   border: const UnderlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_controller.obscureConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                    icon: Icon(
+                      _controller.obscureConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
                     onPressed: () {
                       setState(() {
                         _controller.toggleConfirmPasswordVisibility();
@@ -96,11 +105,16 @@ class _ResetPassState extends State<ResetPass> {
 
               ElevatedButton(
                 onPressed: () async {
-                  // Panggil method resetPassword dari controller
                   final bool success = await _controller.resetPassword(context);
-                  
+
                   if (success) {
-                    Navigator.pushNamedAndRemoveUntil(context, '/auth', (route) => false);
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyRegister(title: ''),
+                      ),
+                      (route) => false,
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
