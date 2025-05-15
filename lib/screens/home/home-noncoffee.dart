@@ -40,11 +40,14 @@ class _HomeNonCoffeeState extends State<HomeNonCoffee> {
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Royal Cafe",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        "Royal Cafe",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 4),
                       Text("Home", style: TextStyle(color: Colors.white70)),
                     ],
@@ -71,8 +74,9 @@ class _HomeNonCoffeeState extends State<HomeNonCoffee> {
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 0),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0,
+                          ),
                         ),
                       ),
                     ),
@@ -91,51 +95,102 @@ class _HomeNonCoffeeState extends State<HomeNonCoffee> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: Image.asset('assets/images/Banner.png',
-                            fit: BoxFit.cover, width: double.infinity),
+                        child: Image.asset(
+                          'assets/images/Banner.png',
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
                       ),
                     ),
 
-                    // Categories
+                    // Promo Banner
                     Container(
                       margin: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: ["Coffee", "Non-Coffee", "Snack", "Food"]
-                            .map((e) {
-                          final isSelected = selectedCategory == e;
-                          return Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                setState(() {
-                                  selectedCategory = e;
-                                });
+                        vertical: 16,
+                        horizontal: 16,
+                      ),
+                      height: 40,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children:
+                              [
+                                "Coffee",
+                                "Non-Coffee",
+                                "Snack",
+                                "Food",
+                                "Royal Glace",
+                                "Fresh Juice",
+                                "Ice Cream Panda",
+                              ].map((e) {
+                                final isSelected = selectedCategory == e;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: () {
+                                        setState(() {
+                                          selectedCategory = e;
+                                        });
 
-                                if (e == "Coffee") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const HomeCoffee()),
-                                  );
-                                }
-                              },
-                              child: Chip(
-                                label: Text(e),
-                                backgroundColor: isSelected
-                                    ? const Color(0xFF8B4A0C)
-                                    : Colors.grey[200],
-                                labelStyle: TextStyle(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.black),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                                        // Navigasi sesuai kategori
+                                        if (e == "Coffee") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeCoffee(),
+                                            ),
+                                          );
+                                        } else if (e == "Non-Coffee") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeNonCoffee(),
+                                            ),
+                                          );
+                                        } else if (e == "Snack") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeSnack(),
+                                            ),
+                                          );
+                                        } else if (e == "Food") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => const HomeFood(),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Chip(
+                                        label: Text(e),
+                                        backgroundColor:
+                                            isSelected
+                                                ? const Color(0xFF8B4A0C)
+                                                : Colors.grey[200],
+                                        labelStyle: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
                       ),
                     ),
 
@@ -151,14 +206,26 @@ class _HomeNonCoffeeState extends State<HomeNonCoffee> {
                           childAspectRatio: 3 / 4,
                           physics: const NeverScrollableScrollPhysics(),
                           children: [
-                            _buildProductCard("Strawberry Tea", "Rp.26.000",
-                                "assets/images/strawberry-tea.png"),
-                            _buildProductCard("Chocolate", "Rp. 26.000",
-                                "assets/images/chocolate.png"),
-                            _buildProductCard("Red Velvet", "Rp. 26.000",
-                                "assets/images/red-velvet.png"),
-                            _buildProductCard("Lemon Tea", "Rp. 26.000",
-                                "assets/images/lemon-tea.png"),
+                            _buildProductCard(
+                              "Strawberry Tea",
+                              "Rp.26.000",
+                              "assets/images/strawberry-tea.png",
+                            ),
+                            _buildProductCard(
+                              "Chocolate",
+                              "Rp. 26.000",
+                              "assets/images/chocolate.png",
+                            ),
+                            _buildProductCard(
+                              "Red Velvet",
+                              "Rp. 26.000",
+                              "assets/images/red-velvet.png",
+                            ),
+                            _buildProductCard(
+                              "Lemon Tea",
+                              "Rp. 26.000",
+                              "assets/images/lemon-tea.png",
+                            ),
                           ],
                         ),
                       ),
@@ -197,7 +264,7 @@ class _HomeNonCoffeeState extends State<HomeNonCoffee> {
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -205,10 +272,14 @@ class _HomeNonCoffeeState extends State<HomeNonCoffee> {
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
-              child: Image.asset(imagePath,
-                  fit: BoxFit.cover, width: double.infinity),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
             ),
           ),
           Padding(
@@ -216,20 +287,24 @@ class _HomeNonCoffeeState extends State<HomeNonCoffee> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Text(price),
                 Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
                     onPressed: () {},
-                    icon: const Icon(Iconsax.shopping_bag,
-                        color: Color(0xFF8B4A0C)),
+                    icon: const Icon(
+                      Iconsax.shopping_bag,
+                      color: Color(0xFF8B4A0C),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../controllers/auth_controller.dart';
+import '../../screens/home/home-coffee.dart';
 import '../../screens/home/home-noncoffee.dart';
-import '../../screens/home/home-snack.dart';
 import '../../screens/home/home-food.dart';
+import '../../screens/home/home-snack.dart';
 
-class HomeCoffee extends StatefulWidget {
-  const HomeCoffee({super.key});
+class HomeRoyalGlace extends StatefulWidget {
+  const HomeRoyalGlace({super.key});
 
   @override
-  State<HomeCoffee> createState() => _HomeCoffeeState();
+  State<HomeRoyalGlace> createState() => _HomeRoyalGlaceState();
 }
 
-class _HomeCoffeeState extends State<HomeCoffee> {
+class _HomeRoyalGlaceState extends State<HomeRoyalGlace> {
   final AuthController _controller = AuthController();
-  String selectedCategory = "Coffee";
+
+  String selectedCategory = "Royal Glace";
 
   @override
   void dispose() {
@@ -68,7 +70,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: "Search Coffee",
+                          hintText: "Search Royal Glace",
                           prefixIcon: const Icon(Iconsax.search_normal),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -103,7 +105,6 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                       ),
                     ),
 
-                    // Promo Banner
                     Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 16,
@@ -171,6 +172,14 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                                                   (context) => const HomeFood(),
                                             ),
                                           );
+                                        } else if (e == "Royal Glace") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => const HomeFood(),
+                                            ),
+                                          );
                                         }
                                       },
                                       child: Chip(
@@ -194,6 +203,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                       ),
                     ),
 
+                    // Product Grid (Fixed height inside scroll view)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: SizedBox(
@@ -206,24 +216,24 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                           physics: const NeverScrollableScrollPhysics(),
                           children: [
                             _buildProductCard(
-                              "Coffee Latte",
-                              "Rp.24.000",
-                              "assets/images/coffee-latte.png",
+                              "Kentang Goreng Ori",
+                              "Rp.22.000",
+                              "assets/images/kentang-goreng.png",
                             ),
                             _buildProductCard(
-                              "Cappuccino",
+                              "Hamburger",
+                              "Rp. 22.000",
+                              "assets/images/hamburger.png",
+                            ),
+                            _buildProductCard(
+                              "Sosis Bakar",
+                              "Rp. 22.000",
+                              "assets/images/sosis-bakar.png",
+                            ),
+                            _buildProductCard(
+                              "Pisang Coklat Keju",
                               "Rp. 27.000",
-                              "assets/images/cappucino.png",
-                            ),
-                            _buildProductCard(
-                              "Kopi Susu",
-                              "Rp. 23.000",
-                              "assets/images/kopi-susu.png",
-                            ),
-                            _buildProductCard(
-                              "Kopi Gula Aren",
-                              "Rp. 27.000",
-                              "assets/images/kopi-susu-gula-aren.png",
+                              "assets/images/pisang-goreng.png",
                             ),
                           ],
                         ),
