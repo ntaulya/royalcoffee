@@ -4,6 +4,9 @@ import '../../controllers/auth_controller.dart';
 import '../../screens/home/home-coffee.dart';
 import '../../screens/home/home-noncoffee.dart';
 import '../../screens/home/home-snack.dart';
+import '../../screens/home/home-royal-glace.dart';
+import '../../screens/home/home-food.dart';
+import '../../screens/home/home-fresh-juice.dart';
 
 class HomeFood extends StatefulWidget {
   const HomeFood({super.key});
@@ -33,7 +36,7 @@ class _HomeFoodState extends State<HomeFood> {
           children: [
             // Header
             Container(
-              color: const Color(0xFF8B4A0C),
+              color: const Color(0xFF834D1E),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -171,19 +174,45 @@ class _HomeFoodState extends State<HomeFood> {
                                                   (context) => const HomeFood(),
                                             ),
                                           );
+                                        } else if (e == "Royal Glace") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeRoyalGlace(),
+                                            ),
+                                          );
+                                        } else if (e == "Fresh Juice") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeFreshJuice(),
+                                            ),
+                                          );
                                         }
                                       },
                                       child: Chip(
                                         label: Text(e),
-                                        backgroundColor:
-                                            isSelected
-                                                ? const Color(0xFF8B4A0C)
-                                                : Colors.grey[200],
+                                        backgroundColor: Colors.white,
+                                        side: BorderSide(
+                                          color:
+                                              isSelected
+                                                  ? const Color(0xFF8B4A0C)
+                                                  : Colors.grey.shade300,
+                                          width: 1.5,
+                                        ),
                                         labelStyle: TextStyle(
                                           color:
                                               isSelected
-                                                  ? Colors.white
+                                                  ? const Color(0xFF8B4A0C)
                                                   : Colors.black,
+                                          fontWeight:
+                                              isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
                                         ),
                                       ),
                                     ),
@@ -240,7 +269,7 @@ class _HomeFoodState extends State<HomeFood> {
       // Bottom Navigation
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF8B4A0C),
+        selectedItemColor: const Color(0xFF834D1E),
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -297,7 +326,7 @@ class _HomeFoodState extends State<HomeFood> {
                     onPressed: () {},
                     icon: const Icon(
                       Iconsax.shopping_bag,
-                      color: Color(0xFF8B4A0C),
+                      color: Color(0xFF834D1E),
                     ),
                   ),
                 ),

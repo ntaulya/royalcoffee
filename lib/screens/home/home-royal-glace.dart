@@ -5,6 +5,7 @@ import '../../screens/home/home-coffee.dart';
 import '../../screens/home/home-noncoffee.dart';
 import '../../screens/home/home-food.dart';
 import '../../screens/home/home-snack.dart';
+import '../../screens/home/home-fresh-juice.dart';
 
 class HomeRoyalGlace extends StatefulWidget {
   const HomeRoyalGlace({super.key});
@@ -34,7 +35,7 @@ class _HomeRoyalGlaceState extends State<HomeRoyalGlace> {
           children: [
             // Header
             Container(
-              color: const Color(0xFF8B4A0C),
+              color: const Color(0xFF834D1E),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,22 +178,40 @@ class _HomeRoyalGlaceState extends State<HomeRoyalGlace> {
                                             context,
                                             MaterialPageRoute(
                                               builder:
-                                                  (context) => const HomeFood(),
+                                                  (context) =>
+                                                      const HomeRoyalGlace(),
+                                            ),
+                                          );
+                                        } else if (e == "Fresh Juice") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeFreshJuice(),
                                             ),
                                           );
                                         }
                                       },
                                       child: Chip(
                                         label: Text(e),
-                                        backgroundColor:
-                                            isSelected
-                                                ? const Color(0xFF8B4A0C)
-                                                : Colors.grey[200],
+                                        backgroundColor: Colors.white,
+                                        side: BorderSide(
+                                          color:
+                                              isSelected
+                                                  ? const Color(0xFF8B4A0C)
+                                                  : Colors.grey.shade300,
+                                          width: 1.5,
+                                        ),
                                         labelStyle: TextStyle(
                                           color:
                                               isSelected
-                                                  ? Colors.white
+                                                  ? const Color(0xFF8B4A0C)
                                                   : Colors.black,
+                                          fontWeight:
+                                              isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
                                         ),
                                       ),
                                     ),
@@ -216,24 +235,24 @@ class _HomeRoyalGlaceState extends State<HomeRoyalGlace> {
                           physics: const NeverScrollableScrollPhysics(),
                           children: [
                             _buildProductCard(
-                              "Kentang Goreng Ori",
-                              "Rp.22.000",
-                              "assets/images/kentang-goreng.png",
+                              "Lychee Blue",
+                              "Rp.25.000",
+                              "assets/images/lychee-blue.png",
                             ),
                             _buildProductCard(
-                              "Hamburger",
-                              "Rp. 22.000",
-                              "assets/images/hamburger.png",
+                              "Coolant Watermelon",
+                              "Rp. 25.000",
+                              "assets/images/coolant-watermelon.png",
                             ),
                             _buildProductCard(
-                              "Sosis Bakar",
-                              "Rp. 22.000",
-                              "assets/images/sosis-bakar.png",
+                              "Berry Breeze",
+                              "Rp. 25.000",
+                              "assets/images/berry-breze.png",
                             ),
                             _buildProductCard(
-                              "Pisang Coklat Keju",
-                              "Rp. 27.000",
-                              "assets/images/pisang-goreng.png",
+                              "Tropical Sunrise",
+                              "Rp. 25.000",
+                              "assets/images/tropical-sunrise.png",
                             ),
                           ],
                         ),
@@ -250,7 +269,7 @@ class _HomeRoyalGlaceState extends State<HomeRoyalGlace> {
       // Bottom Navigation
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF8B4A0C),
+        selectedItemColor: const Color(0xFF834D1E),
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -307,7 +326,7 @@ class _HomeRoyalGlaceState extends State<HomeRoyalGlace> {
                     onPressed: () {},
                     icon: const Icon(
                       Iconsax.shopping_bag,
-                      color: Color(0xFF8B4A0C),
+                      color: Color(0xFF834D1E),
                     ),
                   ),
                 ),

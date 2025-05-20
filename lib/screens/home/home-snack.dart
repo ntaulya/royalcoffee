@@ -4,6 +4,8 @@ import '../../controllers/auth_controller.dart';
 import '../../screens/home/home-coffee.dart';
 import '../../screens/home/home-noncoffee.dart';
 import '../../screens/home/home-food.dart';
+import '../../screens/home/home-royal-glace.dart';
+import '../../screens/home/home-fresh-juice.dart';
 
 class HomeSnack extends StatefulWidget {
   const HomeSnack({super.key});
@@ -171,19 +173,45 @@ class _HomeSnackState extends State<HomeSnack> {
                                                   (context) => const HomeFood(),
                                             ),
                                           );
+                                        } else if (e == "Royal Glace") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeRoyalGlace(),
+                                            ),
+                                          );
+                                        } else if (e == "Fresh Juice") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const HomeFreshJuice(),
+                                            ),
+                                          );
                                         }
                                       },
                                       child: Chip(
                                         label: Text(e),
-                                        backgroundColor:
-                                            isSelected
-                                                ? const Color(0xFF8B4A0C)
-                                                : Colors.grey[200],
+                                        backgroundColor: Colors.white,
+                                        side: BorderSide(
+                                          color:
+                                              isSelected
+                                                  ? const Color(0xFF8B4A0C)
+                                                  : Colors.grey.shade300,
+                                          width: 1.5,
+                                        ),
                                         labelStyle: TextStyle(
                                           color:
                                               isSelected
-                                                  ? Colors.white
+                                                  ? const Color(0xFF8B4A0C)
                                                   : Colors.black,
+                                          fontWeight:
+                                              isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
                                         ),
                                       ),
                                     ),
