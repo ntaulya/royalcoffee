@@ -16,7 +16,7 @@ class AuthController {
   final registerPasswordController = TextEditingController();
   final registerConfirmPasswordController = TextEditingController();
 
-  // OTP Controllers
+  // OTP Controllers (opsional)
   final otp1Controller = TextEditingController();
   final otp2Controller = TextEditingController();
   final otp3Controller = TextEditingController();
@@ -29,6 +29,7 @@ class AuthController {
 
     try {
       final result = await _apiService.loginUser(email, password);
+      print('Token: ${result.token}');
 
       Navigator.pushReplacement(
         context,
@@ -36,7 +37,7 @@ class AuthController {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login berhasil! Selamat datang ${result.email}')),
+        const SnackBar(content: Text('Login berhasil!')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -62,9 +63,10 @@ class AuthController {
 
     try {
       final result = await _apiService.registerUser(email, password, phone, username);
+      print('Token: ${result.token}');
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registrasi berhasil untuk ${result.email}. Silakan login.')),
+        SnackBar(content: Text('Registrasi berhasil. Silakan login.')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,35 +75,19 @@ class AuthController {
     }
   }
 
-  /// RESET PASSWORD (dummy)
-  void resetPassword(BuildContext context) {
-    final email = loginEmailController.text.trim();
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email tidak boleh kosong')),
-      );
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Link reset password dikirim ke $email')),
-    );
-  }
-
-  /// VERIFIKASI OTP
   bool verifyOtp(BuildContext context, String otpCode) {
-    if (otpCode.length == 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('OTP $otpCode diverifikasi')),
-      );
-      return true;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kode OTP harus 4 digit')),
-      );
-      return false;
-    }
+  // Kamu bisa ganti validasinya sesuai logika yang diinginkan
+  if (otpCode.length == 4 && otpCode == '1234') {
+    // Contoh kode OTP valid
+    return true;
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Kode OTP tidak valid')),
+    );
+    return false;
   }
+}
+
 
   /// DISPOSE semua controller
   void dispose() {

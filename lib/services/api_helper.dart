@@ -24,7 +24,7 @@ class ApiService {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonResponse = jsonDecode(response.body);
-      final data = jsonResponse['data']; // Ambil hanya bagian 'data'
+      final data = jsonResponse['data']; // Ambil token saja
       return Login.fromJson(data);
     } else {
       throw Exception('Login gagal: ${response.body}');
