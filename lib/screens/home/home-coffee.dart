@@ -21,14 +21,9 @@ class HomeCoffee extends StatefulWidget {
 class _HomeCoffeeState extends State<HomeCoffee> {
   final AuthController _authController = AuthController();
   final CartController _cartController = CartController();
+
   String selectedCategory = "Coffee";
   int _selectedBottomNavIndex = 0;
-
-  @override
-  void dispose() {
-    _authController.dispose();
-    super.dispose();
-  }
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -37,27 +32,19 @@ class _HomeCoffeeState extends State<HomeCoffee> {
 
     switch (index) {
       case 0:
-        // Home - already here
         break;
       case 1:
-        // Cart - check if items exist, if not go to detail first
         if (_cartController.items.isEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const DetailPesanan()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailPesanan()));
         } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const PesananSaya()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const PesananSaya()));
         }
         break;
       case 2:
-        // Payment - navigate to payment page
+        // TODO: Navigate to payment
         break;
       case 3:
-        // Notifications - navigate to notifications page
+        // TODO: Navigate to notifications
         break;
     }
   }
@@ -85,8 +72,6 @@ class _HomeCoffeeState extends State<HomeCoffee> {
       case "Fresh Juice":
         Navigator.push(context, MaterialPageRoute(builder: (_) => const HomeFreshJuice()));
         break;
-      default:
-        break;
     }
   }
 
@@ -107,10 +92,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Royal Cafe",
-                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
+                      Text("Royal Cafe", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                       SizedBox(height: 4),
                       Text("Home", style: TextStyle(color: Colors.white70)),
                     ],
@@ -120,6 +102,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
               ),
             ),
 
+            // Content
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -142,7 +125,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                       ),
                     ),
 
-                    // Promo Banner
+                    // Banner
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       height: 160,
@@ -183,7 +166,6 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                             return Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(20),
                                 onTap: () => _onCategorySelected(category),
                                 child: Chip(
                                   label: Text(category),
@@ -200,8 +182,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                       ),
                     ),
 
-                    // Product Grid would go here
-                    // Add your product grid widget here
+                    // TODO: Add product grid here
                   ],
                 ),
               ),
@@ -210,7 +191,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
         ),
       ),
 
-      // Bottom Navigation Bar
+      // Bottom Navigation
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedBottomNavIndex,
         onTap: _onBottomNavTapped,

@@ -1,3 +1,6 @@
+// tabbar.dart
+import 'package:flutter/material.dart';
+
 class TabButton extends StatelessWidget {
   final String label;
   final bool isActive;

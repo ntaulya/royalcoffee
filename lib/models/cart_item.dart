@@ -2,14 +2,15 @@ class CartItem {
   final String title;
   final String price;
   final String imagePath;
-  int quantity;
+  final int quantity;
 
   CartItem({
     required this.title,
     required this.price,
     required this.imagePath,
-    this.quantity = 1,
+    required this.quantity,
   });
+
 
   // Method untuk mendapatkan harga sebagai double
   double get priceAsDouble {

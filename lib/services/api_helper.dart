@@ -43,7 +43,7 @@ class ApiService {
         'email': email,
         'password': password,
         'phone': phone,
-        'username': username,
+        'nama_lengkap': username,
       }),
     );
 
