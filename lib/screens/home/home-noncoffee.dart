@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../controllers/auth_controller.dart';
-import '../../screens/home/home-coffee.dart';
+import '../../controllers/AuthController.dart';
+import '../../screens/home/HomeCoffee.dart';
 import '../../screens/home/home-snack.dart';
 import '../../screens/home/home-food.dart';
 import '../../screens/home/home-royal-glace.dart';

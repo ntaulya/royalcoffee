@@ -26,9 +26,6 @@ class ApiService {
         }),
       ).timeout(timeout);
 
-      print('Login Status: ${response.statusCode}');
-      print('Login Body: ${response.body}');
-
       return _handleAuthResponse(response, 'login');
     } on SocketException {
       throw Exception('Tidak ada koneksi internet');
@@ -152,30 +149,26 @@ class ApiService {
   // ===== PRODUCT ENDPOINTS =====
 
   /// Get all products
-  Future<List<Product>> getAllProducts({String? category, String? search}) async {
+  Future<List<Product>> getAllProducts({int category = 1, String? search}) async {
     try {
       String url = '$baseUrl/products';
-      Map<String, String> queryParams = {};
+      final queryParams = <String, String>{
+        'id_categori': category.toString(), 
+        'id_product': '',                   
+        'search': search ?? '',             
+        'page': '',                         
+      };
+     
 
-      if (category != null && category.isNotEmpty) {
-        queryParams['category'] = category;
-      }
-      if (search != null && search.isNotEmpty) {
-        queryParams['search'] = search;
-      }
-
-      Uri uri = Uri.parse(url);
-      if (queryParams.isNotEmpty) {
-        uri = uri.replace(queryParameters: queryParams);
-      }
-
+      Uri uri = Uri.parse(url).replace(queryParameters: queryParams);
+      uri = uri.replace(queryParameters: queryParams);
       final response = await http.get(
         uri,
         headers: defaultHeaders,
       ).timeout(timeout);
 
-      print('Get Products Status: ${response.statusCode}');
-      print('Get Products Body: ${response.body}');
+       print('Create Product Body: ${response.body}');
+
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -190,6 +183,7 @@ class ApiService {
     } on http.ClientException {
       throw Exception('Gagal terhubung ke server');
     } catch (e) {
+       print('Create Product Body: ${e}');
       throw Exception('Gagal mengambil data produk: $e');
     }
   }
@@ -202,8 +196,6 @@ class ApiService {
         headers: defaultHeaders,
       ).timeout(timeout);
 
-      print('Get Product Status: ${response.statusCode}');
-      print('Get Product Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
@@ -227,7 +219,7 @@ class ApiService {
   }
 
   /// Get products by category
-  Future<List<Product>> getProductsByCategory(String category) async {
+  Future<List<Product>> getProductsByCategory(int category) async {
     return getAllProducts(category: category);
   }
 
@@ -383,10 +375,5 @@ class ApiService {
     } catch (e) {
       throw Exception('Gagal mengambil kategori: $e');
     }
-  }
-
-  /// Get Coffee Products
-  Future<List<Product>> getCoffeeProducts() async {
-    return getAllProducts(category: 'Coffee');
   }
 }

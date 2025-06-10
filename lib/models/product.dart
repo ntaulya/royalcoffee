@@ -1,5 +1,5 @@
 class Product {
-  final int id;
+  final String id;
   final String name;
   final String? description;
   final String? imageUrl;
@@ -16,11 +16,11 @@ class Product {
   // Factory constructor untuk parsing dari JSON
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] ?? 0,
+      id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'],
       imageUrl: json['image_url'] ?? json['imageUrl'],
-      category: json['category'] ?? 'coffee',
+      category: json['category'] ?? 1,
     );
   }
 
@@ -37,7 +37,7 @@ class Product {
 
   // CopyWith method untuk updating
   Product copyWith({
-    int? id,
+    String? id,
     String? name,
     String? description,
     String? imageUrl,

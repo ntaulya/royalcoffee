@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import '../screens/home/home-coffee.dart';
+// View
+import '../screens/RegisterView.dart';
+import '../screens/home/HomeCoffee.dart';
+// Service
 import '../services/ApiService.dart';
+import '../services/SecureStorageService.dart';
 
 
 class AuthController {
   final ApiService _apiService = ApiService();
+  final SecureStorageService _storageService = SecureStorageService();
 
 
 
@@ -27,6 +32,21 @@ class AuthController {
 
 
 
+  // Check Token
+  Future<void> checkToken(BuildContext context) async{
+    final token = await _storageService.getToken();
+    if(token != null){
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeCoffee()),
+      );
+    }else{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => RegisterView(title: '')),
+        );
+    }
+  }
 
   /// LOGIN
   Future<void> login(BuildContext context) async {
@@ -35,6 +55,7 @@ class AuthController {
 
     try {
       final result = await _apiService.loginUser(email, password);
+      print("This Response ${result}");
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeCoffee()),

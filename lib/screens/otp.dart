@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../controllers/auth_controller.dart';
+import '../controllers/AuthController.dart';
 import '../controllers/otp_controller.dart';
 import 'reset_pass.dart';
 

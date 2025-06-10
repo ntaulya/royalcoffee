@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../controllers/auth_controller.dart';
+import '../../controllers/AuthController.dart';
 import '../../controllers/cart_controller.dart';
 import '../../models/cart_item.dart';
 import '../../models/product.dart'; // Tambahkan model Product
@@ -48,12 +48,14 @@ class _HomeCoffeeState extends State<HomeCoffee> {
       });
 
       // Panggil API untuk get coffee products
-      final products = await _apiService.getCoffeeProducts();
+      final products = await _apiService.getAllProducts();
 
       setState(() {
         coffeeProducts = products;
         isLoading = false;
       });
+
+
     } catch (e) {
       setState(() {
         errorMessage = e.toString();
@@ -116,11 +118,12 @@ class _HomeCoffeeState extends State<HomeCoffee> {
     }
   }
 
-  void _onCategorySelected(String category) {
+  void _onCategorySelected(int id_categori , String category) {
     if (category == selectedCategory) return;
 
     setState(() {
       selectedCategory = category;
+      id_categori = 1;
     });
 
     Widget? targetScreen;
@@ -293,7 +296,7 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8),
                                 child: InkWell(
-                                  onTap: () => _onCategorySelected(category),
+                                  onTap: () => _onCategorySelected(1,category),
                                   child: Chip(
                                     label: Text(category),
                                     backgroundColor: Colors.white,
