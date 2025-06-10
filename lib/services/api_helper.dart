@@ -237,14 +237,7 @@ class ApiService {
   }
 
   /// Get available products only
-  Future<List<Product>> getAvailableProducts({String? category}) async {
-    try {
-      final allProducts = await getAllProducts(category: category);
-      return allProducts.where((product) => product.isAvailable).toList();
-    } catch (e) {
-      throw Exception('Gagal mengambil produk tersedia: $e');
-    }
-  }
+  
 
   /// Create new product (Admin only - requires token)
   Future<Product> createProduct(Product product, String token) async {
