@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../models/cart_item.dart';
+import '../global.dart';
 
 class CartController {
   static final CartController _instance = CartController._internal();
@@ -24,7 +25,6 @@ class CartController {
   void addToCart(CartItem item) {
     final index = _items.indexWhere((i) => i.title == item.title);
     if (index != -1) {
-      // If item exists, update quantity
       _items[index] = CartItem(
         title: _items[index].title,
         price: _items[index].price,
@@ -32,7 +32,6 @@ class CartController {
         quantity: _items[index].quantity + item.quantity,
       );
     } else {
-      // If item doesn't exist, add new item
       _items.add(CartItem(
         title: item.title,
         price: item.price,
