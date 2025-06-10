@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/SecureStorageService.dart';
+import './home/home-coffee.dart';
 import 'auth.dart'; // file MyRegister ada di auth.dart
 
 class Splash extends StatefulWidget {
@@ -9,14 +11,31 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
+  final SecureStorageService _storageService = SecureStorageService();
+
+
+  Future<void> _checkToken() async{
+    final token = await _storageService.getToken();
+    
+  
+    if(token != null){
+        Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => MyRegister(title: '')),
       );
+    }else{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MyRegister(title: '')),
+        );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), (){
+       _checkToken();
     });
   }
 

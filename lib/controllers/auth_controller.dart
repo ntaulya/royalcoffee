@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../screens/home/home-coffee.dart';
-import '../services/api_helper.dart';
+import '../services/ApiService.dart';
+
 
 class AuthController {
   final ApiService _apiService = ApiService();
+
+
 
   // Login Controllers
   final loginEmailController = TextEditingController();
@@ -22,6 +25,9 @@ class AuthController {
   final otp3Controller = TextEditingController();
   final otp4Controller = TextEditingController();
 
+
+
+
   /// LOGIN
   Future<void> login(BuildContext context) async {
     final email = loginEmailController.text.trim();
@@ -29,20 +35,18 @@ class AuthController {
 
     try {
       final result = await _apiService.loginUser(email, password);
-      print('Token: ${result.token}');
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeCoffee()),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login berhasil!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login berhasil!')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login gagal: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Login gagal: $e')));
     }
   }
 
@@ -62,32 +66,35 @@ class AuthController {
     }
 
     try {
-      final result = await _apiService.registerUser(email, password, phone, username);
-      print('Token: ${result.token}');
+      final result = await _apiService.registerUser(
+        email,
+        password,
+        phone,
+        username,
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registrasi berhasil. Silakan login.')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registrasi gagal: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Registrasi gagal: $e')));
     }
   }
 
   bool verifyOtp(BuildContext context, String otpCode) {
-  // Kamu bisa ganti validasinya sesuai logika yang diinginkan
-  if (otpCode.length == 4 && otpCode == '1234') {
-    // Contoh kode OTP valid
-    return true;
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Kode OTP tidak valid')),
-    );
-    return false;
+    // Kamu bisa ganti validasinya sesuai logika yang diinginkan
+    if (otpCode.length == 4 && otpCode == '1234') {
+      // Contoh kode OTP valid
+      return true;
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Kode OTP tidak valid')));
+      return false;
+    }
   }
-}
-
 
   /// DISPOSE semua controller
   void dispose() {
