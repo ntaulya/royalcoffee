@@ -459,26 +459,12 @@ class _HomeCoffeeState extends State<HomeCoffee> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Rp ${product.price.toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      color: Color(0xFF8B4A0C),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                   const Spacer(),
                   SizedBox(
                     width: double.infinity,
                     height: 32,
                     child: ElevatedButton(
                       onPressed: () {
-                        final cartItem = CartItem(
-                          title: product.name,
-                          price: product.price,
-                          imagePath: product.imageUrl ?? '',
-                          quantity: 1,
-                        );
-                        _cartController.addToCart(cartItem);
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
