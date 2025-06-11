@@ -11,6 +11,9 @@ import '../../models/product.dart';
 
 // Hader
 import '../layout/DashboardHeader.dart';
+import '../layout/BottomNavBar.dart';
+import '../layout/BannerWidget.dart';
+import '../layout/CategoryTabs.dart';
 
 // Masih Di Check 
 import '../../screens/order/detail_pesanan.dart';
@@ -31,7 +34,15 @@ class Dashboard extends StatefulWidget {
 class _DashboardView extends State<Dashboard> {
   final AuthController _authController = AuthController();
   final CartController _cartController = CartController();
-  final ApiService _apiService = ApiService();
+  // final ApiService _apiService = ApiService();
+  final List<String> categories = [
+    "Coffee",
+    "Non-Coffee",
+    "Snack",
+    "Food",
+    "Royal Glace",
+    "Fresh Juice",
+  ];
 
   String selectedCategory = "Coffee";
   int _selectedBottomNavIndex = 0;
@@ -56,10 +67,10 @@ class _DashboardView extends State<Dashboard> {
       });
 
       // Panggil API untuk get coffee products
-      final products = await _apiService.getAllProducts();
+      // final products = await _apiService.getAllProducts();
 
       setState(() {
-        coffeeProducts = products;
+        // coffeeProducts = products;
         isLoading = false;
       });
 
@@ -126,44 +137,11 @@ class _DashboardView extends State<Dashboard> {
     }
   }
 
-  void _onCategorySelected(int id_categori , String category) {
-    if (category == selectedCategory) return;
+  void _onCategorySelected(String category) {
 
     setState(() {
       selectedCategory = category;
-      id_categori = 1;
     });
-
-    Widget? targetScreen;
-
-    switch (category) {
-      case "Non-Coffee":
-        targetScreen = const HomeNonCoffee();
-        break;
-      case "Snack":
-        targetScreen = const HomeSnack();
-        break;
-      case "Food":
-        targetScreen = const HomeFood();
-        break;
-      case "Royal Glace":
-        targetScreen = const HomeRoyalGlace();
-        break;
-      case "Fresh Juice":
-        targetScreen = const HomeFreshJuice();
-        break;
-    }
-
-    if (targetScreen != null) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => targetScreen!))
-          .then((_) {
-        setState(() {
-          selectedCategory = "Coffee";
-        });
-      });
-    }
   }
 
   @override
@@ -205,65 +183,15 @@ class _DashboardView extends State<Dashboard> {
                       ),
 
                       // Banner
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
-                        height: 160,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFE9F7EF), Colors.white],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/images/Banner.png',
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
-                        ),
-                      ),
+                      BannerWidget(imagePath: 'assets/images/Banner.png'),
 
                       // Category Tabs
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 16),
-                        height: 40,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              "Coffee",
-                              "Non-Coffee",
-                              "Snack",
-                              "Food",
-                              "Royal Glace",
-                              "Fresh Juice",
-                            ].map((category) {
-                              final isSelected = selectedCategory == category;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: InkWell(
-                                  onTap: () => _onCategorySelected(1,category),
-                                  child: Chip(
-                                    label: Text(category),
-                                    backgroundColor: Colors.white,
-                                    side: BorderSide(
-                                      color: isSelected
-                                          ? const Color(0xFF8B4A0C)
-                                          : Colors.grey.shade300,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      CategoryTabs(
+                            categories: categories,
+                            selectedCategory: selectedCategory,
+                            onCategorySelected: _onCategorySelected,
                       ),
-
+                      
                       // Products Grid - DENGAN API DATA
                       Padding(
                         padding: const EdgeInsets.all(16),
@@ -277,21 +205,9 @@ class _DashboardView extends State<Dashboard> {
           ],
         ),
       ),
-
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedBottomNavIndex,
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: _selectedBottomNavIndex,
         onTap: _onBottomNavTapped,
-        selectedItemColor: const Color(0xFF8B4A0C),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Iconsax.home), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(Iconsax.shopping_cart), label: "Cart"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.wallet), label: "Payment"),
-          BottomNavigationBarItem(
-              icon: Icon(Iconsax.notification), label: "Notifications"),
-        ],
       ),
     );
   }
