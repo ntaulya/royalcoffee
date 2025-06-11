@@ -48,6 +48,12 @@ class AuthController {
     }
   }
 
+  // LOGOUT
+  Future<void> logOut(BuildContext context) async{
+    await _storageService.deleteToken();
+    checkToken(context);
+  }
+
   /// LOGIN
   Future<void> login(BuildContext context) async {
     final email = loginEmailController.text.trim();
@@ -69,6 +75,7 @@ class AuthController {
       ).showSnackBar(SnackBar(content: Text('Login gagal: $e')));
     }
   }
+  
 
   /// REGISTER
   Future<void> register(BuildContext context) async {

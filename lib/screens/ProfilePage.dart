@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../controllers/AuthController.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -8,6 +9,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final AuthController _authController = AuthController();
   final nameController = TextEditingController(text: 'Muhammad Andi Syaifullah');
   final emailController = TextEditingController(text: 'andisyaifullah@gmail.com');
   final phoneController = TextEditingController(text: '082216458858');
@@ -21,20 +23,25 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 50),
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                const Icon(Icons.arrow_back, color: Colors.yellowAccent),
-                const SizedBox(width: 10),
-                const Text(
-                  'My profile',
-                  style: TextStyle(
-                    color: Colors.yellowAccent,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.symmetric(horizontal: 16), 
+            child: GestureDetector(
+              onTap: () => {
+                Navigator.pop(context)
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.arrow_back, color: Colors.yellowAccent),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'My profile',
+                    style: TextStyle(
+                      color: Colors.yellowAccent,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -52,11 +59,11 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLabel('Nama'),
+                  _buildLabel('Nama Lengkap'),
                   _buildTextField(nameController),
                   const SizedBox(height: 16),
                   _buildLabel('Email'),
-                  _buildTextField(emailController),
+                  _buildTextField(emailController, enabled: false),
                   const SizedBox(height: 16),
                   _buildLabel('Nomor Telepon'),
                   _buildTextField(phoneController),
@@ -75,6 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           label: 'Logout',
                           onPressed: () {
                             // TODO: Tambahkan logic logout
+                            _authController.logOut(context);
                           },
                         ),
                       ],
@@ -99,13 +107,14 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller) {
+  Widget _buildTextField(TextEditingController controller, {bool enabled  = true}) {
     return TextField(
       controller: controller,
+      enabled : enabled,
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
         filled: true,
-        fillColor: const Color(0xFFFFF1D7),
+        fillColor: enabled ? const Color(0xFFFFF1D7) : Colors.grey[300],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
