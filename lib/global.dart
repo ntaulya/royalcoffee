@@ -1,5 +1,5 @@
 // globals.dart
-import '../controllers/cart_controller.dart';
+import '../controllers/CartController.dart';
 
 final cartController = CartController();
 

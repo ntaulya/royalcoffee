@@ -2,13 +2,21 @@ import 'package:flutter/material.dart';
 // View
 import '../screens/Auth/LoginView.dart';
 import '../screens/home/Dashboard.dart';
+
+// Testing View
+import '../screens/home/home-food.dart';
 // Service
-import '../services/ApiService.dart';
+import '../services/Api/AuthService.dart';
+import '../services/Api/UserService.dart';
 import '../services/SecureStorageService.dart';
+
+// Model 
+import '../models/Profile.dart';
 
 
 class AuthController {
-  final ApiService _apiService = ApiService();
+  final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
   final SecureStorageService _storageService = SecureStorageService();
 
 
@@ -38,7 +46,7 @@ class AuthController {
     if(token != null){
         Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
+        MaterialPageRoute(builder: (context) => HomeFood()),
       );
     }else{
         Navigator.pushReplacement(
@@ -47,6 +55,13 @@ class AuthController {
         );
     }
   }
+
+  Future<Profile> getProfile(BuildContext context) async {
+      final result = await _userService.getProfile();
+      return result;
+  }
+
+
 
   // LOGOUT
   Future<void> logOut(BuildContext context) async{
@@ -60,7 +75,7 @@ class AuthController {
     final password = loginPasswordController.text;
 
     try {
-      final result = await _apiService.loginUser(email, password);
+      final result = await _authService.loginUser(email, password);
       _storageService.saveToken(result.token);
       Navigator.pushReplacement(
         context,
@@ -93,7 +108,7 @@ class AuthController {
     }
 
     try {
-      final result = await _apiService.registerUser(
+      final result = await _authService.registerUser(
         email,
         password,
         phone,

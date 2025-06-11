@@ -10,9 +10,25 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final AuthController _authController = AuthController();
-  final nameController = TextEditingController(text: 'Muhammad Andi Syaifullah');
-  final emailController = TextEditingController(text: 'andisyaifullah@gmail.com');
-  final phoneController = TextEditingController(text: '082216458858');
+  final nameController = TextEditingController(text: 'Nama Lengkap');
+  final emailController = TextEditingController(text: 'example@gmail.com');
+  final phoneController = TextEditingController(text: '08xxxxxxxxxx');
+
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  void _loadProfile() async{
+    final profile = await _authController.getProfile(context);
+    setState(() => {
+       nameController.text = profile.namaLengkap,
+       emailController.text = profile.email,
+       phoneController.text = profile.phone,
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
