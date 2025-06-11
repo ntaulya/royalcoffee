@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import '../controllers/AuthController.dart';
 import 'forget_pass.dart';
 
-class RegisterView extends StatefulWidget {
-  const RegisterView({super.key, required this.title});
+class LoginView extends StatefulWidget {
+  const LoginView({super.key, required this.title});
   final String title;
 
   @override
-  State<RegisterView> createState() => _MyRegisterState();
+  State<LoginView> createState() => _LoginView();
 }
 
-class _MyRegisterState extends State<RegisterView> {
+class _LoginView extends State<LoginView> {
   final AuthController _controller = AuthController();
 
   @override

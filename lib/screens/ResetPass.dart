@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../controllers/reset_pass_controller.dart';
-import '../screens/RegisterView.dart';
+import '../screens/LoginView.dart';
 
 class ResetPass extends StatefulWidget {
   const ResetPass({super.key, this.title = 'Reset Password'});
@@ -111,7 +111,7 @@ class _ResetPassState extends State<ResetPass> {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RegisterView(title: ''),
+                        builder: (context) => LoginView(title: ''),
                       ),
                       (route) => false,
                     );

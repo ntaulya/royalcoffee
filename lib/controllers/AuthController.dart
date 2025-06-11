@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // View
-import '../screens/RegisterView.dart';
-import '../screens/home/HomeCoffee.dart';
+import '../screens/LoginView.dart';
+import '../screens/home/Dashboard.dart';
 // Service
 import '../services/ApiService.dart';
 import '../services/SecureStorageService.dart';
@@ -38,12 +38,12 @@ class AuthController {
     if(token != null){
         Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeCoffee()),
+        MaterialPageRoute(builder: (context) => Dashboard()),
       );
     }else{
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => RegisterView(title: '')),
+          MaterialPageRoute(builder: (context) => LoginView(title: '')),
         );
     }
   }
@@ -58,9 +58,8 @@ class AuthController {
       _storageService.saveToken(result.token);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeCoffee()),
+        MaterialPageRoute(builder: (context) => const Dashboard()),
       );
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Login berhasil!')));

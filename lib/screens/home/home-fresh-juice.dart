@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../controllers/AuthController.dart';
-import '../../screens/home/HomeCoffee.dart';
+import '../../screens/home/Dashboard.dart';
 import '../../screens/home/home-noncoffee.dart';
 import '../../screens/home/home-food.dart';
 import '../../screens/home/home-snack.dart';
@@ -144,7 +144,7 @@ class _HomeFreshJuiceState extends State<HomeFreshJuice> {
                                             MaterialPageRoute(
                                               builder:
                                                   (context) =>
-                                                      const HomeCoffee(),
+                                                      const Dashboard(),
                                             ),
                                           );
                                         } else if (e == "Non-Coffee") {

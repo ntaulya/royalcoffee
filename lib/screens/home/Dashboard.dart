@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../controllers/AuthController.dart';
-import '../../controllers/cart_controller.dart';
+
+
+
+import '../../services/ApiService.dart';
+import '../../controllers/CartController.dart';
 import '../../models/cart_item.dart';
-import '../../models/product.dart'; // Tambahkan model Product
-import '../../services/ApiService.dart'; // Service API Anda
+import '../../models/product.dart';
+
+// Hader
+import '../layout/DashboardHeader.dart';
+
+// Masih Di Check 
 import '../../screens/order/detail_pesanan.dart';
 import '../../screens/order/pesanan_saya.dart';
 import '../../screens/home/home-noncoffee.dart';
@@ -13,14 +21,14 @@ import '../../screens/home/home-food.dart';
 import '../../screens/home/home-royal-glace.dart';
 import '../../screens/home/home-fresh-juice.dart';
 
-class HomeCoffee extends StatefulWidget {
-  const HomeCoffee({Key? key}) : super(key: key);
+class Dashboard extends StatefulWidget {
+  const Dashboard({Key? key}) : super(key: key);
 
   @override
-  State<HomeCoffee> createState() => _HomeCoffeeState();
+  State<Dashboard> createState() => _DashboardView();
 }
 
-class _HomeCoffeeState extends State<HomeCoffee> {
+class _DashboardView extends State<Dashboard> {
   final AuthController _authController = AuthController();
   final CartController _cartController = CartController();
   final ApiService _apiService = ApiService();
@@ -165,68 +173,10 @@ class _HomeCoffeeState extends State<HomeCoffee> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Container(
-              color: const Color(0xFF834D1E),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Royal Cafe",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold)),
-                      SizedBox(height: 4),
-                      Text("Home", style: TextStyle(color: Colors.white70)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      StreamBuilder<List<CartItem>>(
-                        stream: _cartController.cartItemsStream,
-                        builder: (context, snapshot) {
-                          final itemCount = _cartController.totalItemCount;
-                          return Stack(
-                            children: [
-                              IconButton(
-                                onPressed: () => _onBottomNavTapped(1),
-                                icon: const Icon(Iconsax.shopping_cart,
-                                    color: Colors.white),
-                              ),
-                              if (itemCount > 0)
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      itemCount.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      Image.asset('assets/icons/profile.png', height: 40),
-                    ],
-                  ),
-                ],
-              ),
+            // Belum Beres Hader
+            DashboardHeader(
+              cartController : _cartController,
+              onCartTap: () => _onBottomNavTapped(1),
             ),
 
             // Content
