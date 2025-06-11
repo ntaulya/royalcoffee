@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../screens/Auth/LoginView.dart';
 import '../screens/home/Dashboard.dart';
 
-// Testing View
-import '../screens/home/home-food.dart';
 // Service
 import '../services/Api/AuthService.dart';
 import '../services/Api/UserService.dart';
@@ -46,7 +44,7 @@ class AuthController {
     if(token != null){
         Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeFood()),
+        MaterialPageRoute(builder: (context) => Dashboard()),
       );
     }else{
         Navigator.pushReplacement(
@@ -114,7 +112,11 @@ class AuthController {
         phone,
         username,
       );
-
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginView(title : '')),
+        (Route<dynamic> route) => false, // false artinya hapus semua halaman lama
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registrasi berhasil. Silakan login.')),
       );

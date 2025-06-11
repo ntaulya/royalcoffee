@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../../models/login.dart';
 import '../../models/Product.dart';
-import '../SecureStorageService.dart';
+
 
 
 class Config {
   final String baseUrl = 'https://restapi.royalcafeandresto.com/api';
   final Duration timeout = const Duration(seconds: 30);
-  final SecureStorageService _storageService = SecureStorageService();
+
 
   /// Default headers untuk semua request
   Map<String, String> get defaultHeaders => {

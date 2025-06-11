@@ -27,7 +27,7 @@ class AuthService extends Config {
     }
   }
 
-  Future<Login> registerUser(
+  Future<void> registerUser(
       String email, String password, String phone, String username) async {
     try {
       final response = await http.post(
@@ -41,10 +41,6 @@ class AuthService extends Config {
         }),
       ).timeout(timeout);
 
-      print('Register Status: ${response.statusCode}');
-      print('Register Body: ${response.body}');
-
-      return _handleAuthResponse(response, 'register');
     } on SocketException {
       throw Exception('Tidak ada koneksi internet');
     } on http.ClientException {
