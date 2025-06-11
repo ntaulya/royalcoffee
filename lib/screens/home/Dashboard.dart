@@ -15,14 +15,11 @@ import '../layout/BottomNavBar.dart';
 import '../layout/BannerWidget.dart';
 import '../layout/CategoryTabs.dart';
 
-// Masih Di Check 
-import '../../screens/order/detail_pesanan.dart';
-import '../../screens/order/pesanan_saya.dart';
-import '../../screens/home/home-noncoffee.dart';
-import '../../screens/home/home-snack.dart';
-import '../../screens/home/home-food.dart';
-import '../../screens/home/home-royal-glace.dart';
-import '../../screens/home/home-fresh-juice.dart';
+
+// View
+import '../order/PesananSaya.dart';
+import '../order/DetailPesanan.dart';
+
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);

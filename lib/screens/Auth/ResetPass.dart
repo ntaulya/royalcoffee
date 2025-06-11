@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../controllers/reset_pass_controller.dart';
-import '../screens/LoginView.dart';
+import '../../controllers/reset_pass_controller.dart';
+import './LoginView.dart';
 
 class ResetPass extends StatefulWidget {
   const ResetPass({super.key, this.title = 'Reset Password'});

@@ -5,7 +5,7 @@ import '../../models/cart_item.dart';
 
 
 // Screen
-import '../ProfilePage.dart';
+import '../Auth/User/ProfilePage.dart';
 
 class DashboardHeader extends StatelessWidget {
   final CartController cartController;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // View
-import '../screens/LoginView.dart';
+import '../screens/Auth/LoginView.dart';
 import '../screens/home/Dashboard.dart';
 // Service
 import '../services/ApiService.dart';

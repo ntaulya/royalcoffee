@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../controllers/AuthController.dart';
-import '../controllers/otp_controller.dart';
+import '../../controllers/AuthController.dart';
+import '../../controllers/otp_controller.dart';
 import 'ResetPass.dart';
 
 class Otp extends StatefulWidget {

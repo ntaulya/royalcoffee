@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../controllers/AuthController.dart';
-import 'forget_pass.dart';
+import '../../controllers/AuthController.dart';
+import 'ForgetPass.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key, required this.title});
