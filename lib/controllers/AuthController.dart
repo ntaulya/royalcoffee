@@ -55,7 +55,7 @@ class AuthController {
 
     try {
       final result = await _apiService.loginUser(email, password);
-      print("This Response ${result}");
+      _storageService.saveToken(result.token);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeCoffee()),
