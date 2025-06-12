@@ -4,17 +4,15 @@ import 'package:iconsax/iconsax.dart';
 import '../../controllers/CartController.dart';
 import '../../models/product.dart';
 
-// Hader
+// Header & Layout
 import '../layout/DashboardHeader.dart';
 import '../layout/BottomNavBar.dart';
 import '../layout/BannerWidget.dart';
 import '../layout/CategoryTabs.dart';
 
-
-// View
+// Views
 import '../order/PesananSaya.dart';
 import '../order/DetailPesanan.dart';
-
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -29,21 +27,17 @@ class _DashboardView extends State<Dashboard> {
   int _selectedBottomNavIndex = 0;
   String _selectedCategory = "Coffee";
 
-
   @override
   void initState() {
     super.initState();
-   
   }
-  // Metode untuk memperbarui kategori yang dipilih
+
   void _onCategorySelected(String category) {
     setState(() {
       _selectedCategory = category;
-      // Di sini Anda bisa menambahkan logika lain, misalnya memuat produk berdasarkan kategori
-      print("Kategori dipilih: $category"); // Untuk debugging
+      print("Kategori dipilih: $category");
     });
   }
-
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -60,9 +54,9 @@ class _DashboardView extends State<Dashboard> {
           );
         } else {
           Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PesananSaya()))
-              .then((_) {
+            context,
+            MaterialPageRoute(builder: (context) => const PesananSaya()),
+          ).then((_) {
             setState(() {
               _selectedBottomNavIndex = 0;
             });
@@ -71,9 +65,9 @@ class _DashboardView extends State<Dashboard> {
         break;
       case 2:
         Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const DetailPesanan()))
-            .then((_) {
+          context,
+          MaterialPageRoute(builder: (context) => const DetailPesanan()),
+        ).then((_) {
           setState(() {
             _selectedBottomNavIndex = 0;
           });
@@ -93,57 +87,64 @@ class _DashboardView extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: const Color(0xFFFCF2D9),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            DashboardHeader(
-              cartController : _cartController,
-              onCartTap: () => _onBottomNavTapped(1),
-            ),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                // Header
+                DashboardHeader(
+                  cartController: _cartController,
+                  onCartTap: () => _onBottomNavTapped(1),
+                ),
 
-            // Content
-            Expanded(
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      // Search
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            hintText: "Search Coffee",
-                            prefixIcon: const Icon(Iconsax.search_normal),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                // Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        // Search
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: "Search Coffee",
+                              prefixIcon: const Icon(Iconsax.search_normal),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
-                      // Banner
-                      BannerWidget(imagePath: 'assets/images/Banner.png'),
-                      // Category Tabs
-                      CategoryTabs(
-                        selectedCategory: _selectedCategory, // Teruskan kategori yang dipilih
-                        onCategorySelected: _onCategorySelected, // Teruskan callback
-                      ),
-                     
-                    ],
+                        // Banner
+                        BannerWidget(imagePath: 'assets/images/Banner.png'),
+
+                        // Category Tabs
+                        CategoryTabs(
+                          selectedCategory: _selectedCategory,
+                          onCategorySelected: _onCategorySelected,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: _selectedBottomNavIndex,
-        onTap: _onBottomNavTapped,
+              ],
+            ),
+          ),
+
+          // Floating BottomNavBar
+          BottomNavBar(
+            selectedIndex: _selectedBottomNavIndex,
+            onTap: _onBottomNavTapped,
+          ),
+        ],
       ),
     );
   }

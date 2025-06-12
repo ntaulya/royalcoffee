@@ -14,63 +14,62 @@ class _ProfilePageState extends State<ProfilePage> {
   final emailController = TextEditingController(text: 'example@gmail.com');
   final phoneController = TextEditingController(text: '08xxxxxxxxxx');
 
-
   @override
   void initState() {
     super.initState();
     _loadProfile();
   }
 
-  void _loadProfile() async{
+  void _loadProfile() async {
     final profile = await _authController.getProfile(context);
-    setState(() => {
-       nameController.text = profile.namaLengkap,
-       emailController.text = profile.email,
-       phoneController.text = profile.phone,
+    setState(() {
+      nameController.text = profile.namaLengkap;
+      emailController.text = profile.email;
+      phoneController.text = profile.phone;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF7A491F), // Warna coklat atas & bawah
+      backgroundColor: const Color(0xFF7A491F),
       body: Column(
         children: [
           const SizedBox(height: 50),
+
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16), 
-            child: GestureDetector(
-              onTap: () => {
-                Navigator.pop(context)
-              },
-              child: Row(
-                children: [
-                  const Icon(Icons.arrow_back, color: Colors.yellowAccent),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'My profile',
-                    style: TextStyle(
-                      color: Colors.yellowAccent,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: const [
+                Icon(Icons.arrow_back, color: Color(0xFFF5CB58)),
+                SizedBox(width: 10),
+                Text(
+                  'My profile',
+                  style: TextStyle(
+                    color: Color(0xFFF5CB58),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
 
           const SizedBox(height: 20),
 
-          // Kontainer isi profile
+          // Isi profil dengan lengkungan hanya di atas
           Expanded(
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
                 color: Color(0xFFF9F9F9),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
+                  // bottom corners default (Radius.zero) → tidak melengkung
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,25 +83,29 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildLabel('Nomor Telepon'),
                   _buildTextField(phoneController),
                   const Spacer(),
-                  Center(
-                    child: Column(
-                      children: [
-                        _buildButton(
-                          label: 'Update Profile',
-                          onPressed: () {
-                            // TODO: Tambahkan logic update
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        _buildButton(
-                          label: 'Logout',
-                          onPressed: () {
-                            // TODO: Tambahkan logic logout
-                            _authController.logOut(context);
-                          },
-                        ),
-                      ],
-                    ),
+
+                  // Tombol full width
+                  _buildButton(
+                    label: 'Update Profile',
+                    onPressed: () {},
+                    backgroundColor: Colors.white,
+                    textColor: const Color(0xFF7A491F),
+                    borderColor: const Color(0xFF7A491F),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildButton(
+                    label: 'Switch to Admin',
+                    onPressed: () => _authController.logOut(context),
+                    backgroundColor: Colors.white,
+                    textColor: const Color(0xFF7A491F),
+                    borderColor: const Color(0xFF7A491F),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildButton(
+                    label: 'Logout',
+                    onPressed: () => _authController.logOut(context),
+                    backgroundColor: const Color(0xFF7A491F),
+                    textColor: Colors.white,
                   ),
                 ],
               ),
@@ -123,10 +126,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, {bool enabled  = true}) {
+  Widget _buildTextField(TextEditingController controller, {bool enabled = true}) {
     return TextField(
       controller: controller,
-      enabled : enabled,
+      enabled: enabled,
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
         filled: true,
@@ -139,17 +142,36 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildButton({required String label, required VoidCallback onPressed}) {
+  Widget _buildButton({
+    required String label,
+    required VoidCallback onPressed,
+    Color backgroundColor = Colors.white,
+    Color textColor = const Color(0xFF7A491F),
+    Color? borderColor,
+  }) {
     return SizedBox(
-      width: 180,
+      width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF7A491F),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+            side: borderColor != null
+                ? BorderSide(color: borderColor, width: 2)
+                : BorderSide.none,
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          elevation: 0,
         ),
-        child: Text(label, style: const TextStyle(color: Colors.white)),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }

@@ -17,6 +17,7 @@ class CategoryTabs extends StatefulWidget {
 class _CategoryTabsState extends State<CategoryTabs> {
   List<String> categories = [];
   bool isLoading = true;
+  String? hoveredCategory;
 
   @override
   void initState() {
@@ -25,10 +26,9 @@ class _CategoryTabsState extends State<CategoryTabs> {
   }
 
   Future<void> _loadCategories() async {
-    try {
-      // Simulasi load kategori dari API
-      await Future.delayed(const Duration(seconds: 1));
-      final loadedCategories = [
+    await Future.delayed(const Duration(seconds: 1));
+    setState(() {
+      categories = [
         "Coffee",
         "Non-Coffee",
         "Snack",
@@ -36,17 +36,8 @@ class _CategoryTabsState extends State<CategoryTabs> {
         "Royal Glace",
         "Fresh Juice",
       ];
-
-      setState(() {
-        categories = loadedCategories;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        categories = []; // fallback
-        isLoading = false;
-      });
-    }
+      isLoading = false;
+    });
   }
 
   @override
@@ -64,22 +55,36 @@ class _CategoryTabsState extends State<CategoryTabs> {
         itemBuilder: (context, index) {
           final category = categories[index];
           final isSelected = widget.selectedCategory == category;
+          final isHovered = hoveredCategory == category;
 
-          return GestureDetector(
-            onTap: () => widget.onCategorySelected(category),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white ,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color : isSelected ? Colors.brown : Colors.grey),
-              ),
-              child: Text(
-                category,
-                style: TextStyle(
-                  color:  isSelected ? Colors.brown : Colors.black,
-                  fontWeight: FontWeight.bold,
+          return MouseRegion(
+            onEnter: (_) => setState(() => hoveredCategory = category),
+            onExit: (_) => setState(() => hoveredCategory = null),
+            child: GestureDetector(
+              onTap: () => widget.onCategorySelected(category),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.brown
+                      : isHovered
+                          ? Colors.brown.shade100
+                          : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: isSelected
+                      ? null
+                      : Border.all(color: Colors.transparent),
+                ),
+                child: Text(
+                  category,
+                  style: TextStyle(
+                    color: isSelected
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
