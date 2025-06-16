@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class HalamanKodePesanan extends StatelessWidget {
+class KodePesanan extends StatelessWidget {
   final String kodePesanan = "5720";
 
-  HalamanKodePesanan({super.key});
+  KodePesanan({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../controllers/CartController.dart';
-import '../../../models/cart_item.dart';
+import '../../models/CartItem.dart';
 import './PesananSaya.dart';
 
 class DetailPesanan extends StatefulWidget {

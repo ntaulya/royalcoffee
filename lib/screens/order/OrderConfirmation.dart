@@ -15,13 +15,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.brown,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const OrderConfirmationPage(),
+      home: const OrderConfirmation(),
     );
   }
 }
 
-class OrderConfirmationPage extends StatelessWidget {
-  const OrderConfirmationPage({super.key});
+class OrderConfirmation extends StatelessWidget {
+  const OrderConfirmation({super.key});
 
   @override
   Widget build(BuildContext context) {

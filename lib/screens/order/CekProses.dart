@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CekAntrianPage extends StatelessWidget {
-  const CekAntrianPage({super.key});
+class CekProses extends StatelessWidget {
+  const CekProses({super.key});
 
   @override
   Widget build(BuildContext context) {

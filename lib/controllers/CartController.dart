@@ -1,5 +1,5 @@
 import 'dart:async';
-import '../models/cart_item.dart';
+import '../models/CartItem.dart';
 import '../global.dart';
 
 class CartController {

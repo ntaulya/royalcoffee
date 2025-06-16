@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../../models/login.dart';
+import '../../models/Login.dart';
 import 'Config.dart';
 
 class AuthService extends Config {

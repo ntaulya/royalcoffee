@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../controllers/CartController.dart';
-import '../../models/product.dart';
 
 // Header & Layout
 import '../layout/DashboardHeader.dart';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../controllers/AuthController.dart';
+import '../../../admin/home/DashboardAdmin.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -95,7 +96,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 10),
                   _buildButton(
                     label: 'Switch to Admin',
-                    onPressed: () => _authController.logOut(context),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DashboardAdmin()),
+                      );
+                    }, 
                     backgroundColor: Colors.white,
                     textColor: const Color(0xFF7A491F),
                     borderColor: const Color(0xFF7A491F),
