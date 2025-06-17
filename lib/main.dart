@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:royalcoffee/admin/screens/AddMenu.dart';
+import 'package:royalcoffee/admin/screens/EditMenu.dart';
 import 'package:royalcoffee/admin/screens/Menu.dart';
 import 'screens/Splash.dart';
 
@@ -14,11 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Royal Cafe',
       theme: ThemeData(primarySwatch: Colors.brown),
-      home: Menu(),
+      home: Splash(),
       debugShowCheckedModeBanner: false,
-      routes: {
-        '/menu': (context) => const Menu(),
-      },
     );
   }
 }
