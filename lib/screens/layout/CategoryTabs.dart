@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../controllers/Product/CategoryController.dart';
+import '../../models/Category.dart';
+import '../../services/CategoryCacheService.dart';
+
 class CategoryTabs extends StatefulWidget {
   final String selectedCategory;
   final ValueChanged<String> onCategorySelected;
@@ -15,29 +19,59 @@ class CategoryTabs extends StatefulWidget {
 }
 
 class _CategoryTabsState extends State<CategoryTabs> {
-  List<String> categories = [];
+  final CategoryController _controller = CategoryController();
+  final CategoryCacheService _cacheService = CategoryCacheService();
+
+  List<Category> categories = [];
   bool isLoading = true;
   String? hoveredCategory;
+  String? selectedCategoryName;
 
   @override
   void initState() {
     super.initState();
-    _loadCategories();
+    _loadCategoriesWithCache();
   }
 
-  Future<void> _loadCategories() async {
-    await Future.delayed(const Duration(seconds: 1));
+  Future<void> _loadCategoriesWithCache() async {
+    setState(() => isLoading = true);
+
+    final fetchedCategories = await _controller.loadCategories();
+
+    if (fetchedCategories.isNotEmpty) {
+      final cachedId = await _cacheService.getSelectedCategoryId();
+
+      // Jika ada cache, pakai itu. Kalau tidak, pakai id pertama
+      final selectedCategory = fetchedCategories.firstWhere(
+        (cat) => cat.id == cachedId,
+        orElse: () => fetchedCategories[0],
+      );
+
+      // Panggil callback dengan nama kategori terpilih
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onCategorySelected(selectedCategory.name);
+      });
+
+      setState(() {
+        categories = fetchedCategories;
+        selectedCategoryName = selectedCategory.name;
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        categories = [];
+        isLoading = false;
+      });
+    }
+  }
+
+  void _onCategoryTap(Category category) {
     setState(() {
-      categories = [
-        "Coffee",
-        "Non-Coffee",
-        "Snack",
-        "Food",
-        "Royal Glace",
-        "Fresh Juice",
-      ];
-      isLoading = false;
+      selectedCategoryName = category.name;
     });
+
+    _cacheService.saveSelectedCategoryId(category.id); // Simpan ke cache
+    widget.onCategorySelected(category.name); // Kirim ke parent
   }
 
   @override
@@ -54,14 +88,14 @@ class _CategoryTabsState extends State<CategoryTabs> {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          final isSelected = widget.selectedCategory == category;
-          final isHovered = hoveredCategory == category;
+          final isSelected = selectedCategoryName == category.name;
+          final isHovered = hoveredCategory == category.name;
 
           return MouseRegion(
-            onEnter: (_) => setState(() => hoveredCategory = category),
+            onEnter: (_) => setState(() => hoveredCategory = category.name),
             onExit: (_) => setState(() => hoveredCategory = null),
             child: GestureDetector(
-              onTap: () => widget.onCategorySelected(category),
+              onTap: () => _onCategoryTap(category),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -78,11 +112,9 @@ class _CategoryTabsState extends State<CategoryTabs> {
                       : Border.all(color: Colors.transparent),
                 ),
                 child: Text(
-                  category,
+                  category.name,
                   style: TextStyle(
-                    color: isSelected
-                        ? Colors.white
-                        : Colors.black,
+                    color: isSelected ? Colors.white : Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

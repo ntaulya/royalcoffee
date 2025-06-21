@@ -34,7 +34,6 @@ class _DashboardView extends State<Dashboard> {
   void _onCategorySelected(String category) {
     setState(() {
       _selectedCategory = category;
-      print("Kategori dipilih: $category");
     });
   }
 
