@@ -4,7 +4,6 @@ import 'package:royalcoffee/admin/screens/IncomingOrder.dart';
 import 'package:royalcoffee/admin/screens/TrackOrder.dart';
 import 'package:royalcoffee/admin/screens/Customer.dart';
 
-
 class Menu extends StatefulWidget {
   const Menu({super.key});
 
@@ -16,45 +15,48 @@ class _MenuState extends State<Menu> {
   int _selectedBottomNavIndex = 2; // index halaman Menu
 
   void _onTap(int index) {
-  if (index == _selectedBottomNavIndex) return;
+    if (index == _selectedBottomNavIndex) return;
 
-  setState(() {
-    _selectedBottomNavIndex = index;
-  });
+    setState(() {
+      _selectedBottomNavIndex = index;
+    });
 
-  switch (index) {
-    case 0:
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => IncomingOrder()),
-      );
-      break;
-    case 1:
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => TrackOrder()),
-      );
-      break;
-    case 2:
-      break;
-    case 3:
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Customer()),
-      );
-      break;
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => IncomingOrder()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TrackOrder()),
+        );
+        break;
+      case 2:
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Customer()),
+        );
+        break;
+    }
   }
-}
-
 
   Widget _buildMenuItem({
     required String imageUrl,
     required String title,
     required String priceStock,
   }) {
-    return Column(
-      children: [
-        Row(
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -65,50 +67,49 @@ class _MenuState extends State<Menu> {
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text(priceStock),
-                  const SizedBox(height: 6),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    priceStock,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
+                          color: Colors.brown.shade50,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.brown),
-                          color: Colors.white,
+                          border: Border.all(color: Colors.brown.shade200),
                         ),
-                        child: const Text("Non-Aktif",
-                            style: TextStyle(color: Colors.brown)),
+                        child: const Text(
+                          "Non-Aktif",
+                          style: TextStyle(color: Colors.brown),
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.brown,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
+                      const Spacer(),
+                      IconButton(
                         onPressed: () {},
-                        child: const Text("Aktifkan"),
+                        icon: const Icon(Icons.power_settings_new),
+                        color: Colors.brown,
+                        tooltip: "Aktifkan",
                       ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.brown.shade900,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
+                      IconButton(
                         onPressed: () {},
-                        child: const Text("Edit"),
+                        icon: const Icon(Icons.edit),
+                        color: Colors.brown.shade900,
+                        tooltip: "Edit",
                       ),
                     ],
                   ),
@@ -117,17 +118,14 @@ class _MenuState extends State<Menu> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        const Divider(thickness: 1, color: Colors.brown),
-        const SizedBox(height: 8),
-      ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xF5F5F7F8),
+      backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
@@ -153,15 +151,17 @@ class _MenuState extends State<Menu> {
             _buildMenuItem(
               imageUrl:
                   'https://cdn-icons-png.flaticon.com/512/2722/2722127.png',
-              title: 'Ice Cream Vanilla',
-              priceStock: '15K, Stok 20',
+              title: 'Ice Cream Cokelat',
+              priceStock: '17K, Stok 15',
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
-        onPressed: () {},
+        onPressed: () {
+          // Tambah menu
+        },
         child: const Icon(Icons.receipt_long_outlined),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

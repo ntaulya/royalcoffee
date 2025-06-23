@@ -1,7 +1,52 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
 
-class AddMenu extends StatelessWidget {
+class AddMenu extends StatefulWidget {
+  const AddMenu({super.key});
+
+  @override
+  State<AddMenu> createState() => _AddMenuState();
+}
+
+class _AddMenuState extends State<AddMenu> {
+  final List<String> categories = [
+    'Coffee',
+    'Non-Coffee',
+    'Snack',
+    'Food',
+    'Royal Glace',
+    'Ice Cream Panda',
+  ];
+
+  String? selectedCategory;
+  File? _mainImage;
+  List<File> _variantImages = [];
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickMainImage() async {
+    final XFile? image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+
+    if (image != null) {
+      setState(() {
+        _mainImage = File(image.path);
+      });
+    }
+  }
+
+  Future<void> _pickVariantImages() async {
+    final List<XFile>? images = await _picker.pickMultiImage(imageQuality: 85);
+
+    if (images != null && images.isNotEmpty) {
+      setState(() {
+        _variantImages.addAll(images.map((xfile) => File(xfile.path)));
+      });
+    }
+  }
+
   Widget _buildTextField(String hintText, {IconData? icon}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -20,27 +65,34 @@ class AddMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildImageDummy() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.network(
-        'https://images.unsplash.com/photo-1578985545062-69928b1d9587', // es krim dummy
-        height: 80,
-        width: 80,
-        fit: BoxFit.cover,
+  Widget _buildImageBox(File? imageFile, VoidCallback onTap,
+      {double size = 100}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(12),
+          image: imageFile != null
+              ? DecorationImage(image: FileImage(imageFile), fit: BoxFit.cover)
+              : null,
+        ),
+        child: imageFile == null
+            ? const Center(child: Icon(Icons.add_a_photo, size: 24))
+            : null,
       ),
     );
   }
 
-  Widget _buildButton(String text, VoidCallback onTap) {
-    return ElevatedButton(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF4B1D0D),
-        shape: StadiumBorder(),
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
-      child: Text(text, style: TextStyle(color: Colors.white)),
     );
   }
 
@@ -48,51 +100,97 @@ class AddMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          color: Colors.black,
+          onPressed: () => Navigator.pop(context),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          "Tambah Menu",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              _buildSectionTitle("Foto Menu Utama"),
+              Center(child: _buildImageBox(_mainImage, _pickMainImage, size: 180)),
+
+              const SizedBox(height: 20),
+              _buildSectionTitle("Informasi Menu"),
+              _buildTextField("Nama Menu", icon: Iconsax.coffee),
+              _buildTextField("Harga Menu", icon: Iconsax.money),
+              _buildTextField("Deskripsi Menu", icon: Iconsax.document),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6.0),
+                child: DropdownButtonFormField<String>(
+                  value: selectedCategory,
+                  hint: const Text("Pilih Kategori"),
+                  items: categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() => selectedCategory = value);
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey.shade200,
+                    prefixIcon: const Icon(Iconsax.category),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+
+              const Divider(thickness: 1.2),
+              _buildSectionTitle("Informasi Varian"),
+              _buildTextField("Varian (misal: Size)", icon: Iconsax.box),
+              _buildTextField("Nama Varian", icon: Iconsax.edit),
+              _buildTextField("Harga Penambahan", icon: Iconsax.money_2),
+              _buildTextField("Stock Varian", icon: Iconsax.archive),
+
+              _buildSectionTitle("Foto Varian"),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
                 children: [
-                  Icon(Icons.arrow_back_ios_new),
-                  SizedBox(width: 12),
-                  Text("Tambah Menu", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  ..._variantImages.map((file) =>
+                      _buildImageBox(file, () {}, size: 60)),
+                  _buildImageBox(null, _pickVariantImages, size: 60),
                 ],
               ),
-              SizedBox(height: 20),
-              _buildTextField("Nama Menu"),
-              _buildTextField("Harga Menu"),
-              _buildTextField("Deskripsi Menu"),
-              _buildTextField("Kategori", icon: Iconsax.category),
-              SizedBox(height: 10),
-              Center(child: _buildButton("Tambah Foto Utama", () {})),
-              SizedBox(height: 10),
-              Center(child: _buildImageDummy()),
-              SizedBox(height: 20),
-              _buildTextField("Varian"),
-              _buildTextField("Nama Varian"),
-              _buildTextField("Harga Penambahan"),
-              _buildTextField("Stock Varian"),
-              SizedBox(height: 10),
-              Center(child: _buildButton("Tambah Foto Varian", () {})),
-              SizedBox(height: 10),
-              Center(child: _buildImageDummy()),
-              SizedBox(height: 30),
+
+              const SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    // Simpan data
+                    // Simpan data ke backend/API
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4B1D0D),
-                    shape: StadiumBorder(),
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    backgroundColor: const Color(0xFF4B1D0D),
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 14),
                   ),
-                  child: Text("Selesai", style: TextStyle(fontSize: 16, color: Colors.white)),
+                  child: const Text(
+                    "Selesai",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),
