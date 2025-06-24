@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Royal Cafe',
       theme: ThemeData(primarySwatch: Colors.brown),
-      home: AddMenu(),
+      home: Splash(),
       debugShowCheckedModeBanner: false,
     );
   }

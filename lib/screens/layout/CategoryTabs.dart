@@ -7,10 +7,12 @@ import '../../services/CategoryCacheService.dart';
 class CategoryTabs extends StatefulWidget {
   final String selectedCategory;
   final ValueChanged<String> onCategorySelected;
+  final ValueChanged<String>? onInitialCategoryReady;
 
   const CategoryTabs({
     required this.selectedCategory,
     required this.onCategorySelected,
+    this.onInitialCategoryReady,
     Key? key,
   }) : super(key: key);
 
@@ -40,16 +42,13 @@ class _CategoryTabsState extends State<CategoryTabs> {
 
     if (fetchedCategories.isNotEmpty) {
       final cachedId = await _cacheService.getSelectedCategoryId();
-
-      // Jika ada cache, pakai itu. Kalau tidak, pakai id pertama
       final selectedCategory = fetchedCategories.firstWhere(
         (cat) => cat.id == cachedId,
         orElse: () => fetchedCategories[0],
       );
 
-      // Panggil callback dengan nama kategori terpilih
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onCategorySelected(selectedCategory.name);
+        widget.onInitialCategoryReady?.call(selectedCategory.id.toString());
       });
 
       setState(() {
@@ -70,8 +69,8 @@ class _CategoryTabsState extends State<CategoryTabs> {
       selectedCategoryName = category.name;
     });
 
-    _cacheService.saveSelectedCategoryId(category.id); // Simpan ke cache
-    widget.onCategorySelected(category.name); // Kirim ke parent
+    _cacheService.saveSelectedCategoryId(category.id); 
+    widget.onCategorySelected(category.id.toString());
   }
 
   @override

@@ -13,6 +13,11 @@ import '../layout/CategoryTabs.dart';
 import '../order/PesananSaya.dart';
 import '../order/DetailPesanan.dart';
 
+// percobaan
+import '../layout/ProductSection.dart';
+import '../../models/Product.dart';
+import '../../controllers/product/ProductController.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
 
@@ -22,19 +27,39 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardView extends State<Dashboard> {
   final CartController _cartController = CartController();
+  late ProductController _productController;
+  final TextEditingController _searchController = TextEditingController();
+
+
 
   int _selectedBottomNavIndex = 0;
-  String _selectedCategory = "Coffee";
+  String _selectedCategory = "";
+  bool _isLoadingProduct = false;
+
 
   @override
   void initState() {
     super.initState();
+    _productController = ProductController();
+  }
+
+
+  void _fetchProducts({String? categoryId, String? searchQuery}) async {
+    setState(() => _isLoadingProduct = true);
+
+    await _productController.fetchProducts(
+      categoryId: categoryId ?? _selectedCategory,
+      searchQuery: searchQuery ?? _searchController.text,
+    );
+
+    setState(() => _isLoadingProduct = false);
   }
 
   void _onCategorySelected(String category) {
     setState(() {
       _selectedCategory = category;
     });
+     _productController.fetchProducts(categoryId: _selectedCategory);
   }
 
   void _onBottomNavTapped(int index) {
@@ -80,6 +105,11 @@ class _DashboardView extends State<Dashboard> {
         });
         break;
     }
+  }
+
+
+  void _onSearchSubmitted(String value) {
+    _fetchProducts(searchQuery: value);
   }
 
   @override
@@ -128,8 +158,27 @@ class _DashboardView extends State<Dashboard> {
                         CategoryTabs(
                           selectedCategory: _selectedCategory,
                           onCategorySelected: _onCategorySelected,
+                          onInitialCategoryReady: (categoryId) async {
+                            setState(() {
+                              _selectedCategory = categoryId;
+                              _isLoadingProduct = true;
+                            });
+
+                            await _productController.fetchProducts(categoryId: categoryId);
+
+                            setState(() {
+                              _isLoadingProduct = false;
+                            });
+                          },
                         ),
-                      ],
+
+                        _isLoadingProduct
+                            ? const Padding(
+                                padding: EdgeInsets.all(32),
+                                child: CircularProgressIndicator(),
+                              )
+                            : ProductSection(products: _productController.products),
+                        ],
                     ),
                   ),
                 ),
