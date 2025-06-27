@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../screens/home/Dashboard.dart';
 import '../../../controllers/AuthController.dart';
 import '../../../admin/home/DashboardAdmin.dart';
 
@@ -15,6 +16,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final emailController = TextEditingController(text: 'example@gmail.com');
   final phoneController = TextEditingController(text: '08xxxxxxxxxx');
 
+
+  List<String> _userRoles = [];
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
       nameController.text = profile.namaLengkap;
       emailController.text = profile.email;
       phoneController.text = profile.phone;
+      _userRoles = profile.role ?? [];
     });
   }
 
@@ -36,14 +41,19 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: const Color(0xFF7A491F),
       body: Column(
         children: [
+          
           const SizedBox(height: 50),
-
           // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
-              children: const [
-                Icon(Icons.arrow_back, color: Color(0xFFF5CB58)),
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFFF5CB58)),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
                 SizedBox(width: 10),
                 Text(
                   'My profile',
@@ -94,19 +104,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderColor: const Color(0xFF7A491F),
                   ),
                   const SizedBox(height: 10),
-                  _buildButton(
-                    label: 'Switch to Admin',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DashboardAdmin()),
-                      );
-                    }, 
-                    backgroundColor: Colors.white,
-                    textColor: const Color(0xFF7A491F),
-                    borderColor: const Color(0xFF7A491F),
-                  ),
-                  const SizedBox(height: 10),
+                  if (_userRoles.contains('admin')) ...[
+                    _buildButton(
+                      label: 'Switch to Admin',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => DashboardAdmin()),
+                        );
+                      }, 
+                      backgroundColor: Colors.white,
+                      textColor: const Color(0xFF7A491F),
+                      borderColor: const Color(0xFF7A491F),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
                   _buildButton(
                     label: 'Logout',
                     onPressed: () => _authController.logOut(context),

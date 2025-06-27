@@ -12,6 +12,7 @@ class ProductController with ChangeNotifier {
     try {
       isLoading = true;
       notifyListeners();
+      print("Category id {$categoryId} , Search value : {$searchQuery}");
       products = await _productService.getProducts(categoryId: categoryId ,saerch: searchQuery);
       errorMessage = null;
     } catch (e) {

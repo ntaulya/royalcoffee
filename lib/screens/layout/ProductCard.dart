@@ -45,7 +45,6 @@ class _ProductCardState extends State<ProductCard> {
           'Authorization': 'Bearer $token',
         },
       );
-      print(response);
       if (response.statusCode == 200) {
         setState(() {
           _imageBytes = response.bodyBytes;

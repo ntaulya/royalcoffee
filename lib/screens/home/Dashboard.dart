@@ -13,7 +13,7 @@ import '../layout/CategoryTabs.dart';
 import '../order/PesananSaya.dart';
 import '../order/DetailPesanan.dart';
 
-// percobaan
+
 import '../layout/ProductSection.dart';
 import '../../models/Product.dart';
 import '../../controllers/product/ProductController.dart';
@@ -55,12 +55,21 @@ class _DashboardView extends State<Dashboard> {
     setState(() => _isLoadingProduct = false);
   }
 
-  void _onCategorySelected(String category) {
-    setState(() {
-      _selectedCategory = category;
-    });
-     _productController.fetchProducts(categoryId: _selectedCategory);
-  }
+  void _onCategorySelected(String category) async {
+  setState(() {
+    _selectedCategory = category;
+    _isLoadingProduct = true;
+  });
+
+  await _productController.fetchProducts(
+    categoryId: category,
+    searchQuery: _searchController.text,
+  );
+
+  setState(() {
+    _isLoadingProduct = false;
+  });
+}
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -87,14 +96,16 @@ class _DashboardView extends State<Dashboard> {
         }
         break;
       case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DetailPesanan()),
-        ).then((_) {
-          setState(() {
-            _selectedBottomNavIndex = 0;
-          });
-        });
+        // Belum Selesai 
+        
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const DetailPesanan()),
+        // ).then((_) {
+        //   setState(() {
+        //     _selectedBottomNavIndex = 0;
+        //   });
+        // });
         break;
       case 3:
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,7 +136,7 @@ class _DashboardView extends State<Dashboard> {
                 // Header
                 DashboardHeader(
                   cartController: _cartController,
-                  onCartTap: () => _onBottomNavTapped(1),
+                  onCartTap: () => _onBottomNavTappedr(1),
                 ),
 
                 // Content
@@ -138,11 +149,16 @@ class _DashboardView extends State<Dashboard> {
                         Padding(
                           padding: const EdgeInsets.all(16),
                           child: TextField(
+                            controller: _searchController,
+                            onSubmitted: _onSearchSubmitted, 
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
                               hintText: "Search Coffee",
-                              prefixIcon: const Icon(Iconsax.search_normal),
+                              prefixIcon: IconButton(
+                                icon: const Icon(Iconsax.search_normal),
+                                onPressed: () => _onSearchSubmitted(_searchController.text), 
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
@@ -150,7 +166,6 @@ class _DashboardView extends State<Dashboard> {
                             ),
                           ),
                         ),
-
                         // Banner
                         BannerWidget(imagePath: 'assets/images/Banner.png'),
 
@@ -164,7 +179,10 @@ class _DashboardView extends State<Dashboard> {
                               _isLoadingProduct = true;
                             });
 
-                            await _productController.fetchProducts(categoryId: categoryId);
+                            await _productController.fetchProducts(
+                              categoryId: categoryId,
+                              searchQuery : _searchController.text,
+                              );
 
                             setState(() {
                               _isLoadingProduct = false;
