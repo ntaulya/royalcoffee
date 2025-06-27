@@ -10,13 +10,13 @@ import '../layout/BannerWidget.dart';
 import '../layout/CategoryTabs.dart';
 
 // Views
-import '../order/PesananSaya.dart';
-import '../order/DetailPesanan.dart';
+import './PesananSaya.dart';
+import './DetailPesanan.dart';
 
 
 import '../layout/ProductSection.dart';
-import '../../models/Product.dart';
-import '../../controllers/product/ProductController.dart';
+import '../../models/Product/Product.dart';
+import '../../controllers/Product/ProductController.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -96,8 +96,6 @@ class _DashboardView extends State<Dashboard> {
         }
         break;
       case 2:
-        // Belum Selesai 
-        
         // Navigator.push(
         //   context,
         //   MaterialPageRoute(builder: (context) => const DetailPesanan()),
@@ -136,7 +134,7 @@ class _DashboardView extends State<Dashboard> {
                 // Header
                 DashboardHeader(
                   cartController: _cartController,
-                  onCartTap: () => _onBottomNavTappedr(1),
+                  onCartTap: () => _onBottomNavTapped(1),
                 ),
 
                 // Content
@@ -189,13 +187,16 @@ class _DashboardView extends State<Dashboard> {
                             });
                           },
                         ),
-
+                        // Product 
                         _isLoadingProduct
                             ? const Padding(
                                 padding: EdgeInsets.all(32),
                                 child: CircularProgressIndicator(),
                               )
-                            : ProductSection(products: _productController.products),
+                            : ProductSection(
+                                products: _productController.products,
+                                controller: _productController,
+                              ),
                         ],
                     ),
                   ),

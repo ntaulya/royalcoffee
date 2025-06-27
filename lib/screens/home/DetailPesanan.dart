@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:typed_data';
+import '../../services/Api/ImageHelper.dart'; 
 import '../../../controllers/CartController.dart';
 import '../../models/CartItem.dart';
+import '../../models/Product/Product.dart';
+import '../../models/Product/Variant.dart';
 import './PesananSaya.dart';
 
 class DetailPesanan extends StatefulWidget {
-  final CartItem? initialItem; // Add parameter for initial item
-  
-  const DetailPesanan({super.key, this.initialItem});
+  final Product product;
+  const DetailPesanan({super.key, required this.product});
 
   @override
   State<DetailPesanan> createState() => _DetailPesananState();
@@ -14,55 +18,96 @@ class DetailPesanan extends StatefulWidget {
 
 class _DetailPesananState extends State<DetailPesanan> {
   final cartController = CartController();
-
-  int qtyHangat = 0; // Start with 0
-  int qtyDingin = 0; // Start with 0
-
-  final int hargaHangat = 24000;
-  final int hargaDingin = 27000;
+  late PageController _pageController;
+  Map<String, int> quantityPerVariant = {};
+  int _currentPage = 0;
+  Timer? _autoScrollTimer;
 
   @override
   void initState() {
     super.initState();
-    _loadExistingQuantities();
+    _pageController = PageController(viewportFraction: 0.8);
+    _initializeQuantities();
+    _startAutoScroll();
   }
 
-  void _loadExistingQuantities() {
-    // Check existing cart items and set quantities
-    final existingHangat = cartController.items.firstWhere(
-      (item) => item.title == 'Latte Hangat',
-      orElse: () => CartItem(title: '', price: '', imagePath: '', quantity: 0),
-    );
-    
-    final existingDingin = cartController.items.firstWhere(
-      (item) => item.title == 'Latte Dingin',
-      orElse: () => CartItem(title: '', price: '', imagePath: '', quantity: 0),
-    );
+  void _initializeQuantities() {
+    for (var variant in widget.product.variants ?? []) {
+      quantityPerVariant[variant.namaVarian] = 0;
+    }
+    if ((widget.product.variants?.isNotEmpty ?? false)) {
+      quantityPerVariant[widget.product.variants!.first.namaVarian] = 1;
+    }
+  }
 
-    setState(() {
-      qtyHangat = existingHangat.quantity;
-      qtyDingin = existingDingin.quantity;
-      
-      // If no existing items, set minimum 1 for one variant
-      if (qtyHangat == 0 && qtyDingin == 0) {
-        qtyHangat = 1; // Default to 1 hangat
-      }
+  int get totalItem => quantityPerVariant.values.fold(0, (a, b) => a + b);
+
+  int get totalHarga {
+    final hargaDasar = int.tryParse(widget.product.price) ?? 0;
+    return (widget.product.variants ?? []).fold(0, (sum, variant) {
+      final tambahan = int.tryParse(variant.hargaTambahan) ?? 0;
+      final qty = quantityPerVariant[variant.namaVarian] ?? 0;
+      return sum + (hargaDasar + tambahan) * qty;
     });
+  }
+
+  String formatRupiah(int value) {
+    return 'Rp.${value.toString().replaceAllMapped(RegExp(r'(\d{3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
+  }
+
+  void _handleAddToCart() {
+    final hargaDasar = int.tryParse(widget.product.price) ?? 0;
+    for (var v in widget.product.variants ?? []) {
+      final qty = quantityPerVariant[v.namaVarian] ?? 0;
+      if (qty > 0) {
+        final tambahan = int.tryParse(v.hargaTambahan) ?? 0;
+        cartController.addToCart(CartItem(
+          title: '${widget.product.name} - ${v.namaVarian}',
+          price: (hargaDasar + tambahan).toString(),
+          imagePath: v.imagePath,
+          quantity: qty,
+        ));
+      }
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const PesananSaya()));
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (!mounted || (widget.product.variants?.isEmpty ?? true)) return;
+      final totalPages = widget.product.variants!.length;
+      _currentPage = (_currentPage + 1) % totalPages;
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _stopAutoScroll() {
+    _autoScrollTimer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    _stopAutoScroll();
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    int totalItem = qtyHangat + qtyDingin;
-    int totalHarga = (qtyHangat * hargaHangat) + (qtyDingin * hargaDingin);
+    final variants = widget.product.variants ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFF834D1E),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   IconButton(
@@ -71,17 +116,11 @@ class _DetailPesananState extends State<DetailPesanan> {
                   ),
                   const Text(
                     'Detail Pesanan',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
-
-            // Konten Putih
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(20),
@@ -92,79 +131,147 @@ class _DetailPesananState extends State<DetailPesanan> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Gambar Produk
-                    Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'assets/images/coffee-latte.png',
-                          width: 160,
-                          height: 160,
-                          fit: BoxFit.cover,
+                    // ✅ Gambar Varian dengan Bearer Token
+                    if (variants.isNotEmpty)
+                      SizedBox(
+                        height: 200,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: variants.length,
+                          itemBuilder: (_, i) {
+                            final v = variants[i];
+                            final imageUrl = v.imagePath;
+
+                            return FutureBuilder<Uint8List?>(
+                              future: ImageHelper.loadImage(imageUrl),
+                              builder: (context, snapshot) {
+                                Widget imageWidget;
+
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  imageWidget = const Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasData && snapshot.data != null) {
+                                  imageWidget = Image.memory(
+                                    snapshot.data!,
+                                    width: 180,
+                                    height: 180,
+                                    fit: BoxFit.cover,
+                                  );
+                                } else {
+                                  imageWidget = Container(
+                                    width: 180,
+                                    height: 180,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.broken_image, size: 80),
+                                  );
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(16),
+                                          child: imageWidget,
+                                        ),
+                                        if (v.isPrimary)
+                                          Positioned(
+                                            top: 8,
+                                            left: 8,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.orange,
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: const Text(
+                                                'Varian Utama',
+                                                style: TextStyle(fontSize: 10, color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         ),
-                      ),
-                    ),
+                      )
+                    else
+                      const Center(child: Icon(Icons.broken_image, size: 100)),
 
                     const SizedBox(height: 16),
 
-                    // Deskripsi Produk
-                    const Text(
-                      'Minuman kopi yang lembut dan creamy, terbuat dari perpaduan espresso berkualitas dan susu steamed yang hangat. '
-                      'Disajikan dengan sentuhan seni latte art berbentuk daun di atas permukaannya, menambah daya tarik visual dan cita rasa yang elegan. '
-                      'Cocok dinikmati kapan saja, baik untuk memulai hari maupun menemani waktu santai.',
-                      style: TextStyle(fontSize: 13, height: 1.5),
+                    // Deskripsi
+                    Text(
+                      widget.product.description ?? 'Tidak ada deskripsi.',
+                      style: const TextStyle(fontSize: 13, height: 1.5),
                     ),
 
                     const SizedBox(height: 20),
 
-                    const Text(
-                      'Varian',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const Text('Varian', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
 
-                    // Varian Hangat
-                    buildVarianTile(
-                      label: 'Hangat',
-                      price: hargaHangat,
-                      quantity: qtyHangat,
-                      onAdd: () => setState(() => qtyHangat++),
-                      onRemove: () {
-                        if (qtyHangat > 0) setState(() => qtyHangat--);
-                      },
-                      backgroundColor: const Color(0xFFF2F2F2),
-                    ),
+                    // ✅ List Varian
+                    ...variants.map((v) {
+                      final hargaDasar = int.tryParse(widget.product.price) ?? 0;
+                      final hargaTambahan = int.tryParse(v.hargaTambahan) ?? 0;
+                      final stok = int.tryParse(v.stock) ?? 0;
+                      final hargaTotal = hargaDasar + hargaTambahan;
+                      final qty = quantityPerVariant[v.namaVarian] ?? 0;
 
-                    const SizedBox(height: 10),
-
-                    // Varian Dingin
-                    buildVarianTile(
-                      label: 'Dingin',
-                      price: hargaDingin,
-                      quantity: qtyDingin,
-                      onAdd: () => setState(() => qtyDingin++),
-                      onRemove: () {
-                        if (qtyDingin > 0) setState(() => qtyDingin--);
-                      },
-                      backgroundColor: const Color(0xFFFFF1C5),
-                    ),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: v.namaVarian.toLowerCase().contains("dingin")
+                              ? const Color(0xFFFFF1C5)
+                              : const Color(0xFFF2F2F2),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${v.namaVarian}\n${formatRupiah(hargaTotal)}\nStok: $stok',
+                                style: const TextStyle(fontSize: 13, color: Colors.black54),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  onPressed: qty > 0
+                                      ? () => setState(() => quantityPerVariant[v.namaVarian] = qty - 1)
+                                      : null,
+                                ),
+                                Text('$qty'),
+                                IconButton(
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  onPressed: qty < stok
+                                      ? () => setState(() => quantityPerVariant[v.namaVarian] = qty + 1)
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
 
                     const Spacer(),
 
-                    // Footer: Harga total dan tombol
+                    // ✅ Footer Total dan Button
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(color: Colors.black12, blurRadius: 10),
-                        ],
+                        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -172,48 +279,21 @@ class _DetailPesananState extends State<DetailPesanan> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Rp.${totalHarga.toString().replaceAllMapped(RegExp(r'(\d{3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'Total Item : $totalItem',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              Text(formatRupiah(totalHarga), style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('Total Item : $totalItem', style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                           const SizedBox(height: 8),
-
                           ElevatedButton(
-                            onPressed: totalItem > 0 ? () {
-                              _updateCartItems();
-                              
-                              // Navigasi ke halaman PesananSaya
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const PesananSaya(),
-                                ),
-                              );
-                            } : null,
+                            onPressed: totalItem > 0 ? _handleAddToCart : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF8B4A0C),
                               minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             child: const Text(
                               'Lanjutkan ke Pembayaran',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -225,75 +305,6 @@ class _DetailPesananState extends State<DetailPesanan> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _updateCartItems() {
-    // Remove existing latte items first
-    cartController.removeItemCompletely('Latte Hangat');
-    cartController.removeItemCompletely('Latte Dingin');
-
-    // Add items with correct quantities
-    if (qtyHangat > 0) {
-      cartController.addToCart(
-        CartItem(
-          title: 'Latte Hangat',
-          price: hargaHangat.toString(),
-          imagePath: 'assets/images/coffee-latte.png',
-          quantity: qtyHangat,
-        ),
-      );
-    }
-
-    if (qtyDingin > 0) {
-      cartController.addToCart(
-        CartItem(
-          title: 'Latte Dingin',
-          price: hargaDingin.toString(),
-          imagePath: 'assets/images/coffee-latte.png',
-          quantity: qtyDingin,
-        ),
-      );
-    }
-  }
-
-  Widget buildVarianTile({
-    required String label,
-    required int price,
-    required int quantity,
-    required VoidCallback onAdd,
-    required VoidCallback onRemove,
-    required Color backgroundColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              '$label\nRp.${price ~/ 1000}.000',
-              style: const TextStyle(fontSize: 13, color: Colors.black54),
-            ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                onPressed: onRemove,
-                icon: const Icon(Icons.remove_circle_outline),
-              ),
-              Text('$quantity'),
-              IconButton(
-                onPressed: onAdd,
-                icon: const Icon(Icons.add_circle_outline),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

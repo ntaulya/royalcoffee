@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../../models/Login.dart';
-import '../../models/Product.dart';
+import '../../models/Product/Product.dart';
 
 
 

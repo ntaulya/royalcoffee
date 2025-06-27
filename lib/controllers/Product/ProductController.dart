@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/Api/product/ProductServices.dart';
-import '../../models/Product.dart';
+import '../../models/Product/Product.dart';
 
 class ProductController with ChangeNotifier {
   final ProductServices _productService = ProductServices();
@@ -12,11 +12,25 @@ class ProductController with ChangeNotifier {
     try {
       isLoading = true;
       notifyListeners();
-      print("Category id {$categoryId} , Search value : {$searchQuery}");
-      products = await _productService.getProducts(categoryId: categoryId ,saerch: searchQuery);
+      products = await _productService.getProducts(categoryId: categoryId ,search: searchQuery);
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+  Future<Product?> fetchProductDetail(String productId) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+      final product = await _productService.getProductById(productId);
+      errorMessage = null;
+      return product;
+    } catch (e) {
+      errorMessage = e.toString();
+      return null;
     } finally {
       isLoading = false;
       notifyListeners();
