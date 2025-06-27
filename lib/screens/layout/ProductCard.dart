@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../../models/Product/Product.dart';
-import '../../services/Api/ImageHelper.dart'; // Pastikan sudah buat file ini
+import '../../services/Api/ImageHelper.dart'; 
 
 class ProductCard extends StatefulWidget {
   final Product product;
@@ -41,6 +41,11 @@ class _ProductCardState extends State<ProductCard> {
       _imageBytes = imageData;
       _isLoading = false;
     });
+  }
+
+  String formatRupiah(String value) {
+    final number = int.tryParse(value.replaceAll('.', '')) ?? 0;
+    return 'Rp.${number.toString().replaceAllMapped(RegExp(r'(\d{3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
   }
 
   @override
@@ -88,7 +93,7 @@ class _ProductCardState extends State<ProductCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      widget.product.price,
+                      formatRupiah(widget.product.price),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -98,7 +103,7 @@ class _ProductCardState extends State<ProductCard> {
                       width: double.infinity,
                       height: 32,
                       child: ElevatedButton(
-                        onPressed: widget.onAddToCart,
+                        onPressed: widget.onTap,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF8B4A0C),
                           foregroundColor: Colors.white,
@@ -106,7 +111,7 @@ class _ProductCardState extends State<ProductCard> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text('Add', style: TextStyle(fontSize: 12)),
+                        child: const Text('Detail', style: TextStyle(fontSize: 12)),
                       ),
                     ),
                   ],
