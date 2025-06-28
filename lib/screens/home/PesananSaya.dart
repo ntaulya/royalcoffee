@@ -72,8 +72,9 @@ class _PesananSayaState extends State<PesananSaya> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                const SizedBox(height: 4),
                 Text('Rp ${item.price}', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                Text('Product ID: ${item.productId}', style: const TextStyle(fontSize: 11)),
+                Text('Variant ID: ${item.variantId}', style: const TextStyle(fontSize: 11)),
               ],
             ),
           ),
@@ -83,7 +84,7 @@ class _PesananSayaState extends State<PesananSaya> {
                 icon: const Icon(Icons.remove),
                 onPressed: () {
                   if (item.quantity > 1) {
-                    cartController.updateItemQuantity(item.title, item.quantity - 1);
+                    cartController.updateItemQuantity(item.productId, item.variantId, item.quantity - 1);
                   } else {
                     cartController.removeFromCart(item);
                   }
@@ -93,7 +94,7 @@ class _PesananSayaState extends State<PesananSaya> {
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
-                  cartController.updateItemQuantity(item.title, item.quantity + 1);
+                  cartController.updateItemQuantity(item.productId, item.variantId, item.quantity + 1);
                 },
               ),
             ],

@@ -62,6 +62,8 @@ class _DetailPesananState extends State<DetailPesanan> {
       if (qty > 0) {
         final tambahan = int.tryParse(v.hargaTambahan) ?? 0;
         cartController.addToCart(CartItem(
+          productId: widget.product.id.toString(),
+          variantId: v.idVarian.toString(),    
           title: '${widget.product.name} - ${v.namaVarian}',
           price: (hargaDasar + tambahan).toString(),
           imagePath: v.imagePath,
@@ -69,7 +71,7 @@ class _DetailPesananState extends State<DetailPesanan> {
         ));
       }
     }
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const PesananSaya()));
+    Navigator.pop(context);
   }
 
   void _startAutoScroll() {
@@ -285,14 +287,18 @@ class _DetailPesananState extends State<DetailPesanan> {
                           ),
                           const SizedBox(height: 8),
                           ElevatedButton(
-                            onPressed: totalItem > 0 ? _handleAddToCart : null,
+                            onPressed: totalItem > 0
+                                ? () {
+                                    _handleAddToCart();
+                                  }
+                                : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF8B4A0C),
                               minimumSize: const Size(double.infinity, 50),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             child: const Text(
-                              'Lanjutkan ke Pembayaran',
+                              'Tambahkan ke dalam Keranjang',
                               style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),

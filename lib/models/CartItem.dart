@@ -1,34 +1,38 @@
 class CartItem {
+  final String productId;
+  final String variantId;
   final String title;
   final String price;
   final String imagePath;
   final int quantity;
 
   CartItem({
+    required this.productId,
+    required this.variantId,
     required this.title,
     required this.price,
     required this.imagePath,
     required this.quantity,
   });
 
-
-  // Method untuk mendapatkan harga sebagai double
   double get priceAsDouble {
     String priceStr = price.replaceAll(RegExp(r'[^\d]'), '');
     return double.tryParse(priceStr) ?? 0.0;
   }
 
-  // Method untuk mendapatkan total harga berdasarkan quantity
   double get totalPrice => priceAsDouble * quantity;
 
-  // Method untuk copy dengan quantity yang berbeda
   CartItem copyWith({
+    String? productId,
+    String? variantId,
     String? title,
     String? price,
     String? imagePath,
     int? quantity,
   }) {
     return CartItem(
+      productId: productId ?? this.productId,
+      variantId: variantId ?? this.variantId,
       title: title ?? this.title,
       price: price ?? this.price,
       imagePath: imagePath ?? this.imagePath,
@@ -39,9 +43,11 @@ class CartItem {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is CartItem && other.title == title;
+    return other is CartItem &&
+        other.productId == productId &&
+        other.variantId == variantId;
   }
 
   @override
-  int get hashCode => title.hashCode;
+  int get hashCode => Object.hash(productId, variantId);
 }
