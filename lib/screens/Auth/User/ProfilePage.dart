@@ -106,7 +106,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 10),
                   if (_userRoles.contains('admin')) ...[
                     _buildButton(
-                      label: 'Switch to Admin',
+                      label: 'Switch to Dashboard Admin',
                       onPressed: () {
                         Navigator.push(
                           context,
