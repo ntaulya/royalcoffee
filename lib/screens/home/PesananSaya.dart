@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../controllers/CartController.dart';
+import '../../services/Api/ImageHelper.dart';
+import 'dart:typed_data';
 import '../../models/CartItem.dart';
 
 class PesananSaya extends StatefulWidget {
@@ -22,12 +24,12 @@ class _PesananSayaState extends State<PesananSaya> {
       ),
       body: StreamBuilder<List<CartItem>>(
         stream: cartController.cartItemsStream,
+        initialData : cartController.items,
         builder: (context, snapshot) {
           final cartItems = snapshot.data ?? [];
-
           double subtotal = cartItems.fold(
             0,
-            (sum, item) => sum + (double.tryParse(item.price) ?? 0) * item.quantity,
+            (sum, item) => sum + item.totalPrice,
           );
           double tax = subtotal * 0.1;
           double total = subtotal + tax;
@@ -65,7 +67,29 @@ class _PesananSayaState extends State<PesananSaya> {
       ),
       child: Row(
         children: [
-          Image.asset(item.imagePath, width: 60, height: 60, fit: BoxFit.cover),
+         FutureBuilder<Uint8List?>(
+            future: ImageHelper.loadImage(item.imagePath),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                );
+              } else if (snapshot.hasData && snapshot.data != null) {
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(snapshot.data!, width: 60, height: 60, fit: BoxFit.cover),
+                );
+              } else {
+                return const SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: Icon(Icons.broken_image, color: Colors.grey),
+                );
+              }
+            },
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -73,8 +97,8 @@ class _PesananSayaState extends State<PesananSaya> {
               children: [
                 Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                 Text('Rp ${item.price}', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-                Text('Product ID: ${item.productId}', style: const TextStyle(fontSize: 11)),
-                Text('Variant ID: ${item.variantId}', style: const TextStyle(fontSize: 11)),
+                // Text('Product ID: ${item.productId}', style: const TextStyle(fontSize: 11)),
+                // Text('Variant ID: ${item.variantId}', style: const TextStyle(fontSize: 11)),
               ],
             ),
           ),
