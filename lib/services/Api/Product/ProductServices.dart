@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../../SecureStorageService.dart';
 import '../Config.dart';
 import '../../../models/Product/Product.dart';
+import '../../../models/Product/Pajak.dart';
 
 class ProductServices extends Config {
   final Config _config = Config();
@@ -79,6 +80,37 @@ class ProductServices extends Config {
       throw Exception('Gagal terhubung ke server');
     } catch (e) {
       throw Exception('Gagal mengambil produk detail: $e');
+    }
+  }
+  Future<Pajak> getCalculationPajak({int? totalBelanjaan}) async {
+    try {
+      String url = '${_config.baseUrl}/product/pajak';
+      String? token = await _storageService.getToken();
+      Map<String, String> requestHeaders = {
+        ..._config.defaultHeaders,
+        'Authorization': 'Bearer $token',
+      };
+
+      final uri = Uri.parse(url).replace(queryParameters: {
+        'total': (totalBelanjaan ?? 0).toString(),
+      });
+
+      final response = await http
+          .get(uri, headers: requestHeaders)
+          .timeout(_config.timeout);
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final data = jsonResponse['data'];
+        return Pajak.fromJson(data);
+      } else {
+        throw Exception(_config.getErrorMessage(response, 'get Pajak'));
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } on http.ClientException {
+      throw Exception('Gagal terhubung ke server');
+    } catch (e) {
+      throw Exception('Gagal mengambil pajak: $e');
     }
   }
 }
