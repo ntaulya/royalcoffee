@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
+import 'dart:async';
+
 import '../../controllers/CartController.dart';
+import '../../services/Api/ImageHelper.dart';
+import '../../services/Api/Product/ProductServices.dart';
 import '../../models/CartItem.dart';
+import '../../models/Product/Pajak.dart';
 
 class PesananSaya extends StatefulWidget {
   const PesananSaya({Key? key}) : super(key: key);
@@ -11,6 +17,51 @@ class PesananSaya extends StatefulWidget {
 
 class _PesananSayaState extends State<PesananSaya> {
   final cartController = CartController();
+  final ProductServices productService = ProductServices();
+  late final StreamSubscription _cartSubscription;
+
+  Pajak? pajak;
+  double subtotal = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _cartSubscription = cartController.cartItemsStream.listen((_) {
+      calculateTax();
+    });
+    calculateTax();
+  }
+
+  @override
+  void dispose() {
+    _cartSubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> calculateTax() async {
+    final items = cartController.items;
+    double newSubtotal = items.fold(0, (sum, item) => sum + item.totalPrice);
+    if (newSubtotal == 0) {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+      return;
+    }
+    if (newSubtotal == subtotal) return;
+
+    try {
+      final pajakResponse = await productService.getCalculationPajak(
+        totalBelanjaan: newSubtotal.toInt(),
+      );
+      if (!mounted) return;
+      setState(() {
+        subtotal = newSubtotal;
+        pajak = pajakResponse;
+      });
+    } catch (e) {
+      print("Gagal hitung pajak: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,15 +73,9 @@ class _PesananSayaState extends State<PesananSaya> {
       ),
       body: StreamBuilder<List<CartItem>>(
         stream: cartController.cartItemsStream,
+        initialData: cartController.items,
         builder: (context, snapshot) {
           final cartItems = snapshot.data ?? [];
-
-          double subtotal = cartItems.fold(
-            0,
-            (sum, item) => sum + (double.tryParse(item.price) ?? 0) * item.quantity,
-          );
-          double tax = subtotal * 0.1;
-          double total = subtotal + tax;
 
           return Column(
             children: [
@@ -45,7 +90,7 @@ class _PesananSayaState extends State<PesananSaya> {
                         },
                       ),
               ),
-              buildSummary(subtotal, tax, total),
+              buildSummary(),
               buildPaymentSection(),
             ],
           );
@@ -65,7 +110,29 @@ class _PesananSayaState extends State<PesananSaya> {
       ),
       child: Row(
         children: [
-          Image.asset(item.imagePath, width: 60, height: 60, fit: BoxFit.cover),
+          FutureBuilder<Uint8List?>(
+            future: ImageHelper.loadImage(item.imagePath),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                );
+              } else if (snapshot.hasData && snapshot.data != null) {
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(snapshot.data!, width: 60, height: 60, fit: BoxFit.cover),
+                );
+              } else {
+                return const SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: Icon(Icons.broken_image, color: Colors.grey),
+                );
+              }
+            },
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -73,8 +140,6 @@ class _PesananSayaState extends State<PesananSaya> {
               children: [
                 Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                 Text('Rp ${item.price}', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-                Text('Product ID: ${item.productId}', style: const TextStyle(fontSize: 11)),
-                Text('Variant ID: ${item.variantId}', style: const TextStyle(fontSize: 11)),
               ],
             ),
           ),
@@ -104,7 +169,14 @@ class _PesananSayaState extends State<PesananSaya> {
     );
   }
 
-  Widget buildSummary(double subtotal, double tax, double total) {
+  Widget buildSummary() {
+    if (pajak == null) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: BoxDecoration(
@@ -114,9 +186,9 @@ class _PesananSayaState extends State<PesananSaya> {
       child: Column(
         children: [
           buildSummaryRow('Subtotal', subtotal),
-          buildSummaryRow('Pajak (10%)', tax),
+          buildSummaryRow('Pajak (${pajak!.persen.toStringAsFixed(2)}%)', pajak!.nominalPotongan),
           const Divider(thickness: 1),
-          buildSummaryRow('Total', total, isBold: true),
+          buildSummaryRow('Total', pajak!.totalKeselurusan, isBold: true),
         ],
       ),
     );
@@ -140,7 +212,6 @@ class _PesananSayaState extends State<PesananSaya> {
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton.icon(
         onPressed: () {
-          // Tambahkan logika pembayaran di sini
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
