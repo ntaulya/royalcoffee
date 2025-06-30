@@ -1,57 +1,91 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../admin/home/DashboardAdmin.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditMenu extends StatefulWidget {
+  const EditMenu({super.key});
+
   @override
   State<EditMenu> createState() => _EditMenuState();
 }
 
 class _EditMenuState extends State<EditMenu> {
   String? selectedCategory;
-  File? selectedImage;
+  File? _mainImage;
+  List<File> _variantImages = [];
 
   final List<String> categoryOptions = [
     'Coffee',
     'Non-Coffee',
     'Snack',
-    'Drink',
+    'Food',
     'Royal Glace',
     'Ice Cream Panda',
   ];
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickMainImage() async {
+    final XFile? image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+
     if (image != null) {
       setState(() {
-        selectedImage = File(image.path);
+        _mainImage = File(image.path);
       });
     }
   }
 
-  Widget _buildImage() {
+  Future<void> _pickVariantImages() async {
+    final List<XFile>? images = await _picker.pickMultiImage(imageQuality: 85);
+    if (images != null && images.isNotEmpty) {
+      setState(() {
+        _variantImages.addAll(images.map((xfile) => File(xfile.path)));
+      });
+    }
+  }
+
+  Widget _buildImageBox(File? imageFile, VoidCallback onTap,
+      {double size = 100, String? caption}) {
     return GestureDetector(
-      onTap: _pickImage,
-      child: Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: selectedImage != null
-              ? Image.file(
-                  selectedImage!,
-                  height: 120,
-                  width: 120,
-                  fit: BoxFit.cover,
-                )
-              : Image.network(
-                  'https://images.unsplash.com/photo-1578985545062-69928b1d9587',
-                  height: 120,
-                  width: 120,
-                  fit: BoxFit.cover,
-                ),
-        ),
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(12),
+              image: imageFile != null
+                  ? DecorationImage(
+                      image: FileImage(imageFile), fit: BoxFit.cover)
+                  : null,
+            ),
+            child: imageFile == null
+                ? const Center(child: Icon(Icons.add_a_photo, size: 24))
+                : null,
+          ),
+          if (caption != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                caption,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -74,76 +108,21 @@ class _EditMenuState extends State<EditMenu> {
     );
   }
 
-  Widget _buildCategoryDropdown() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: DropdownButtonFormField<String>(
-        value: selectedCategory,
-        decoration: InputDecoration(
-          prefixIcon: Icon(Iconsax.category),
-          hintText: "Pilih Kategori",
-          filled: true,
-          fillColor: Colors.grey.shade200,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-        ),
-        items: categoryOptions.map((category) {
-          return DropdownMenuItem<String>(
-            value: category,
-            child: Text(category),
-          );
-        }).toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedCategory = value;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _buildSaveButton(VoidCallback onTap) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4B1D0D),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-        ),
-        child: const Text("Save", style: TextStyle(color: Colors.white)),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          color: Colors.black,
+          onPressed: () => Navigator.pop(context),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF4B1D0D)),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => DashboardAdmin()),
-            );
-          },
-        ),
         title: const Text(
-          "Menu Edit",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF4B1D0D),
-          ),
+          "Edit Menu",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -153,39 +132,90 @@ class _EditMenuState extends State<EditMenu> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildImage(),
-              const SizedBox(height: 20),
-
-              // 🟤 Detail Menu Tetap di Atas
-              const Text(
-                "Detail Menu",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              _buildSectionTitle("Foto Menu Utama"),
+              Center(
+                child: _buildImageBox(
+                  _mainImage,
+                  _pickMainImage,
+                  size: 180,
+                  caption: "Ukuran ideal 1080 x 1080 px",
+                ),
               ),
-              const SizedBox(height: 10),
 
-              _buildTextField("Nama Menu"),
-              _buildTextField("Harga Menu"),
-              _buildTextField("Deskripsi Menu"),
-              _buildCategoryDropdown(),
+              const SizedBox(height: 12),
+              _buildSectionTitle("Foto Varian"),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  ..._variantImages.map(
+                    (file) =>
+                        _buildImageBox(file, () {}, size: 60, caption: "60x60"),
+                  ),
+                  _buildImageBox(null, _pickVariantImages,
+                      size: 60, caption: "Tambah"),
+                ],
+              ),
 
               const SizedBox(height: 20),
-              const Text("Edit Varian",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              _buildTextField("Varian"),
-              _buildTextField("Nama Varian"),
-              _buildTextField("Harga"),
-              _buildTextField("Stock"),
+              _buildSectionTitle("Informasi Menu"),
+              _buildTextField("Nama Menu", icon: Iconsax.coffee),
+              _buildTextField("Harga Menu", icon: Iconsax.money),
+              _buildTextField("Deskripsi Menu", icon: Iconsax.document),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6.0),
+                child: DropdownButtonFormField<String>(
+                  value: selectedCategory,
+                  hint: const Text("Pilih Kategori"),
+                  items: categoryOptions.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() => selectedCategory = value);
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey.shade200,
+                    prefixIcon: const Icon(Iconsax.category),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+
+              const Divider(thickness: 1.2),
+              _buildSectionTitle("Informasi Varian"),
+              _buildTextField("Varian (misal: Size)", icon: Iconsax.box),
+              _buildTextField("Nama Varian", icon: Iconsax.edit),
+              _buildTextField("Harga Penambahan", icon: Iconsax.money_2),
+              _buildTextField("Stock Varian", icon: Iconsax.archive),
 
               const SizedBox(height: 30),
-
-              // ✅ Save Button Full Width di Bawah
-              _buildSaveButton(() {
-                // Simpan detail menu
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Menu berhasil disimpan!')),
-                );
-              }),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Menu berhasil disimpan!')),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4B1D0D),
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 14),
+                  ),
+                  child: const Text(
+                    "Simpan",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -66,22 +66,34 @@ class _AddMenuState extends State<AddMenu> {
   }
 
   Widget _buildImageBox(File? imageFile, VoidCallback onTap,
-      {double size = 100}) {
+      {double size = 100, String? caption}) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(12),
-          image: imageFile != null
-              ? DecorationImage(image: FileImage(imageFile), fit: BoxFit.cover)
-              : null,
-        ),
-        child: imageFile == null
-            ? const Center(child: Icon(Icons.add_a_photo, size: 24))
-            : null,
+      child: Column(
+        children: [
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(12),
+              image: imageFile != null
+                  ? DecorationImage(image: FileImage(imageFile), fit: BoxFit.cover)
+                  : null,
+            ),
+            child: imageFile == null
+                ? const Center(child: Icon(Icons.add_a_photo, size: 24))
+                : null,
+          ),
+          if (caption != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                caption,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -121,7 +133,26 @@ class _AddMenuState extends State<AddMenu> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSectionTitle("Foto Menu Utama"),
-              Center(child: _buildImageBox(_mainImage, _pickMainImage, size: 180)),
+              Center(
+                child: _buildImageBox(
+                  _mainImage,
+                  _pickMainImage,
+                  size: 180,
+                  caption: "Ukuran ideal 1080 x 1080 px",
+                ),
+              ),
+
+              const SizedBox(height: 12),
+              _buildSectionTitle("Foto Varian"),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  ..._variantImages.map((file) =>
+                      _buildImageBox(file, () {}, size: 60, caption: "60x60")),
+                  _buildImageBox(null, _pickVariantImages, size: 60, caption: "Tambah"),
+                ],
+              ),
 
               const SizedBox(height: 20),
               _buildSectionTitle("Informasi Menu"),
@@ -161,17 +192,6 @@ class _AddMenuState extends State<AddMenu> {
               _buildTextField("Nama Varian", icon: Iconsax.edit),
               _buildTextField("Harga Penambahan", icon: Iconsax.money_2),
               _buildTextField("Stock Varian", icon: Iconsax.archive),
-
-              _buildSectionTitle("Foto Varian"),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  ..._variantImages.map((file) =>
-                      _buildImageBox(file, () {}, size: 60)),
-                  _buildImageBox(null, _pickVariantImages, size: 60),
-                ],
-              ),
 
               const SizedBox(height: 30),
               Center(

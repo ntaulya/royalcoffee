@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:royalcoffee/admin/home/DashboardAdmin.dart';
-import 'package:royalcoffee/admin/screens/AddMenu.dart';
-import 'package:royalcoffee/admin/screens/EditMenu.dart';
+import 'package:provider/provider.dart';
+import 'package:royalcoffee/admin/screens/Customer.dart';
+import 'package:royalcoffee/admin/screens/IncomingOrder.dart';
 import 'package:royalcoffee/admin/screens/Menu.dart';
-import 'screens/Splash.dart';
+import 'package:royalcoffee/admin/screens/TrackOrder.dart';
+import 'package:royalcoffee/controllers/product/ProductController.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProductController()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,10 +23,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Royal Cafe',
-      theme: ThemeData(primarySwatch: Colors.brown),
-      home: EditMenu(),
       debugShowCheckedModeBanner: false,
+      title: 'Royal Cafe',
+      theme: ThemeData(
+        useMaterial3: false,
+        fontFamily: 'Poppins',
+      ),
+      home: const IncomingOrder(), // ganti ke halaman pertama kamu
     );
   }
 }
