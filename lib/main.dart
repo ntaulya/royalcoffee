@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:royalcoffee/admin/screens/ConfirmOrder.dart';
 import 'package:royalcoffee/admin/screens/Customer.dart';
 import 'package:royalcoffee/admin/screens/IncomingOrder.dart';
 import 'package:royalcoffee/admin/screens/Menu.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: false,
         fontFamily: 'Poppins',
       ),
-      home: const IncomingOrder(), // ganti ke halaman pertama kamu
+      home:  ConfirmOrder(), // ganti ke halaman pertama kamu
     );
   }
 }
