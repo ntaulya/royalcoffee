@@ -3,8 +3,19 @@ import '../../controllers/reset_pass_controller.dart';
 import './LoginView.dart';
 
 class ResetPass extends StatefulWidget {
-  const ResetPass({super.key, this.title = 'Reset Password'});
+  final String email;
   final String title;
+  final String otp;
+  final int remainingTime;
+
+  const ResetPass({
+    super.key,
+    required this.email, 
+    required this.otp,
+    required this.remainingTime,
+    this.title = 'Reset Password',
+  });
+  
 
   @override
   State<ResetPass> createState() => _ResetPassState();
@@ -17,6 +28,12 @@ class _ResetPassState extends State<ResetPass> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  String formatTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$secs';
   }
 
   @override
@@ -41,6 +58,10 @@ class _ResetPassState extends State<ResetPass> {
                       'Selamat Datang, Semoga Hari Anda Menyenangkan',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 14, color: Color(0xFF834D1E)),
+                    ),
+                    Text(
+                      'Kode OTP berlaku hingga ${formatTime(widget.remainingTime)}',
+                      style: const TextStyle(color: Colors.red, fontSize: 12),
                     ),
                   ],
                 ),
@@ -105,8 +126,7 @@ class _ResetPassState extends State<ResetPass> {
 
               ElevatedButton(
                 onPressed: () async {
-                  final bool success = await _controller.resetPassword(context);
-
+                  final bool success = await _controller.resetPassword(context, widget.email, widget.otp);
                   if (success) {
                     Navigator.pushAndRemoveUntil(
                       context,

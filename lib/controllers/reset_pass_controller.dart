@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/Api/AuthService.dart';
 
 class ResetPassController {
   final TextEditingController newPasswordController = TextEditingController();
@@ -41,32 +42,34 @@ class ResetPassController {
   }
   
   // Method untuk reset password
-  Future<bool> resetPassword(BuildContext context) async {
+  Future<bool> resetPassword(BuildContext context, String email, String otp) async {
     try {
-      String? passwordError = validatePassword(newPasswordController.text);
+      final password = newPasswordController.text.trim();
+      final confirmPassword = confirmPasswordController.text.trim();
+
+      String? passwordError = validatePassword(password);
       if (passwordError != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(passwordError)),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(passwordError)));
         return false;
       }
-      
-      String? confirmError = validateConfirmPassword(confirmPasswordController.text);
+
+      String? confirmError = validateConfirmPassword(confirmPassword);
       if (confirmError != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(confirmError)),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(confirmError)));
         return false;
       }
-      
-      // TODO: Implementasi reset password dengan API
-      
-      await Future.delayed(const Duration(seconds: 1));
-      
+
+      // 🔁 Panggil API untuk verifikasi OTP + set password baru
+      await AuthService().verifyOtp(
+        email: email,
+        otp: otp,
+        password: password,
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password berhasil diubah')),
       );
-      
+
       return true;
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,6 +78,7 @@ class ResetPassController {
       return false;
     }
   }
+  
   
   void dispose() {
     newPasswordController.dispose();

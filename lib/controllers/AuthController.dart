@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 // View
 import '../screens/Auth/LoginView.dart';
 import '../screens/home/Dashboard.dart';
-
+import '../screens/Auth/Otp.dart';
+import '../screens/Auth/ResetPass.dart';
 // Service
 import '../services/Api/AuthService.dart';
 import '../services/Api/UserService.dart';
@@ -115,7 +116,7 @@ class AuthController {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginView(title : '')),
-        (Route<dynamic> route) => false, // false artinya hapus semua halaman lama
+        (Route<dynamic> route) => false,
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registrasi berhasil. Silakan login.')),
@@ -127,10 +128,75 @@ class AuthController {
     }
   }
 
+
+  Future<void> sendOtpToEmail(BuildContext context, String email) async {
+    if (!AuthService.isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Format email tidak valid')),
+      );
+      return;
+    }
+    try {
+      await _authService.forgotPassword(email);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) =>  Otp(email: email)),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP berhasil dikirim ke email')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
+  }
+
+  Future<void> verifyOtpFromApi({
+    required BuildContext context,
+    required String email,
+    required String otp,
+    int remainingTime = 0,
+    String password = '',
+  }) async {
+    try {
+      if (password.isEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResetPass(
+              email: email, 
+              otp: otp,
+              remainingTime: remainingTime,
+              ),
+          ),
+        );
+      } else {
+        await _authService.verifyOtp(email: email, otp: otp, password: password);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password berhasil diubah')),
+        );
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginView(title: '')),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Verifikasi OTP gagal: $e')),
+      );
+    }
+  }
+
   bool verifyOtp(BuildContext context, String otpCode) {
-    // Kamu bisa ganti validasinya sesuai logika yang diinginkan
-    if (otpCode.length == 4 && otpCode == '1234') {
-      // Contoh kode OTP valid
+  
+    if (otpCode.length == 6 && otpCode == '123456') {
+     
       return true;
     } else {
       ScaffoldMessenger.of(

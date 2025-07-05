@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 class OtpController {
   final List<TextEditingController> otpControllers = List.generate(
-    4,
+    6,
     (_) => TextEditingController(),
   );
-  final List<FocusNode> focusNodes = List.generate(4, (_) => FocusNode());
+
+  final List<FocusNode> focusNodes = List.generate(
+    6,
+    (_) => FocusNode(),
+  );
 
   void dispose() {
     for (var c in otpControllers) {

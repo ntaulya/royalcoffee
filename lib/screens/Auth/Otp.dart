@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../../controllers/AuthController.dart';
 import '../../controllers/otp_controller.dart';
 import 'ResetPass.dart';
 
 class Otp extends StatefulWidget {
-  const Otp({super.key, this.title = 'OTP'});
+  final String email;
   final String title;
+
+  const Otp({
+    super.key,
+    required this.email,
+    this.title = 'OTP',
+  });
 
   @override
   State<Otp> createState() => _OtpState();
@@ -15,11 +22,46 @@ class _OtpState extends State<Otp> {
   final AuthController _authController = AuthController();
   final OtpController _otpController = OtpController();
 
+
+  int _secondsRemaining = 300;
+  late Timer _timer;
+  bool _canResend = false;
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
   @override
   void dispose() {
+    _timer.cancel();
     _authController.dispose();
     _otpController.dispose();
     super.dispose();
+  }
+
+  void startTimer() {
+    _secondsRemaining = 300;
+    _canResend = false;
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining == 0) {
+        setState(() {
+          _canResend = true;
+        });
+        timer.cancel();
+      } else {
+        setState(() {
+          _secondsRemaining--;
+        });
+      }
+    });
+  }
+
+  String formatTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$secs';
   }
 
   @override
@@ -57,9 +99,9 @@ class _OtpState extends State<Otp> {
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(4, (index) {
+                children: List.generate(6, (index) {
                   return SizedBox(
-                    width: 60,
+                    width: 50,
                     child: TextField(
                       controller: _otpController.otpControllers[index],
                       focusNode: _otpController.focusNodes[index],
@@ -85,15 +127,19 @@ class _OtpState extends State<Otp> {
 
               Center(
                 child: TextButton(
-                  onPressed: () {
-                    // Implementasi logika kirim ulang OTP
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Kode OTP dikirim ulang')),
-                    );
-                  },
-                  child: const Text(
-                    'Tidak menerima kode? Kirim ulang',
-                    style: TextStyle(
+                  onPressed: _canResend
+                      ? () {
+                          startTimer(); 
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Kode OTP dikirim ulang')),
+                          );
+                        }
+                      : null, 
+                  child: Text(
+                    _canResend
+                        ? 'Tidak menerima kode? Kirim ulang'
+                        : 'Kirim ulang dalam ${formatTime(_secondsRemaining)}',
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFF834D1E),
                     ),
@@ -106,15 +152,16 @@ class _OtpState extends State<Otp> {
               ElevatedButton(
                 onPressed: () {
                   final otpCode = _otpController.otpCode;
-
-                  // Verifikasi OTP dan jika berhasil, navigasi ke halaman reset password
-                  if (_authController.verifyOtp(context, otpCode)) {
-                    // Navigasi ke halaman reset password
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ResetPass()),
-                    );
-                  }
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ResetPass(
+                        email: widget.email,
+                        otp: otpCode,
+                        remainingTime: _secondsRemaining,
+                      ),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF834D1E),

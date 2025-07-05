@@ -45,6 +45,7 @@ class _DashboardView extends State<Dashboard> {
 
 
   void _fetchProducts({String? categoryId, String? searchQuery}) async {
+    if (!mounted) return;
     setState(() => _isLoadingProduct = true);
 
     await _productController.fetchProducts(
@@ -56,20 +57,21 @@ class _DashboardView extends State<Dashboard> {
   }
 
   void _onCategorySelected(String category) async {
-  setState(() {
-    _selectedCategory = category;
-    _isLoadingProduct = true;
-  });
+    if (!mounted) return;
+    setState(() {
+      _selectedCategory = category;
+      _isLoadingProduct = true;
+    });
 
-  await _productController.fetchProducts(
-    categoryId: category,
-    searchQuery: _searchController.text,
-  );
+    await _productController.fetchProducts(
+      categoryId: category,
+      searchQuery: _searchController.text,
+    );
 
-  setState(() {
-    _isLoadingProduct = false;
-  });
-}
+    setState(() {
+      _isLoadingProduct = false;
+    });
+  }
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -172,6 +174,7 @@ class _DashboardView extends State<Dashboard> {
                           selectedCategory: _selectedCategory,
                           onCategorySelected: _onCategorySelected,
                           onInitialCategoryReady: (categoryId) async {
+                            if (!mounted) return;
                             setState(() {
                               _selectedCategory = categoryId;
                               _isLoadingProduct = true;
@@ -179,8 +182,8 @@ class _DashboardView extends State<Dashboard> {
 
                             await _productController.fetchProducts(
                               categoryId: categoryId,
-                              searchQuery : _searchController.text,
-                              );
+                              searchQuery: _searchController.text,
+                            );
 
                             setState(() {
                               _isLoadingProduct = false;

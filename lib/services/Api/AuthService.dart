@@ -50,6 +50,50 @@ class AuthService extends Config {
     }
   }
 
+  Future<void> forgotPassword(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/forget_password'), 
+        headers: defaultHeaders,
+        body: jsonEncode({'email': email.trim()}),
+      ).timeout(timeout);
+      if (response.statusCode != 201) {
+        throw Exception(getErrorMessage(response, 'forgot-password'));
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } on http.ClientException {
+      throw Exception('Gagal terhubung ke server');
+    } catch (e) {
+      throw Exception('Gagal mengirim OTP: $e');
+    }
+  }
+
+  Future<void> verifyOtp({
+    required String email,
+    required String otp,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/verifyOtp'),
+        headers: defaultHeaders,
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'password': password,
+        }),
+      ).timeout(timeout);
+      if (response.statusCode != 201) {
+        throw Exception(getErrorMessage(response, 'verify-otp'));
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } catch (e) {
+      throw Exception('Gagal verifikasi OTP: $e');
+    }
+  }
+
   Login _handleAuthResponse(http.Response response, String action) {
     if (response.statusCode == 200 || response.statusCode == 201) {
       try {
