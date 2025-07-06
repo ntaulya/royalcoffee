@@ -208,35 +208,95 @@ class _PesananSayaState extends State<PesananSaya> {
   }
 
   Widget buildPaymentSection() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Pembayaran Berhasil'),
-              content: const Text('Terima kasih telah melakukan pembayaran.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    cartController.clearCart();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Tutup'),
+    String? selectedTipePemesanan;
+    final TextEditingController notesController = TextEditingController();
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedTipePemesanan,
+                decoration: const InputDecoration(
+                  labelText: 'Tipe Pemesanan',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            ),
-          );
-        },
-        icon: const Icon(Icons.payment),
-        label: const Text('Bayar Sekarang'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.brown,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 48),
-        ),
-      ),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'take_away',
+                    child: Text('Take Away'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'dine_in',
+                    child: Text('Dine In'),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedTipePemesanan = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Catatan',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: selectedTipePemesanan == null
+                    ? null
+                    : () async {
+                        try {
+                          await productService.checkoutOrder(
+                            tipePemesanan: selectedTipePemesanan!,
+                            notes: notesController.text.trim(),
+                            products: cartController.items,
+                          );
+
+                          if (!context.mounted) return;
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Pembayaran Berhasil'),
+                              content: const Text('Terima kasih telah melakukan pembayaran.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    cartController.clearCart();
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Tutup'),
+                                ),
+                              ],
+                            ),
+                          );
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Gagal melakukan pembayaran: $e')),
+                          );
+                        }
+                      },
+                icon: const Icon(Icons.payment),
+                label: const Text('Bayar Sekarang'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

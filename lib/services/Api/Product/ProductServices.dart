@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../../SecureStorageService.dart';
 import '../Config.dart';
 import '../../../models/Product/Product.dart';
+import '../../../models/CartItem.dart';
 import '../../../models/Product/Pajak.dart';
 
 class ProductServices extends Config {
@@ -111,6 +112,55 @@ class ProductServices extends Config {
       throw Exception('Gagal terhubung ke server');
     } catch (e) {
       throw Exception('Gagal mengambil pajak: $e');
+    }
+  }
+
+  Future<void> checkoutOrder({
+    required String tipePemesanan,
+    required String notes,
+    required List<CartItem> products,
+  }) async {
+    try {
+      String url = '${_config.baseUrl}/product/carts';
+      String? token = await _storageService.getToken();
+
+      var uri = Uri.parse(url);
+      var request = http.MultipartRequest('POST', uri);
+
+     
+      request.headers.addAll({
+        ..._config.defaultHeaders,
+        'Authorization': 'Bearer $token',
+        
+      });
+
+     
+      request.fields['tipe_pemesanan'] = tipePemesanan;
+      request.fields['notes'] = notes;
+      request.fields['product'] = ''; 
+
+     
+      for (int i = 0; i < products.length; i++) {
+        request.fields['product[$i][product_id]'] = products[i].productId.toString();
+        request.fields['product[$i][id_varian]'] = products[i].variantId.toString();
+        request.fields['product[$i][qty]'] = products[i].quantity.toString();
+      }
+
+     
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print('Status: ${response.statusCode}');
+      print('Body: ${response.body}');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(_config.getErrorMessage(response, 'checkout'));
+      }
+
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } catch (e) {
+      throw Exception('Gagal melakukan checkout: $e');
     }
   }
 }
