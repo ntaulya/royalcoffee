@@ -13,16 +13,10 @@ import 'package:royalcoffee/admin/screens/AturMenu.dart';
 import 'package:royalcoffee/screens/BaristaView.dart';
 import 'package:royalcoffee/screens/WaitersView.dart';
 import 'package:royalcoffee/controllers/product/ProductController.dart';
+import 'screens/Splash.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ProductController()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,13 +25,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Royal Cafe',
-      theme: ThemeData(
-        useMaterial3: false,
-        fontFamily: 'Poppins',
-      ),
-      home:  Splash(),
+      theme: ThemeData(primarySwatch: Colors.brown),
+      home: Splash(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

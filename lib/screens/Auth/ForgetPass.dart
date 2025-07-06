@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'otp.dart'; // Import halaman OTP kamu
+import '../../../controllers/AuthController.dart';
 
 class ForgetPass extends StatelessWidget {
+  
   const ForgetPass({super.key});
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
-
+    final authController = AuthController();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lupa Password'),
@@ -26,12 +27,8 @@ class ForgetPass extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Disini bisa kamu kirim OTP ke email dulu (kalau mau)
-                // Setelah itu, langsung navigasi ke halaman OTP
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Otp()),
-                );
+                final email = emailController.text.trim();
+                authController.sendOtpToEmail(context, email);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF834D1E),
