@@ -98,7 +98,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   // Tombol full width
                   _buildButton(
                     label: 'Update Profile',
-                    onPressed: () {},
+                    onPressed: () {
+                      _authController.updateProfile(
+                        context,
+                        namaLengkap: nameController.text.trim(),
+                        email: emailController.text.trim(),
+                        phone: phoneController.text.trim(),
+                      );
+                    },
                     backgroundColor: Colors.white,
                     textColor: const Color(0xFF7A491F),
                     borderColor: const Color(0xFF7A491F),

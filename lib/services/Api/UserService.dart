@@ -46,4 +46,39 @@ class UserService extends Config {
         throw Exception('Gagal mengambil data profil: $e');
     }
   }
+  Future<void> updateProfile({
+    required String namaLengkap,
+    required String email,
+    required String phone,
+    }) async {
+      try {
+          String url = '${_config.baseUrl}/user/detail';
+          String? token = await _storageService.getToken();
+
+          Map<String, String> headers = {
+          ..._config.defaultHeaders,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Bearer $token',
+          };
+
+          final body = {
+            'nama_lengkap': namaLengkap,
+            'email': email,
+            'phone': phone,
+            'password': '',
+            'user_id': ''
+          };
+
+          final response = await http
+              .patch(Uri.parse(url), headers: headers, body: body)
+              .timeout(_config.timeout);
+          if (response.statusCode != 201) {
+            throw Exception(_config.getErrorMessage(response, 'update profile'));
+          }
+      } on SocketException {
+          throw Exception('Tidak ada koneksi internet');
+      } catch (e) {
+          throw Exception('Gagal update profil: $e');
+      }
+    }
 }

@@ -59,6 +59,29 @@ class AuthController {
       final result = await _userService.getProfile();
       return result;
   }
+  Future<void> updateProfile(
+    BuildContext context, {
+    required String namaLengkap,
+    required String email,
+    required String phone,
+  }) async {
+    try {
+      await _userService.updateProfile(
+        namaLengkap: namaLengkap,
+        email: email,
+        phone: phone,
+      );
+      final updatedProfile = await getProfile(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profil berhasil diperbarui')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal update profil: $e')),
+      );
+    }
+  }
+
 
 
 
