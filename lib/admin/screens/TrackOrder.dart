@@ -11,21 +11,9 @@ class TrackOrder extends StatefulWidget {
   State<TrackOrder> createState() => _TrackOrderState();
 }
 
-class _TrackOrderState extends State<TrackOrder> with SingleTickerProviderStateMixin {
-  int _selectedBottomNavIndex = 1; // aktif di index ke-1 (Track Order)
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 5, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _TrackOrderState extends State<TrackOrder> {
+  int _selectedBottomNavIndex = 1;
+  String _currentStep = "Menunggu Diproses";
 
   void _onTap(int index) {
     if (index == _selectedBottomNavIndex) return;
@@ -42,7 +30,7 @@ class _TrackOrderState extends State<TrackOrder> with SingleTickerProviderStateM
         );
         break;
       case 1:
-        // Stay on Track Order
+        // Stay here
         break;
       case 2:
         Navigator.pushReplacement(
@@ -57,6 +45,43 @@ class _TrackOrderState extends State<TrackOrder> with SingleTickerProviderStateM
         );
         break;
     }
+  }
+
+  List<Map<String, dynamic>> _getAllOrders() {
+    return [
+      {
+        "orderId": "ORD001",
+        "customerName": "Muhammad Andi Syaifullah",
+        "status": "Menunggu Diproses",
+        "time": "10:30 AM",
+        "statusColor": Colors.brown,
+      },
+      {
+        "orderId": "ORD002",
+        "customerName": "Siti Nurhaliza",
+        "status": "Proses",
+        "time": "09:45 AM",
+        "statusColor": Colors.orange,
+      },
+      {
+        "orderId": "ORD003",
+        "customerName": "Ahmad Fauzi",
+        "status": "Selesai",
+        "time": "08:20 AM",
+        "statusColor": Colors.green,
+      },
+      {
+        "orderId": "ORD004",
+        "customerName": "Dewi Sartika",
+        "status": "Proses",
+        "time": "07:15 AM",
+        "statusColor": Colors.orange,
+      },
+    ];
+  }
+
+  List<Map<String, dynamic>> _getFilteredOrders(String status) {
+    return _getAllOrders().where((order) => order["status"] == status).toList();
   }
 
   Widget _buildOrderCard({
@@ -112,18 +137,12 @@ class _TrackOrderState extends State<TrackOrder> with SingleTickerProviderStateM
                 const SizedBox(height: 4),
                 Text(
                   customerName,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
+                  style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   time,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -148,91 +167,84 @@ class _TrackOrderState extends State<TrackOrder> with SingleTickerProviderStateM
     );
   }
 
-  // Data dummy untuk setiap tab
-  List<Map<String, dynamic>> _getAllOrders() {
-    return [
-      {
-        "orderId": "ORD001",
-        "customerName": "Muhammad Andi Syaifullah",
-        "status": "Sedang Dibuat",
-        "time": "10:30 AM",
-        "statusColor": Colors.orange,
-      },
-      {
-        "orderId": "ORD002",
-        "customerName": "Siti Nurhaliza",
-        "status": "Siap Diambil",
-        "time": "09:45 AM",
-        "statusColor": Colors.green,
-      },
-      {
-        "orderId": "ORD003",
-        "customerName": "Ahmad Fauzi",
-        "status": "Sedang Diantar",
-        "time": "08:20 AM",
-        "statusColor": Colors.blue,
-      },
-      {
-        "orderId": "ORD004",
-        "customerName": "Dewi Sartika",
-        "status": "Selesai",
-        "time": "07:15 AM",
-        "statusColor": Colors.grey,
-      },
-      {
-        "orderId": "ORD005",
-        "customerName": "Budi Santoso",
-        "status": "Sedang Dibuat",
-        "time": "11:00 AM",
-        "statusColor": Colors.orange,
-      },
-    ];
-  }
-
-  List<Map<String, dynamic>> _getFilteredOrders(String status) {
-    if (status == "Semua") return _getAllOrders();
-    return _getAllOrders().where((order) => order["status"] == status).toList();
+  Widget _buildProgressIndicator() {
+    final steps = ["Menunggu Diproses", "Proses", "Selesai"];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: List.generate(steps.length, (index) {
+          final isActive = steps[index] == _currentStep;
+          return Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _currentStep = steps[index];
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isActive ? const Color(0xFF4B1D0D) : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    steps[index],
+                    style: TextStyle(
+                      color: isActive ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              if (index != steps.length - 1)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6),
+                  child: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                ),
+            ],
+          );
+        }),
+      ),
+    );
   }
 
   Widget _buildOrderList(String status) {
     final orders = _getFilteredOrders(status);
-    
     if (orders.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.inbox_outlined,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "Tidak ada order dengan status $status",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
+      return Expanded(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
+              const SizedBox(height: 16),
+              Text(
+                "Tidak ada pesanan dengan status \"$status\"",
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.only(top: 16, bottom: 100),
-      itemCount: orders.length,
-      itemBuilder: (context, index) {
-        final order = orders[index];
-        return _buildOrderCard(
-          orderId: order["orderId"],
-          customerName: order["customerName"],
-          status: order["status"],
-          time: order["time"],
-          statusColor: order["statusColor"],
-        );
-      },
+    return Expanded(
+      child: ListView.builder(
+        padding: const EdgeInsets.only(top: 16, bottom: 100),
+        itemCount: orders.length,
+        itemBuilder: (context, index) {
+          final order = orders[index];
+          return _buildOrderCard(
+            orderId: order["orderId"],
+            customerName: order["customerName"],
+            status: order["status"],
+            time: order["time"],
+            statusColor: order["statusColor"],
+          );
+        },
+      ),
     );
   }
 
@@ -245,45 +257,20 @@ class _TrackOrderState extends State<TrackOrder> with SingleTickerProviderStateM
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
-          "Track Order",
+          "Cek Antrian & Proses",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
             color: Colors.black,
           ),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          indicatorColor: const Color(0xFF8B4A0C),
-          indicatorWeight: 3,
-          labelColor: const Color(0xFF8B4A0C),
-          unselectedLabelColor: Colors.grey,
-          labelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 14,
-          ),
-          tabs: const [
-            Tab(text: "Semua"),
-            Tab(text: "Sedang Dibuat"),
-            Tab(text: "Siap Diambil"),
-            Tab(text: "Sedang Diantar"),
-            Tab(text: "Selesai"),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          _buildOrderList("Semua"),
-          _buildOrderList("Sedang Dibuat"),
-          _buildOrderList("Siap Diambil"),
-          _buildOrderList("Sedang Diantar"),
-          _buildOrderList("Selesai"),
+          const SizedBox(height: 12),
+          _buildProgressIndicator(),
+          const SizedBox(height: 12),
+          _buildOrderList(_currentStep),
         ],
       ),
       bottomNavigationBar: BottomNavBarAdmin(
