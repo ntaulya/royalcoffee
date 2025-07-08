@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:royalcoffee/admin/layout/BottomNavBarAdmin.dart';
-import 'package:royalcoffee/admin/screens/IncomingOrder.dart';
-import 'package:royalcoffee/admin/screens/Customer.dart';
-import 'package:royalcoffee/admin/screens/Menu.dart';
+import 'package:royalcoffee/screens/Admin/layout/BottomNavBarAdmin.dart';
+import 'package:royalcoffee/screens/Admin/screens/Customer.dart';
+import 'package:royalcoffee/screens/Admin/screens/Menu.dart';
 
 class TrackOrder extends StatefulWidget {
   const TrackOrder({super.key});
@@ -22,29 +21,29 @@ class _TrackOrderState extends State<TrackOrder> {
       _selectedBottomNavIndex = index;
     });
 
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const IncomingOrder()),
-        );
-        break;
-      case 1:
-        // Stay here
-        break;
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Menu()),
-        );
-        break;
-      case 3:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Customer()),
-        );
-        break;
-    }
+    // switch (index) {
+    //   case 0:
+    //     // Navigator.pushReplacement(
+    //     //   context,
+    //     //   MaterialPageRoute(builder: (context) => const IncomingOrder()),
+    //     // );
+    //     break;
+    //   case 1:
+    //     // Stay here
+    //     break;
+    //   case 2:
+    //     Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(builder: (context) => const Menu()),
+    //     );
+    //     break;
+    //   case 3:
+    //     Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(builder: (context) => const Customer()),
+    //     );
+    //     break;
+    // }
   }
 
   List<Map<String, dynamic>> _getAllOrders() {
@@ -272,10 +271,6 @@ class _TrackOrderState extends State<TrackOrder> {
           const SizedBox(height: 12),
           _buildOrderList(_currentStep),
         ],
-      ),
-      bottomNavigationBar: BottomNavBarAdmin(
-        selectedIndex: _selectedBottomNavIndex,
-        onTap: _onTap,
       ),
     );
   }

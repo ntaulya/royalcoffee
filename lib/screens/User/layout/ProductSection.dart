@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../controllers/Product/ProductController.dart';
-import '../../models/Product/Product.dart';
+import '../../../controllers/Product/ProductController.dart';
+import '../../../models/Product/Product.dart';
 import 'ProductCard.dart';
 import '../home/DetailPesanan.dart';
 

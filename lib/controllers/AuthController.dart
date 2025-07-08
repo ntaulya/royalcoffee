@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // View
+import '../screens/User/home/Dashboard.dart';
 import '../screens/Auth/LoginView.dart';
-import '../screens/home/Dashboard.dart';
 import '../screens/Auth/Otp.dart';
 import '../screens/Auth/ResetPass.dart';
 // Service

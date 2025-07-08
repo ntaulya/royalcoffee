@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../screens/home/Dashboard.dart';
+import '../../../screens/User/home/Dashboard.dart';
 import '../../../controllers/AuthController.dart';
-import '../../../admin/home/DashboardAdmin.dart';
+import '../../Admin/home/DashboardAdmin.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

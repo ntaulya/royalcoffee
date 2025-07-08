@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
-import '../../controllers/CartController.dart';
-
+import '../../../controllers/CartController.dart';
+import '../../../controllers/Product/ProductController.dart';
+import '../../../models/Product/Product.dart';
 // Header & Layout
 import '../layout/DashboardHeader.dart';
 import '../layout/BottomNavBar.dart';
@@ -15,8 +16,6 @@ import './DetailPesanan.dart';
 
 
 import '../layout/ProductSection.dart';
-import '../../models/Product/Product.dart';
-import '../../controllers/Product/ProductController.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import '../../models/Product/Product.dart';
-import '../../services/Api/ImageHelper.dart'; 
+import '../../../models/Product/Product.dart';
+import '../../../services/Api/ImageHelper.dart'; 
 
 class ProductCard extends StatefulWidget {
   final Product product;

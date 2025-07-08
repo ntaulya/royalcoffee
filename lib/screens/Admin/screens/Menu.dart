@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:royalcoffee/admin/layout/BottomNavBarAdmin.dart';
-import 'package:royalcoffee/admin/screens/IncomingOrder.dart';
-import 'package:royalcoffee/admin/screens/TrackOrder.dart';
-import 'package:royalcoffee/admin/screens/Customer.dart';
+import 'package:royalcoffee/screens/Admin/layout/BottomNavBarAdmin.dart';
+import 'package:royalcoffee/screens/Admin/screens/TrackOrder.dart';
+import 'package:royalcoffee/screens/Admin/screens/Customer.dart';
 import 'package:royalcoffee/controllers/product/ProductController.dart';
 import 'package:royalcoffee/models/Product/Product.dart';
 
@@ -32,20 +31,7 @@ class _MenuState extends State<Menu> {
       _selectedBottomNavIndex = index;
     });
 
-    switch (index) {
-      case 0:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => IncomingOrder()));
-        break;
-      case 1:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => TrackOrder()));
-        break;
-      case 3:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Customer()));
-        break;
-    }
+   
   }
 
   Widget _buildStatusButton(String text, Color color,
@@ -175,10 +161,6 @@ class _MenuState extends State<Menu> {
         child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: BottomNavBarAdmin(
-        selectedIndex: _selectedBottomNavIndex,
-        onTap: _onTap,
-      ),
     );
   }
 }

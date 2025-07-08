@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:royalcoffee/admin/layout/BottomNavBarAdmin.dart';
-import 'package:royalcoffee/admin/screens/IncomingOrder.dart';
-import 'package:royalcoffee/admin/screens/TrackOrder.dart';
-import 'package:royalcoffee/admin/screens/Menu.dart';
+import 'package:royalcoffee/screens/Admin/layout/BottomNavBarAdmin.dart';
+import 'package:royalcoffee/screens/Admin/screens/TrackOrder.dart';
+import 'package:royalcoffee/screens/Admin/screens/Customer.dart';
+import 'package:royalcoffee/screens/Admin/screens/Menu.dart';
 
 class Customer extends StatefulWidget {
   const Customer({super.key});
@@ -21,29 +21,7 @@ class _CustomerState extends State<Customer> {
       _selectedBottomNavIndex = index;
     });
 
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const IncomingOrder()),
-        );
-        break;
-      case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const TrackOrder()),
-        );
-        break;
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Menu()),
-        );
-        break;
-      case 3:
-        // Stay on Customer
-        break;
-    }
+    
   }
 
   Widget _buildCustomerItem(int index, String name, String emailPhone) {
@@ -142,10 +120,7 @@ class _CustomerState extends State<Customer> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: BottomNavBarAdmin(
-        selectedIndex: _selectedBottomNavIndex,
-        onTap: _onTap,
-      ),
+      
     );
   }
 }

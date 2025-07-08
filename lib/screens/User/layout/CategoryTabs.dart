@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../controllers/Product/CategoryController.dart';
-import '../../models/Category.dart';
-import '../../services/CategoryCacheService.dart';
+import '../../../controllers/Product/CategoryController.dart';
+import '../../../models/Category.dart';
+import '../../../services/CategoryCacheService.dart';
 
 class CategoryTabs extends StatefulWidget {
   final String selectedCategory;

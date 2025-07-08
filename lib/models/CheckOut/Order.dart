@@ -1,0 +1,39 @@
+import './ItemProduct';
+
+class Order {
+  final String id;
+  final String? email;
+  final String nama_pemesan;
+  final String tipe_pemesanan;
+  final String create_at;
+  final String? catatan;
+  final List<ItemProduct>? Item;
+
+
+  Order({
+    required this.id,
+    required this.nama_pemesan,
+    required this.tipe_pemesanan,
+    required this.tipe_create_at,
+    this.email,
+    this.catatan,
+    this.Item,
+  });
+
+
+  factory Order.fromJson(Map<String,dynamic> json){
+    return Order(
+      id : json['id_checkout'] ?? '';
+      email: json['email'] ?? '',
+      nama_pemesan: json['nama_lengkap'] ?? '';
+      tipe_pemesanan: json['tipe_pemesanan'] ?? '';
+      create_at: json['created_at'] ?? '';
+      catatan: json['notes'] ?? '';
+      Item: json['item_product'] != null
+        ? (json['item_product'] as List)
+          .map((v) => ItemProduct.fromJson(v))
+          .toList()
+        : null,
+    );
+  }
+}

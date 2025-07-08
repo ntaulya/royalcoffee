@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../controllers/CartController.dart';
-import '../../models/CartItem.dart';
+import '../../../controllers/CartController.dart';
+import '../../../models/CartItem.dart';
 
 
 // Screen
-import '../Auth/User/ProfilePage.dart';
+import '../../Auth/User/ProfilePage.dart';
 
 class DashboardHeader extends StatelessWidget {
   final CartController cartController;
