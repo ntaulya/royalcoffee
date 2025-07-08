@@ -1,4 +1,4 @@
-import './ItemProduct';
+import './ItemProduct.dart';
 
 class Order {
   final String id;
@@ -14,7 +14,7 @@ class Order {
     required this.id,
     required this.nama_pemesan,
     required this.tipe_pemesanan,
-    required this.tipe_create_at,
+    required this.create_at,
     this.email,
     this.catatan,
     this.Item,
@@ -23,12 +23,12 @@ class Order {
 
   factory Order.fromJson(Map<String,dynamic> json){
     return Order(
-      id : json['id_checkout'] ?? '';
+      id : json['id_checkout'] ?? '',
       email: json['email'] ?? '',
-      nama_pemesan: json['nama_lengkap'] ?? '';
-      tipe_pemesanan: json['tipe_pemesanan'] ?? '';
-      create_at: json['created_at'] ?? '';
-      catatan: json['notes'] ?? '';
+      nama_pemesan: json['nama_lengkap'] ?? '',
+      tipe_pemesanan: json['tipe_pemesanan'] ?? '',
+      create_at: json['created_at'] ?? '',
+      catatan: json['notes'] ?? '',
       Item: json['item_product'] != null
         ? (json['item_product'] as List)
           .map((v) => ItemProduct.fromJson(v))

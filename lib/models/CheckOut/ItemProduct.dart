@@ -4,7 +4,7 @@ class ItemProduct {
   final String nama_product;
   final String nama_varian;
   final int qty;
-  final double harga_stauan;
+  final double harga_satuan;
   final double harga_total;
 
   ItemProduct({
@@ -17,14 +17,14 @@ class ItemProduct {
     required this.harga_total,
   });
 
-  factrory ItemProduct.fromJson(Map<String, dynamic> json){  
-    return Item(
+  factory ItemProduct.fromJson(Map<String, dynamic> json){  
+    return ItemProduct(
         product_id: json['product_id'],
         varian_id: json['varian_id'],
         nama_product: json['nama_product'],
         nama_varian: json['nama_varian'],
         qty: json['qty'],
-        harga_stauan: json['harga_satuan'],
+        harga_satuan: json['harga_satuan'],
         harga_total: json['harga_total'],
     );
   }

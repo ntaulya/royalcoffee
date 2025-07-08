@@ -3,6 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 
+
+import '../../../../controllers/Product/CategoryController.dart';
+import '../../../../models/Category.dart';
+
+class MenuVariant {
+  File? image;
+  String name = '';
+  String price = '';
+  String stock = '';
+
+  MenuVariant({this.image});
+}
+
 class AddMenu extends StatefulWidget {
   const AddMenu({super.key});
 
@@ -11,46 +24,49 @@ class AddMenu extends StatefulWidget {
 }
 
 class _AddMenuState extends State<AddMenu> {
-  final List<String> categories = [
-    'Coffee',
-    'Non-Coffee',
-    'Snack',
-    'Food',
-    'Royal Glace',
-    'Ice Cream Panda',
-  ];
-
-  String? selectedCategory;
+  final CategoryController _categoryController = CategoryController();
+  List<Category> _categories = [];
+  Category? selectedCategory;
+  
   File? _mainImage;
-  List<File> _variantImages = [];
-
   final ImagePicker _picker = ImagePicker();
+
+  List<MenuVariant> _variants = [];
+
+  Future<void> _loadCategories() async {
+    final categories = await _categoryController.loadCategories();
+    setState(() {
+      _categories = categories;
+    });
+  }
+
+
+  
 
   Future<void> _pickMainImage() async {
     final XFile? image =
         await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
 
     if (image != null) {
-      setState(() {
-        _mainImage = File(image.path);
-      });
+      setState(() => _mainImage = File(image.path));
     }
   }
 
-  Future<void> _pickVariantImages() async {
-    final List<XFile>? images = await _picker.pickMultiImage(imageQuality: 85);
+  Future<void> _pickVariantImage(int index) async {
+    final XFile? image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
 
-    if (images != null && images.isNotEmpty) {
-      setState(() {
-        _variantImages.addAll(images.map((xfile) => File(xfile.path)));
-      });
+    if (image != null) {
+      setState(() => _variants[index].image = File(image.path));
     }
   }
 
-  Widget _buildTextField(String hintText, {IconData? icon}) {
+  Widget _buildTextField(String hintText, {IconData? icon, Function(String)? onChanged, String? initialValue}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: TextField(
+      child: TextFormField(
+        initialValue: initialValue,
+        onChanged: onChanged,
         decoration: InputDecoration(
           hintText: hintText,
           prefixIcon: icon != null ? Icon(icon) : null,
@@ -108,6 +124,64 @@ class _AddMenuState extends State<AddMenu> {
     );
   }
 
+  Widget _buildVariantCard(int index) {
+    final variant = _variants[index];
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                _buildImageBox(
+                  variant.image,
+                  () => _pickVariantImage(index),
+                  size: 60,
+                  caption: "60x60",
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    children: [
+                      _buildTextField("Nama Varian",
+                          icon: Iconsax.edit,
+                          initialValue: variant.name,
+                          onChanged: (val) => variant.name = val),
+                      _buildTextField("Harga Penambahan",
+                          icon: Iconsax.money_2,
+                          initialValue: variant.price,
+                          onChanged: (val) => variant.price = val),
+                      _buildTextField("Stock",
+                          icon: Iconsax.archive,
+                          initialValue: variant.stock,
+                          onChanged: (val) => variant.stock = val),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() => _variants.removeAt(index));
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    _variants.add(MenuVariant());
+    _loadCategories();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,18 +216,6 @@ class _AddMenuState extends State<AddMenu> {
                 ),
               ),
 
-              const SizedBox(height: 12),
-              _buildSectionTitle("Foto Varian"),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  ..._variantImages.map((file) =>
-                      _buildImageBox(file, () {}, size: 60, caption: "60x60")),
-                  _buildImageBox(null, _pickVariantImages, size: 60, caption: "Tambah"),
-                ],
-              ),
-
               const SizedBox(height: 20),
               _buildSectionTitle("Informasi Menu"),
               _buildTextField("Nama Menu", icon: Iconsax.coffee),
@@ -162,16 +224,16 @@ class _AddMenuState extends State<AddMenu> {
 
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6.0),
-                child: DropdownButtonFormField<String>(
+                child: DropdownButtonFormField<Category>(
                   value: selectedCategory,
                   hint: const Text("Pilih Kategori"),
-                  items: categories.map((category) {
+                  items: _categories.map((category) {
                     return DropdownMenuItem(
                       value: category,
-                      child: Text(category),
+                      child: Text(category.name),
                     );
                   }).toList(),
-                  onChanged: (value) {
+                  onChanged: (Category? value) {
                     setState(() => selectedCategory = value);
                   },
                   decoration: InputDecoration(
@@ -187,17 +249,35 @@ class _AddMenuState extends State<AddMenu> {
               ),
 
               const Divider(thickness: 1.2),
-              _buildSectionTitle("Informasi Varian"),
-              _buildTextField("Varian (misal: Size)", icon: Iconsax.box),
-              _buildTextField("Nama Varian", icon: Iconsax.edit),
-              _buildTextField("Harga Penambahan", icon: Iconsax.money_2),
-              _buildTextField("Stock Varian", icon: Iconsax.archive),
+              _buildSectionTitle("Varian Menu"),
+
+              ...List.generate(_variants.length, _buildVariantCard),
+
+              TextButton.icon(
+                onPressed: () {
+                  setState(() => _variants.add(MenuVariant()));
+                },
+                icon: const Icon(Icons.add),
+                label: const Text("Tambah Varian"),
+              ),
 
               const SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    // Simpan data ke backend/API
+                     if (_variants.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Minimal harus ada 1 varian')),
+                        );
+                        return;
+                      }
+
+                      if (selectedCategory == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Pilih kategori terlebih dahulu')),
+                        );
+                        return;
+                      }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4B1D0D),
@@ -206,7 +286,7 @@ class _AddMenuState extends State<AddMenu> {
                         horizontal: 40, vertical: 14),
                   ),
                   child: const Text(
-                    "Selesai",
+                    "Tambahkan Product",
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),

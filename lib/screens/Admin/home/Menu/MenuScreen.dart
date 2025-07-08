@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../../models/Product/Product.dart';
 import '../../../../controllers/Product/ProductController.dart';
 
+import './AddMenu.dart';
+
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
 
@@ -126,7 +128,10 @@ class MenuScreen extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           backgroundColor: const Color(0xFF844C29),
           onPressed: () {
-            // Tambah menu
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddMenu()),
+            );
           },
           child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
         ),

@@ -5,6 +5,7 @@ import 'dart:async';
 import '../../../controllers/CartController.dart';
 import '../../../services/Api/ImageHelper.dart';
 import '../../../services/Api/Product/ProductServices.dart';
+import '../../../services/Api/Product/CheckOrderService.dart';
 import '../../../models/CartItem.dart';
 import '../../../models/Product/Pajak.dart';
 
@@ -18,6 +19,7 @@ class PesananSaya extends StatefulWidget {
 class _PesananSayaState extends State<PesananSaya> {
   final cartController = CartController();
   final ProductServices productService = ProductServices();
+  final CheckOrderService checkoutService = CheckOrderService();
   late final StreamSubscription _cartSubscription;
 
   Pajak? pajak;
@@ -255,7 +257,7 @@ class _PesananSayaState extends State<PesananSaya> {
                     ? null
                     : () async {
                         try {
-                          await productService.checkoutOrder(
+                          await checkoutService.checkoutOrder(
                             tipePemesanan: selectedTipePemesanan!,
                             notes: notesController.text.trim(),
                             products: cartController.items,

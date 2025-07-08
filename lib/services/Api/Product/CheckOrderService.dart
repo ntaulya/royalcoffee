@@ -6,15 +6,19 @@ import '../Config.dart';
 import '../../SecureStorageService.dart';
 import '../../../models/CheckOut/Order.dart';
 import '../../../models/CheckOut/ItemProduct.dart';
+import '../../../models/CartItem.dart';
 
 
 
 class CheckOrderService extends Config{
   final Config _config = Config();
   final SecureStorageService _storageService = SecureStorageService();
-  Fiture<List<Order>> getOrder({String? id, String? search}) async {
+
+  Future<List<Order>> getOrder({String? id, String? search}) async {
     try{
       String url = '${_config.baseUrl}/product/checkOrder';
+      String? token = await _storageService.getToken();
+
       Map<String,String> requrestHeaders = {
         ..._config.defaultHeaders,
         'Authorization' : 'Bearer $token',
@@ -26,16 +30,73 @@ class CheckOrderService extends Config{
       });
 
       final response = await http
-        .get(uri,headers:requrestHeaders)
-        .timeout(_config.timeout);
-      print(reponse.statusCode);
-      print(reponse.body);
+          .get(uri, headers: requrestHeaders)
+          .timeout(_config.timeout);
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 201) {
+      final jsonData = json.decode(response.body);
+      final List<dynamic> ordersJson = jsonData['data'] ?? [];
+
+      return ordersJson.map((orderJson) => Order.fromJson(orderJson)).toList();
+    } else {
+      throw Exception(_config.getErrorMessage(response, 'getOrder'));
+    }
     }on SocketException{
       throw Exception('Tidak ada koneksi internet');
     }on http.ClientException{
       throw Exception('Gagal terhubung ke server');
     }catch (e) {
       throw Exception('Gagal mengambil order: $e');
+    }
+  }
+  
+  Future<void> checkoutOrder({
+    required String tipePemesanan,
+    required String notes,
+    required List<CartItem> products,
+  }) async {
+    try {
+      String url = '${_config.baseUrl}/product/carts';
+      String? token = await _storageService.getToken();
+
+      var uri = Uri.parse(url);
+      var request = http.MultipartRequest('POST', uri);
+
+     
+      request.headers.addAll({
+        ..._config.defaultHeaders,
+        'Authorization': 'Bearer $token',
+        
+      });
+
+     
+      request.fields['tipe_pemesanan'] = tipePemesanan;
+      request.fields['notes'] = notes;
+      request.fields['product'] = ''; 
+
+     
+      for (int i = 0; i < products.length; i++) {
+        request.fields['product[$i][product_id]'] = products[i].productId.toString();
+        request.fields['product[$i][id_varian]'] = products[i].variantId.toString();
+        request.fields['product[$i][qty]'] = products[i].quantity.toString();
+      }
+
+     
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print('Status: ${response.statusCode}');
+      print('Body: ${response.body}');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(_config.getErrorMessage(response, 'checkout'));
+      }
+
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } catch (e) {
+      throw Exception('Gagal melakukan checkout: $e');
     }
   }
 }
