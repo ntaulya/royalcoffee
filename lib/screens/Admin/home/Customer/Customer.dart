@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../layout/BottomNavBarAdmin.dart';
 
-
-// Belum Selesai
-import '../Incoming/IncomingOrder.dart';
-import '../Menu/MenuScreen.dart';
-import '../Customer/Customer.dart';
+import '../../../../controllers/User/UserController.dart';
+import '../../../../models/User/User.dart';
 
 class Customer extends StatefulWidget {
   const Customer({super.key});
@@ -15,19 +12,20 @@ class Customer extends StatefulWidget {
 }
 
 class _CustomerState extends State<Customer> {
-  int _selectedBottomNavIndex = 3; // aktif di index ke-3 (Customer)
+  final UserController _userController = UserController();
 
-  void _onTap(int index) {
-    if (index == _selectedBottomNavIndex) return;
-
-    setState(() {
-      _selectedBottomNavIndex = index;
-    });
-
-    
+  @override
+  void initState() {
+    super.initState();
+    _loadUsers();
   }
 
-  Widget _buildCustomerItem(int index, String name, String emailPhone) {
+  Future<void> _loadUsers() async {
+    await _userController.getAllUsers(context: context);
+    setState(() {}); 
+  }
+
+  Widget _buildCustomerItem(int index, User user) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: const BoxDecoration(
@@ -42,7 +40,7 @@ class _CustomerState extends State<Customer> {
             radius: 14,
             backgroundColor: Colors.brown,
             child: Text(
-              "$index",
+              "${index + 1}",
               style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
           ),
@@ -52,7 +50,7 @@ class _CustomerState extends State<Customer> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  user.namaLengkap,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -61,7 +59,7 @@ class _CustomerState extends State<Customer> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  emailPhone,
+                  '${user.email}, ${user.phone}',
                   style: const TextStyle(
                     fontSize: 13,
                     color: Colors.black87,
@@ -76,7 +74,16 @@ class _CustomerState extends State<Customer> {
   }
 
   @override
+  void dispose() {
+    _userController.disposeController();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isLoading = _userController.isLoading;
+    final users = _userController.users;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
@@ -92,38 +99,17 @@ class _CustomerState extends State<Customer> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 100), // Tambah padding bottom untuk space dari bottom nav
-              children: [
-                _buildCustomerItem(
-                  1,
-                  "Muhammad Andi Syaifullah",
-                  "andisyaifullah@gmail.com, 082216458858",
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : users.isEmpty
+              ? const Center(child: Text("Belum ada data pelanggan"))
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  itemCount: users.length,
+                  itemBuilder: (context, index) {
+                    return _buildCustomerItem(index, users[index]);
+                  },
                 ),
-                // Tambah customer lain di sini
-              ],
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(right: 16, bottom: 100), // Adjust margin bottom agar tidak tertutup bottom nav
-        child: FloatingActionButton(
-          onPressed: () {
-            // Aksi tambah pelanggan
-          },
-          backgroundColor: const Color(0xFF844C29),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Icon(Icons.group, color: Colors.white),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      
     );
   }
 }

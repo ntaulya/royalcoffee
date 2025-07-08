@@ -5,42 +5,42 @@ class IncomingOrder extends StatelessWidget {
 
   List<Map<String, dynamic>> _getIncomingOrders() {
     return [
-      // {
-      //   "orderId": "ORD006",
-      //   "customerName": "Rina Sari",
-      //   "items": ["Americano x2", "Cappuccino x1", "Croissant x1"],
-      //   "total": "Rp 75.000",
-      //   "time": "11:45 AM",
-      //   "priority": "high",
-      //   "orderType": "Dine In",
-      // },
-      // {
-      //   "orderId": "ORD007",
-      //   "customerName": "Dani Pratama",
-      //   "items": ["Latte x1", "Sandwich x2"],
-      //   "total": "Rp 65.000",
-      //   "time": "11:30 AM",
-      //   "priority": "medium",
-      //   "orderType": "Take Away",
-      // },
-      // {
-      //   "orderId": "ORD008",
-      //   "customerName": "Maya Putri",
-      //   "items": ["Espresso x3", "Cake x1"],
-      //   "total": "Rp 85.000",
-      //   "time": "11:15 AM",
-      //   "priority": "high",
-      //   "orderType": "Delivery",
-      // },
-      // {
-      //   "orderId": "ORD009",
-      //   "customerName": "Agus Setiawan",
-      //   "items": ["Mocha x1", "Cookies x2"],
-      //   "total": "Rp 55.000",
-      //   "time": "11:00 AM",
-      //   "priority": "low",
-      //   "orderType": "Dine In",
-      // },
+      {
+        "orderId": "ORD006",
+        "customerName": "Rina Sari",
+        "items": ["Americano x2", "Cappuccino x1", "Croissant x1"],
+        "total": "Rp 75.000",
+        "time": "11:45 AM",
+        "priority": "high",
+        "orderType": "Dine In",
+      },
+      {
+        "orderId": "ORD007",
+        "customerName": "Dani Pratama",
+        "items": ["Latte x1", "Sandwich x2"],
+        "total": "Rp 65.000",
+        "time": "11:30 AM",
+        "priority": "medium",
+        "orderType": "Take Away",
+      },
+      {
+        "orderId": "ORD008",
+        "customerName": "Maya Putri",
+        "items": ["Espresso x3", "Cake x1"],
+        "total": "Rp 85.000",
+        "time": "11:15 AM",
+        "priority": "high",
+        "orderType": "Delivery",
+      },
+      {
+        "orderId": "ORD009",
+        "customerName": "Agus Setiawan",
+        "items": ["Mocha x1", "Cookies x2"],
+        "total": "Rp 55.000",
+        "time": "11:00 AM",
+        "priority": "low",
+        "orderType": "Dine In",
+      },
     ];
   }
 

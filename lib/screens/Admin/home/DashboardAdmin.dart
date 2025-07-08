@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 
-
 import '../layout/BottomNavBarAdmin.dart';
-
-
-// Belum Selesai
 import './Incoming/IncomingOrder.dart';
 import './Track/TrackOrder.dart';
 import './Menu/MenuScreen.dart';
 import './Customer/Customer.dart';
-
-
-
 
 class DashboardAdmin extends StatefulWidget {
   const DashboardAdmin({super.key});
@@ -23,12 +16,26 @@ class DashboardAdmin extends StatefulWidget {
 class _DashboardAdmin extends State<DashboardAdmin> {
   int _selectedBottomNavIndex = 0;
 
-  final List<Widget> _screens = const [
-    IncomingOrder(), 
-    TrackOrder(),
-    MenuScreen(),
-    Customer(),
-  ];
+  // Screens akan diload saat dipilih
+  Widget? _incomingOrder;
+  Widget? _trackOrder;
+  Widget? _menuScreen;
+  Widget? _customer;
+
+  Widget _getScreen(int index) {
+    switch (index) {
+      case 0:
+        return _incomingOrder ??= const IncomingOrder();
+      case 1:
+        return _trackOrder ??= const TrackOrder();
+      case 2:
+        return _menuScreen ??= const MenuScreen();
+      case 3:
+        return _customer ??= const Customer();
+      default:
+        return const Center(child: Text("Halaman tidak ditemukan"));
+    }
+  }
 
   void _onTap(int index) {
     setState(() {
@@ -40,23 +47,7 @@ class _DashboardAdmin extends State<DashboardAdmin> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          "Dashboard Admin",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.black,
-          ),
-        ),
-      ),
-      body: IndexedStack(
-        index: _selectedBottomNavIndex,
-        children: _screens,
-      ),
+      body: _getScreen(_selectedBottomNavIndex),
       bottomNavigationBar: BottomNavBarAdmin(
         selectedIndex: _selectedBottomNavIndex,
         onTap: _onTap,
