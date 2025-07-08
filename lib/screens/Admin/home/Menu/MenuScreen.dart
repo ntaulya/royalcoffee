@@ -1,38 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:royalcoffee/screens/Admin/layout/BottomNavBarAdmin.dart';
-import 'package:royalcoffee/screens/Admin/screens/TrackOrder.dart';
-import 'package:royalcoffee/screens/Admin/screens/Customer.dart';
-import 'package:royalcoffee/controllers/product/ProductController.dart';
-import 'package:royalcoffee/models/Product/Product.dart';
 
-class Menu extends StatefulWidget {
-  const Menu({super.key});
+import '../../../../models/Product/Product.dart';
+import '../../../../controllers/Product/ProductController.dart';
 
-  @override
-  State<Menu> createState() => _MenuState();
-}
-
-class _MenuState extends State<Menu> {
-  int _selectedBottomNavIndex = 2;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() =>
-        Provider.of<ProductController>(context, listen: false)
-            .fetchProducts());
-  }
-
-  void _onTap(int index) {
-    if (index == _selectedBottomNavIndex) return;
-
-    setState(() {
-      _selectedBottomNavIndex = index;
-    });
-
-   
-  }
+class MenuScreen extends StatelessWidget {
+  const MenuScreen({super.key});
 
   Widget _buildStatusButton(String text, Color color,
       {Color? textColor, VoidCallback? onPressed}) {
@@ -116,51 +89,48 @@ class _MenuState extends State<Menu> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          "Atur Status Menu",
-          style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+    return ChangeNotifierProvider(
+      create: (_) => ProductController()..fetchProducts(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9F9F9),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text(
+            "Atur Status Menu",
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+          ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Consumer<ProductController>(
-        builder: (context, controller, child) {
-          if (controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (controller.errorMessage != null) {
-            return Center(child: Text(controller.errorMessage!));
-          }
-
-          if (controller.products.isEmpty) {
-            return const Center(child: Text("Tidak ada data menu."));
-          }
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: ListView.builder(
+        body: Consumer<ProductController>(
+          builder: (context, controller, _) {
+            if (controller.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (controller.errorMessage != null) {
+              return Center(child: Text(controller.errorMessage!));
+            }
+            if (controller.products.isEmpty) {
+              return const Center(child: Text("Tidak ada data menu."));
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               itemCount: controller.products.length,
-              itemBuilder: (context, index) {
-                return _buildMenuItem(controller.products[index]);
-              },
-            ),
-          );
-        },
+              itemBuilder: (context, index) =>
+                  _buildMenuItem(controller.products[index]),
+            );
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: const Color(0xFF844C29),
+          onPressed: () {
+            // Tambah menu
+          },
+          child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF844C29),
-        onPressed: () {
-          // Tambah menu
-        },
-        child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

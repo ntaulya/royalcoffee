@@ -7,8 +7,9 @@ import '../layout/BottomNavBarAdmin.dart';
 // Belum Selesai
 import './Incoming/IncomingOrder.dart';
 import './Track/TrackOrder.dart';
-import './Menu/Menu.dart';
+import './Menu/MenuScreen.dart';
 import './Customer/Customer.dart';
+
 
 
 
@@ -25,7 +26,7 @@ class _DashboardAdmin extends State<DashboardAdmin> {
   final List<Widget> _screens = const [
     IncomingOrder(), 
     TrackOrder(),
-    Menu(),
+    MenuScreen(),
     Customer(),
   ];
 

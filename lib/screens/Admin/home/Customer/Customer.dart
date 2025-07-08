@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:royalcoffee/screens/Admin/layout/BottomNavBarAdmin.dart';
-import 'package:royalcoffee/screens/Admin/screens/TrackOrder.dart';
-import 'package:royalcoffee/screens/Admin/screens/Customer.dart';
-import 'package:royalcoffee/screens/Admin/screens/Menu.dart';
+import '../../layout/BottomNavBarAdmin.dart';
+
+
+// Belum Selesai
+import '../Incoming/IncomingOrder.dart';
+import '../Menu/MenuScreen.dart';
+import '../Customer/Customer.dart';
 
 class Customer extends StatefulWidget {
   const Customer({super.key});
