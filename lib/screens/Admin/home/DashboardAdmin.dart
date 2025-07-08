@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:royalcoffee/screens/Admin/layout/BottomNavBarAdmin.dart';
-import 'package:royalcoffee/screens/Admin/screens/TrackOrder.dart';
-import 'package:royalcoffee/screens/Admin/screens/Customer.dart';
-import 'package:royalcoffee/screens/Admin/screens/Menu.dart';
+
+
+import '../layout/BottomNavBarAdmin.dart';
 
 
 // Belum Selesai
-import './IncomingOrder.dart';
+import './Incoming/IncomingOrder.dart';
+import './Track/TrackOrder.dart';
+import './Menu/Menu.dart';
+import './Customer/Customer.dart';
+
 
 
 class DashboardAdmin extends StatefulWidget {
