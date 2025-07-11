@@ -13,7 +13,7 @@ import '../layout/CategoryTabs.dart';
 // Views
 import './PesananSaya.dart';
 import './DetailPesanan.dart';
-
+import './CekProses.dart';
 
 import '../layout/ProductSection.dart';
 
@@ -81,20 +81,14 @@ class _DashboardView extends State<Dashboard> {
       case 0:
         break;
       case 1:
-        if (_cartController.items.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Keranjang masih kosong')),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const PesananSaya()),
-          ).then((_) {
-            setState(() {
-              _selectedBottomNavIndex = 0;
-            });
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CekProses()),
+        ).then((_) {
+          setState(() {
+            _selectedBottomNavIndex = 0;
           });
-        }
+        });
         break;
       case 2:
         // Navigator.push(
@@ -133,11 +127,25 @@ class _DashboardView extends State<Dashboard> {
             child: Column(
               children: [
                 // Header
-                DashboardHeader(
+               DashboardHeader(
                   cartController: _cartController,
-                  onCartTap: () => _onBottomNavTapped(1),
+                  onCartTap: () {
+                    if (_cartController.items.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Keranjang masih kosong')),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PesananSaya()),
+                      ).then((_) {
+                        setState(() {
+                          _selectedBottomNavIndex = 0;
+                        });
+                      });
+                    }
+                  },
                 ),
-
                 // Content
                 Expanded(
                   child: SingleChildScrollView(
