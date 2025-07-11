@@ -8,6 +8,7 @@ import '../../../services/Api/Product/ProductServices.dart';
 import '../../../services/Api/Product/CheckOrderService.dart';
 import '../../../models/CartItem.dart';
 import '../../../models/Product/Pajak.dart';
+import './PesananBerhasilDiProses.dart';
 
 class PesananSaya extends StatefulWidget {
   const PesananSaya({Key? key}) : super(key: key);
@@ -264,20 +265,9 @@ class _PesananSayaState extends State<PesananSaya> {
                           );
 
                           if (!context.mounted) return;
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Pembayaran Berhasil'),
-                              content: const Text('Terima kasih telah melakukan pembayaran.'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    cartController.clearCart();
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Tutup'),
-                                ),
-                              ],
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => PesananBerhasilDiProses(),
                             ),
                           );
                         } catch (e) {

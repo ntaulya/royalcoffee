@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-class KodePesanan extends StatelessWidget {
-  final String kodePesanan = "5720";
-
-  KodePesanan({super.key});
+class PesananBerhasilDiProses extends StatelessWidget {
+  const PesananBerhasilDiProses({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,32 +29,6 @@ class KodePesanan extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, height: 1.5),
               ),
-            ),
-
-            const SizedBox(height: 24),
-            
-            const Text('Kode Pesanan:', style: TextStyle(fontWeight: FontWeight.bold)),
-
-            const SizedBox(height: 16),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: kodePesanan.split('').map((digit) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  width: 50,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3EFFC),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    digit,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                );
-              }).toList(),
             ),
 
             const SizedBox(height: 32),

@@ -50,81 +50,86 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isDisabled = widget.product.status == 'non_aktif';
+
     return GestureDetector(
       onTap: widget.onTap,
       child: SizedBox(
-        height: 150, // 👈 Batasi tinggi untuk menghindari overflow
+        height: 150,
         child: Card(
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image Section
-              Expanded(
-                flex: 3,
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                    color: widget.product.status == "non_aktif" ? Colors.grey[200] : Colors.white,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _imageBytes != null
-                            ? Image.memory(_imageBytes!, fit: BoxFit.cover)
-                            : const Icon(Icons.broken_image, size: 50),
+          color: isDisabled ? Colors.grey.shade100 : Colors.white,
+          child: Opacity(
+            opacity: isDisabled ? 0.6 : 1.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image Section
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                      color: Colors.grey.shade200,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                      child: _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _imageBytes != null
+                              ? Image.memory(_imageBytes!, fit: BoxFit.cover)
+                              : const Icon(Icons.broken_image, size: 50),
+                    ),
                   ),
                 ),
-              ),
 
-              // Info Section
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.product.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        formatRupiah(widget.product.price),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 32,
-                        child: ElevatedButton(
-                          onPressed: widget.onTap,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8B4A0C),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text('Detail', style: TextStyle(fontSize: 12)),
+                // Info Section
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.product.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                        Text(
+                          formatRupiah(widget.product.price),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 6),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 32,
+                          child: ElevatedButton(
+                            onPressed: widget.onTap,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF8B4A0C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text('Detail', style: TextStyle(fontSize: 12)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
