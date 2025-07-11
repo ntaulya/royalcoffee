@@ -4,15 +4,19 @@ import '../../models/Product/Product.dart';
 
 class ProductController with ChangeNotifier {
   final ProductServices _productService = ProductServices();
+
   List<Product> products = [];
   bool isLoading = false;
   String? errorMessage;
 
-  Future<void> fetchProducts({String? categoryId , String? searchQuery}) async {
+  Future<void> fetchProducts({String? categoryId, String? searchQuery}) async {
     try {
       isLoading = true;
       notifyListeners();
-      products = await _productService.getProducts(categoryId: categoryId ,search: searchQuery);
+      products = await _productService.getProducts(
+        categoryId: categoryId,
+        search: searchQuery,
+      );
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();
@@ -21,6 +25,7 @@ class ProductController with ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<Product?> fetchProductDetail(String productId) async {
     try {
       isLoading = true;
@@ -31,6 +36,41 @@ class ProductController with ChangeNotifier {
     } catch (e) {
       errorMessage = e.toString();
       return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> createProduct({
+    required String namaProduct,
+    required String hargaProduct,
+    required String descriptionProduct,
+    required String kategoriId,
+    required List<Map<String, dynamic>> varianProductList,
+    required BuildContext context,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+     
+
+      await _productService.createProduct(
+        namaProduct: namaProduct,
+        hargaProduct: hargaProduct,
+        descriptionProduct: descriptionProduct,
+        kategoriId: kategoriId,
+        varianProductList: varianProductList,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Produk berhasil ditambahkan')),
+      );
+    } catch (e) {
+      errorMessage = e.toString();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menambahkan produk: $e')),
+      );
     } finally {
       isLoading = false;
       notifyListeners();

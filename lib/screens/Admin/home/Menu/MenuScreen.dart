@@ -58,12 +58,30 @@ class MenuScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(product.name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14)),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 4),
-                Text("${product.price}K, Stok ${product.variants?.first.stock ?? 0}",
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w400)),
+                Text(
+                  "Harga ${product.price}K, Stok ${product.variants?.first.stock ?? 0}",
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+                ),
+                if ((product.variants?.length ?? 0) > 1)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: product.variants!
+                          .asMap()
+                          .entries
+                          .skip(1)
+                          .map((entry) {
+                        final variant = entry.value;
+                        return Text(
+                          "- Varian Tambahan: ${variant.namaVarian} (+${variant.hargaTambahan}K), Stok ${variant.stock}",
+                          style: const TextStyle(fontSize: 12),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -130,7 +148,9 @@ class MenuScreen extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const AddMenu()),
+              MaterialPageRoute(
+                builder: (context) => const AddMenu(),
+              ),
             );
           },
           child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
