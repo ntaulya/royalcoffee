@@ -53,7 +53,7 @@ class _ProductCardState extends State<ProductCard> {
     return GestureDetector(
       onTap: widget.onTap,
       child: SizedBox(
-        height: 220, // 👈 Batasi tinggi untuk menghindari overflow
+        height: 150, // 👈 Batasi tinggi untuk menghindari overflow
         child: Card(
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

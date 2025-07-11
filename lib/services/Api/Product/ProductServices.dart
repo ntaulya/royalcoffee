@@ -188,4 +188,34 @@ class ProductServices extends Config {
       throw Exception('Gagal membuat produk: $e');
     }
   }
+  Future<void> updateProductStatus({
+    required String productId,
+    required String statusProduct, 
+  }) async {
+    try {
+      String url = '${_config.baseUrl}/product/status';
+      String? token = await _storageService.getToken();
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          ..._config.defaultHeaders,
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+          'product_id': productId,
+          'status_product': statusProduct,
+        },
+      ).timeout(_config.timeout);
+      if (response.statusCode != 201) {
+        final body = jsonDecode(response.body);
+        throw Exception(body['message'] ?? 'Gagal memperbarui status produk');
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } catch (e) {
+      throw Exception('Gagal mengubah status produk: $e');
+    }
+  }
 }

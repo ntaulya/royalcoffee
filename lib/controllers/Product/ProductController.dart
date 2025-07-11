@@ -76,4 +76,29 @@ class ProductController with ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+  Future<void> toggleProductStatus({
+    required String productId,
+    required String currentStatus,
+    required String categoryId,
+  }) async {
+    final newStatus = currentStatus.toLowerCase() == 'aktif' ? 'non_aktif' : 'aktif';
+
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      await _productService.updateProductStatus(
+        productId: productId,
+        statusProduct: newStatus,
+      );
+      await fetchProducts(categoryId: categoryId);
+    } catch (e) {
+      errorMessage = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

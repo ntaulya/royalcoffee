@@ -61,7 +61,6 @@ class _AddMenuState extends State<AddMenu> {
       final file = File(image.path);
       final mimeType = lookupMimeType(image.path);
       final isPng = mimeType == 'image/png';
-      print('Ukuran file: ${file.lengthSync()} bytes (${(file.lengthSync() / (1024 * 1024)).toStringAsFixed(2)} MB)');
       if (file.lengthSync() > 2 * 1024 * 1024) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Kuran file anda : ${(file.lengthSync() / (1024 * 1024)).toStringAsFixed(2)} MB\n $errorLabel maksimal 2MB')));
       } else if (!isPng) {
