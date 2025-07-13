@@ -32,11 +32,10 @@ class CheckOrderService extends Config{
       final response = await http
           .get(uri, headers: requrestHeaders)
           .timeout(_config.timeout);
-      print(response.statusCode);
-      print(response.body);
-      if (response.statusCode == 201) {
+    
+      if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      final List<dynamic> ordersJson = jsonData['data'] ?? [];
+      final List<dynamic> ordersJson = jsonData['data']['data'] ?? [];
 
       return ordersJson.map((orderJson) => Order.fromJson(orderJson)).toList();
     } else {
