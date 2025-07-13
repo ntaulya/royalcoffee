@@ -51,13 +51,12 @@ class ProductServices extends Config {
   }
 
   // Get Single Product by ID
-  Future<Product> getProductById(String id) async {
+  Future<Product> getProductById(String idProduct ,String id) async {
     try {
       String url = '${_config.baseUrl}/product';
       String? token = await _storageService.getToken();
-
       final uri = Uri.parse(url).replace(queryParameters: {
-        'id_categori': '',
+        'id_categori': idProduct,
         'id_product': id,
         'search': '',
         'page': '1',
@@ -117,7 +116,6 @@ class ProductServices extends Config {
     }
   }
 
-  // Create Product with Variants
   Future<void> createProduct({
     required String namaProduct,
     required String hargaProduct,

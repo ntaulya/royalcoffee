@@ -26,11 +26,11 @@ class ProductController with ChangeNotifier {
     }
   }
 
-  Future<Product?> fetchProductDetail(String productId) async {
+  Future<Product?> fetchProductDetail(String categoryId , String productId) async {
     try {
       isLoading = true;
       notifyListeners();
-      final product = await _productService.getProductById(productId);
+      final product = await _productService.getProductById(categoryId,productId);
       errorMessage = null;
       return product;
     } catch (e) {

@@ -8,11 +8,13 @@ class ProductSection extends StatelessWidget {
   final List<Product> products;
   final Function(Product)? onProductTap;
   final ProductController controller;
+  final String selectedCategoryId;
 
   const ProductSection({
     Key? key, 
     required this.products,
     required this.controller,
+    required this.selectedCategoryId,
     this.onProductTap,
     }) : super(key: key);
 
@@ -65,7 +67,7 @@ class ProductSection extends StatelessWidget {
               Product? detail;
 
               try {
-                detail = await controller.fetchProductDetail(product.id);
+                detail = await controller.fetchProductDetail(selectedCategoryId,product.id);
               } catch (e) {
                 debugPrint('Error fetching product detail: $e');
               }

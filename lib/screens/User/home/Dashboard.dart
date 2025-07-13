@@ -206,6 +206,7 @@ class _DashboardView extends State<Dashboard> {
                             : ProductSection(
                                 products: _productController.products,
                                 controller: _productController,
+                                selectedCategoryId: _selectedCategory,
                               ),
                         ],
                     ),
