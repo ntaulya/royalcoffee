@@ -23,21 +23,24 @@ class CheckOrderService extends Config{
         ..._config.defaultHeaders,
         'Authorization' : 'Bearer $token',
       };
+
+      
+      
       final uri = Uri.parse(url).replace(queryParameters:{
         'search' : search ?? '',
         'id_checkout' : id ?? '',
         'page' : '1',
       });
+      
 
       final response = await http
           .get(uri, headers: requrestHeaders)
           .timeout(_config.timeout);
-    
+      print(response.body);
       if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final List<dynamic> ordersJson = jsonData['data']['data'] ?? [];
-
-      return ordersJson.map((orderJson) => Order.fromJson(orderJson)).toList();
+        final jsonData = json.decode(response.body);
+        final List<dynamic> ordersJson = jsonData['data']['data'];
+        return ordersJson.map((orderJson) => Order.fromJson(orderJson)).toList();
     } else {
       throw Exception(_config.getErrorMessage(response, 'getOrder'));
     }
@@ -46,6 +49,7 @@ class CheckOrderService extends Config{
     }on http.ClientException{
       throw Exception('Gagal terhubung ke server');
     }catch (e) {
+      print(e);
       throw Exception('Gagal mengambil order: $e');
     }
   }
@@ -85,8 +89,6 @@ class CheckOrderService extends Config{
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Status: ${response.statusCode}');
-      print('Body: ${response.body}');
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(_config.getErrorMessage(response, 'checkout'));

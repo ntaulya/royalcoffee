@@ -25,7 +25,6 @@ class _IncomingOrderState extends State<IncomingOrder> {
     super.initState();
     _orderController = OrderController();
 
-    // Jalankan setelah build pertama selesai
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _orderController.getOrders(context: context);
       setState(() {
@@ -42,10 +41,10 @@ class _IncomingOrderState extends State<IncomingOrder> {
     );
   }
 
-  Future<void> _navigateToDetail(BuildContext context, String orderId) async {
+  Future<void> _navigateToDetail(BuildContext context, dynamic orderId) async {
     try {
       final service = CheckOrderService();
-      final orders = await service.getOrder(id: orderId);
+      final orders = await service.getOrder(id: orderId.toString());
 
       if (orders.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -54,10 +53,12 @@ class _IncomingOrderState extends State<IncomingOrder> {
         return;
       }
 
+      final order = orders.first;
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => DetailOrderPage(order: orders.first),
+          builder: (_) => DetailOrderPage(order: order),
         ),
       );
     } catch (e) {
@@ -67,9 +68,11 @@ class _IncomingOrderState extends State<IncomingOrder> {
     }
   }
 
+
+
   Widget _buildOrderItem(int index, Order order) {
     return InkWell(
-      onTap: () => _navigateToDetail(context, order.id.toString()),
+      onTap: () => _navigateToDetail(context, order.id),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: const BoxDecoration(

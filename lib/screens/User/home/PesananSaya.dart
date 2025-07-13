@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'dart:async';
+import 'package:intl/intl.dart';
 
 import '../../../controllers/CartController.dart';
 import '../../../services/Api/ImageHelper.dart';
@@ -64,6 +65,11 @@ class _PesananSayaState extends State<PesananSaya> {
     } catch (e) {
       print("Gagal hitung pajak: $e");
     }
+  }
+
+  String formatRupiah(double amount) {
+    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    return formatter.format(amount);
   }
 
   @override
@@ -142,7 +148,7 @@ class _PesananSayaState extends State<PesananSaya> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                Text('Rp ${item.price}', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                Text(formatRupiah(double.tryParse(item.price) ?? 0), style: TextStyle(color: Colors.grey[600], fontSize: 14)),
               ],
             ),
           ),
@@ -204,7 +210,7 @@ class _PesananSayaState extends State<PesananSaya> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-          Text('Rp ${amount.toStringAsFixed(0)}', style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(formatRupiah(amount), style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
         ],
       ),
     );

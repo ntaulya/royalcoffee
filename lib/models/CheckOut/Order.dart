@@ -9,7 +9,6 @@ class Order {
   final String? catatan;
   final List<ItemProduct>? Item;
 
-
   Order({
     required this.id,
     required this.nama_pemesan,
@@ -20,20 +19,19 @@ class Order {
     this.Item,
   });
 
-
-  factory Order.fromJson(Map<String,dynamic> json){
+  factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
-      id : json['id_checkout'] ?? '',
-      email: json['email'] ?? '',
-      nama_pemesan: json['nama_lengkap'] ?? '',
-      tipe_pemesanan: json['tipe_pemesanan'] ?? '',
-      create_at: json['created_at'] ?? '',
-      catatan: json['notes'] ?? '',
-      Item: json['item_product'] != null
-        ? (json['item_product'] as List)
-          .map((v) => ItemProduct.fromJson(v))
-          .toList()
-        : null,
+      id: json['id_checkout']?.toString() ?? '',
+      email: json['email']?.toString(),
+      nama_pemesan: json['nama_lengkap']?.toString() ?? '',
+      tipe_pemesanan: json['tipe_pemesanan']?.toString() ?? '',
+      create_at: json['created_at']?.toString() ?? '',
+      catatan: json['notes']?.toString(),
+      Item: (json['item_product'] is List)
+          ? (json['item_product'] as List)
+              .map((v) => ItemProduct.fromJson(v))
+              .toList()
+          : null,
     );
   }
 }

@@ -19,15 +19,15 @@ class ItemProduct {
     this.image = "",
   });
 
-  factory ItemProduct.fromJson(Map<String, dynamic> json){  
+  factory ItemProduct.fromJson(Map<String, dynamic> json) {
     return ItemProduct(
-        product_id: json['product_id'],
-        varian_id: json['varian_id'],
-        nama_product: json['nama_product'],
-        nama_varian: json['nama_varian'],
-        qty: int.tryParse(json['qty'].toString()) ?? 0,
-        harga_satuan: double.tryParse(json['harga_satuan'].toString()) ?? 0.0,
-        harga_total: double.tryParse(json['harga_total'].toString()) ?? 0.0,
+      product_id: json['product_id']?.toString() ?? '',
+      varian_id: json['varian_id']?.toString() ?? '',
+      nama_product: json['nama_product']?.toString() ?? '',
+      nama_varian: json['nama_varian']?.toString() ?? '',
+      qty: int.tryParse(json['qty'].toString()) ?? 0,
+      harga_satuan: double.tryParse(json['harga_satuan'].toString()) ?? 0.0,
+      harga_total: double.tryParse(json['harga_total'].toString()) ?? 0.0,
     );
   }
 }
