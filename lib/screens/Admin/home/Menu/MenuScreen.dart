@@ -37,6 +37,14 @@ class _MenuScreenState extends State<MenuScreen> {
     });
   }
 
+
+  String getPrimaryVariantStock(Product product) {
+    if (product.variants != null && product.variants!.isNotEmpty) {
+      return product.variants!.first.stock;
+    }
+    return "0";
+  }
+
   Widget _buildStatusButton(String text, Color color,
       {Color? textColor, VoidCallback? onPressed}) {
     return ElevatedButton(
@@ -98,9 +106,10 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Harga ${product.price}K, Stok ${product.variants?.first.stock ?? 0}",
+                  "Harga ${product.price}K, Stok ${getPrimaryVariantStock(product)}",
                   style: const TextStyle(fontSize: 13),
                 ),
+
                 if ((product.variants?.length ?? 0) > 1)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
