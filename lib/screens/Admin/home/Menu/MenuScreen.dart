@@ -44,6 +44,35 @@ class _MenuScreenState extends State<MenuScreen> {
     }
     return "0";
   }
+  String formatRupiah(String value) {
+    if (value.contains('~')) {
+      final parts = value.split('~');
+      final start = int.tryParse(parts[0].trim());
+      final end = int.tryParse(parts[1].trim());
+
+      if (start != null && end != null) {
+        return 'Rp.${_formatNumber(start)} ~ Rp.${_formatNumber(end)}';
+      } else {
+        return value; 
+      }
+    }
+
+    // Harga tunggal
+    final number = int.tryParse(value.trim());
+    if (number != null) {
+      return 'Rp.${_formatNumber(number)}';
+    }
+
+    return value; 
+  }
+
+  String _formatNumber(int value) {
+    return value.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
 
   Widget _buildStatusButton(String text, Color color,
       {Color? textColor, VoidCallback? onPressed}) {
@@ -106,7 +135,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Harga ${product.price}K, Stok ${getPrimaryVariantStock(product)}",
+                  "Harga ${formatRupiah(product.price)}, Stok ${getPrimaryVariantStock(product)}",
                   style: const TextStyle(fontSize: 13),
                 ),
 

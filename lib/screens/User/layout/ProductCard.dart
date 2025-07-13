@@ -44,9 +44,37 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   String formatRupiah(String value) {
-    final number = int.tryParse(value.replaceAll('.', '')) ?? 0;
-    return 'Rp.${number.toString().replaceAllMapped(RegExp(r'(\d{3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
+    // Jika mengandung rentang harga (~)
+    if (value.contains('~')) {
+      final parts = value.split('~');
+      final start = int.tryParse(parts[0].trim());
+      final end = int.tryParse(parts[1].trim());
+
+      if (start != null && end != null) {
+        return 'Rp.${_formatNumber(start)} ~ Rp.${_formatNumber(end)}';
+      } else {
+        return value; // fallback
+      }
+    }
+
+    // Harga tunggal
+    final number = int.tryParse(value.trim());
+    if (number != null) {
+      return 'Rp.${_formatNumber(number)}';
+    }
+
+    return value; // fallback jika format aneh
   }
+
+  // Fungsi helper untuk memformat angka
+  String _formatNumber(int value) {
+    return value.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
