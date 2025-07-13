@@ -36,7 +36,6 @@ class CheckOrderService extends Config{
       final response = await http
           .get(uri, headers: requrestHeaders)
           .timeout(_config.timeout);
-      print(response.body);
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final List<dynamic> ordersJson = jsonData['data']['data'];
@@ -98,6 +97,42 @@ class CheckOrderService extends Config{
       throw Exception('Tidak ada koneksi internet');
     } catch (e) {
       throw Exception('Gagal melakukan checkout: $e');
+    }
+  }
+
+  Future<void> confirmPayment({
+    required String idCheckout,
+    required String methodPembayaran,
+    required int nominalPembayaran,
+  }) async {
+    try {
+      String url = '${_config.baseUrl}/product/carts/confirm';
+      String? token = await _storageService.getToken();
+
+      var uri = Uri.parse(url);
+      var response = await http.patch(
+        uri,
+        headers: {
+          ..._config.defaultHeaders,
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+          'id_checkout': idCheckout,
+          'method_pembayaran': methodPembayaran,
+          'nominal_pembayaran': nominalPembayaran.toString(),
+        },
+      );
+
+      print("🔁 Response confirm: ${response.body}");
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(_config.getErrorMessage(response, 'confirmPayment'));
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } catch (e) {
+      throw Exception('Gagal melakukan konfirmasi pembayaran: $e');
     }
   }
 }

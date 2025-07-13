@@ -6,7 +6,7 @@ class ItemProduct {
   final int qty;
   final double harga_satuan;
   final double harga_total;
-  final String? image;
+  final String image;
 
   ItemProduct({
     required this.product_id,
@@ -16,7 +16,7 @@ class ItemProduct {
     required this.qty,
     required this.harga_satuan,
     required this.harga_total,
-    this.image = "",
+    required this.image,
   });
 
   factory ItemProduct.fromJson(Map<String, dynamic> json) {
@@ -26,6 +26,7 @@ class ItemProduct {
       nama_product: json['nama_product']?.toString() ?? '',
       nama_varian: json['nama_varian']?.toString() ?? '',
       qty: int.tryParse(json['qty'].toString()) ?? 0,
+      image : json['image'].toString() ?? '',
       harga_satuan: double.tryParse(json['harga_satuan'].toString()) ?? 0.0,
       harga_total: double.tryParse(json['harga_total'].toString()) ?? 0.0,
     );

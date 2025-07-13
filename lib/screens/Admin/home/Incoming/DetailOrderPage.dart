@@ -1,5 +1,10 @@
+// DetailOrderPage.dart
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'dart:typed_data';
 
 import '../../../../models/CheckOut/Order.dart';
@@ -11,7 +16,6 @@ import '../../layout/formatCurrency.dart';
 
 class DetailOrderPage extends StatefulWidget {
   final Order order;
-
   const DetailOrderPage({super.key, required this.order});
 
   @override
@@ -22,31 +26,23 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   Pajak? pajak;
   bool isLoading = true;
 
+  String paymentMethod = 'QRIS';
+  final TextEditingController paymentAmountController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting('id_ID', null);
+    noteController.text = widget.order.catatan ?? '';
     _fetchPajak();
   }
 
-  /// ✅ Format Waktu ke Zona Lokal (WIB/WITA/WIT Otomatis)
-  String formatWaktuLokal(String utcString) {
-    try {
-      final utcTime = DateTime.parse(utcString).toUtc();
-      final localTime = utcTime.toLocal();
-      final formatted = DateFormat('d MMMM yyyy, HH:mm', 'id_ID').format(localTime);
-      print(formatted);
-      final offset = localTime.timeZoneOffset.inHours;
-      final zona = switch (offset) {
-        7 => 'WIB',
-        8 => 'WITA',
-        9 => 'WIT',
-        _ => 'Zona Tidak Dikenal',
-      };
-
-      return '$formatted $zona';
-    } catch (e) {
-      return utcString;
-    }
+  @override
+  void dispose() {
+    paymentAmountController.dispose();
+    noteController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchPajak() async {
@@ -68,127 +64,216 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Gagal memuat pajak: $e")),
       );
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
     }
+  }
+
+  String formatDate(String utcString) {
+    final dateTime = DateTime.parse(utcString).toLocal();
+    final formatter = DateFormat('dd MMMM yyyy, HH:mm', 'id_ID');
+    return formatter.format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
     final items = widget.order.Item ?? [];
+    final subtotal = pajak?.totalKeselurusan ?? 0;
+    final tax = pajak?.nominalPotongan ?? 0;
+    final total = subtotal;
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Detail Pesanan"),
+        title: const Text("Konfirmasi Pesanan"),
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildSectionTitle("Informasi Pemesan"),
-                Text("Nama: ${widget.order.nama_pemesan}"),
-                Text("Email: ${widget.order.email ?? "-"}"),
-                Text("Tipe Pemesanan: ${widget.order.tipe_pemesanan}"),
-                Text("Waktu Pemesanan: ${formatWaktuLokal(widget.order.create_at)}"),
-                if (widget.order.catatan != null && widget.order.catatan!.isNotEmpty)
-                  Text("Catatan: ${widget.order.catatan}"),
-                const SizedBox(height: 16),
-
-                _buildSectionTitle("Produk Dipesan"),
-                ...items.map((item) => _buildProductItem(item)).toList(),
-
-                const SizedBox(height: 24),
-
-                if (pajak != null) ...[
-                  _buildSectionTitle("Ringkasan Pembayaran"),
-                  _buildPriceRow(
-                    "Subtotal",
-                    formatCurrency(
-                      pajak!.totalKeselurusan - pajak!.nominalPotongan,
-                    ),
-                  ),
-                  _buildPriceRow(
-                    "Pajak (${pajak!.persen.toStringAsFixed(2)}%)",
-                    formatCurrency(pajak!.nominalPotongan),
-                  ),
-                  const Divider(thickness: 1),
-                  _buildPriceRow(
-                    "Total Setelah Pajak",
-                    formatCurrency(pajak!.totalKeselurusan),
-                    isBold: true,
-                  ),
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(child: Text(formatDate(widget.order.create_at))),
+                  Center(child: Text(widget.order.nama_pemesan)),
+                  const SizedBox(height: 16),
+                  ...items.map((item) => _buildProductItem(item)).toList(),
+                  const Divider(),
+                  _orderSummary('Subtotal', subtotal - tax),
+                  _orderSummary('Tax and Fees', tax),
+                  const Divider(),
+                  _orderSummary('Total', total, isTotal: true),
+                  const SizedBox(height: 16),
+                  _noteField(),
+                  const SizedBox(height: 16),
+                  const Text("Metode Pembayaran", style: TextStyle(fontWeight: FontWeight.bold)),
+                  _paymentMethodSelector(),
+                  const SizedBox(height: 12),
+                  _paymentAmountField(),
+                  const SizedBox(height: 80),
                 ],
-              ],
+              ),
             ),
+      bottomNavigationBar: _bottomActions(total),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+  Widget _bottomActions(double total) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: Colors.white,
+      child: Row(
+        children: [
+          _bottomButton("Batalkan", Colors.red, () => Navigator.pop(context)),
+          const SizedBox(width: 8),
+          _bottomButton("Cetak Struk", Colors.orange, () => _printReceipt(total)),
+          const SizedBox(width: 8),
+          _bottomButton("Konfirmasi", Colors.green, () => _showConfirmationDialog(total)),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomButton(String label, Color color, VoidCallback onTap) {
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        child: Text(label, style: const TextStyle(fontSize: 16)),
       ),
     );
   }
 
   Widget _buildProductItem(ItemProduct item) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: FutureBuilder<Uint8List?>(
-          future: (item.image != null && item.image!.isNotEmpty)
-              ? ImageHelper.loadImage(item.image!)
-              : Future.value(null),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                width: 48,
-                height: 48,
-                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              );
-            } else if (snapshot.hasData && snapshot.data != null) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          FutureBuilder<Uint8List?>(
+            future: (item.image != null && item.image!.isNotEmpty)
+                ? ImageHelper.loadImage(item.image!)
+                : Future.value(null),
+            builder: (context, snapshot) {
               return ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.memory(
-                  snapshot.data!,
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.cover,
-                ),
+                borderRadius: BorderRadius.circular(8),
+                child: snapshot.hasData
+                    ? Image.memory(snapshot.data!, width: 50, height: 50, fit: BoxFit.cover)
+                    : Container(width: 50, height: 50, color: Colors.grey),
               );
-            } else {
-              return const Icon(Icons.broken_image, size: 48, color: Colors.grey);
-            }
-          },
-        ),
-        title: Text(item.nama_product, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(
-          'Varian: ${item.nama_varian}\nQty: ${item.qty} x ${formatCurrency(item.harga_satuan)}',
-        ),
-        trailing: Text(
-          formatCurrency(item.harga_total),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+            },
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Text(item.nama_product)),
+          Text('${item.qty}x', style: const TextStyle(color: Colors.grey)),
+        ],
       ),
     );
   }
 
-  Widget _buildPriceRow(String label, String value, {bool isBold = false}) {
+  Widget _orderSummary(String label, num amount, {bool isTotal = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-          Text(value, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(label,
+              style: TextStyle(
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                fontSize: isTotal ? 16 : 14,
+              )),
+          Text(formatCurrency(amount),
+              style: TextStyle(
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                fontSize: isTotal ? 16 : 14,
+              )),
         ],
       ),
     );
+  }
+
+  Widget _noteField() {
+    return TextField(
+      controller: noteController,
+      maxLines: 2,
+      readOnly: true,
+      decoration: InputDecoration(
+        hintText: 'Catatan customer dan nomor meja...',
+        filled: true,
+        fillColor: Colors.grey[300],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _paymentMethodSelector() {
+    return Column(
+      children: ['QRIS', 'Tunai'].map((method) {
+        return RadioListTile(
+          value: method,
+          groupValue: paymentMethod,
+          onChanged: (val) => setState(() => paymentMethod = val!),
+          title: Text(method),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _paymentAmountField() {
+    return TextField(
+      controller: paymentAmountController,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        hintText: 'Masukkan nominal pembayaran',
+        filled: true,
+        fillColor: Colors.grey[300],
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+      ),
+    );
+  }
+
+  void _showConfirmationDialog(double total) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Pesanan Diterima'),
+        content: Text('Pembayaran Rp${formatCurrency(total)} berhasil dikonfirmasi.'),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+      ),
+    );
+  }
+
+  Future<void> _printReceipt(double total) async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (_) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('Royal Cafe & Resto', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18)),
+            pw.SizedBox(height: 10),
+            pw.Text('Tanggal: ${formatDate(widget.order.create_at)}'),
+            pw.Text('Customer: ${widget.order.nama_pemesan}'),
+            pw.SizedBox(height: 16),
+            pw.Text('Pesanan:'),
+            pw.SizedBox(height: 8),
+            ...widget.order.Item!.map((item) => pw.Text('${item.qty}x ${item.nama_product}')),
+            pw.Divider(),
+            pw.Text('Total: Rp${formatCurrency(total)}'),
+            pw.Text('Pembayaran: $paymentMethod'),
+            pw.Text('Catatan: ${noteController.text}'),
+          ],
+        ),
+      ),
+    );
+    await Printing.layoutPdf(onLayout: (_) async => pdf.save());
   }
 }

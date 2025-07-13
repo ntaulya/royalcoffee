@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
@@ -20,13 +21,17 @@ class _IncomingOrderState extends State<IncomingOrder> {
   bool _initialized = false;
   late OrderController _orderController;
 
+  Timer? _pollingTimer;
+  int _lastOrderCount = 0;
+
   @override
   void initState() {
     super.initState();
     _orderController = OrderController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _orderController.getOrders(context: context);
+      _fetchAndCheckOrders(); // Pertama kali fetch
+      _startPolling();        // Mulai polling tiap 30 detik
       setState(() {
         _initialized = true;
       });
@@ -68,7 +73,44 @@ class _IncomingOrderState extends State<IncomingOrder> {
     }
   }
 
+  /// 🔁 Fetch orders dan cek apakah ada yang baru
+  Future<void> _fetchAndCheckOrders() async {
+    await _orderController.getOrders(context: context);
+    final currentCount = _orderController.orders.length;
 
+    if (_lastOrderCount != 0 && currentCount > _lastOrderCount) {
+      final newOrders = currentCount - _lastOrderCount;
+      _showNewOrderNotification(newOrders);
+    }
+
+    _lastOrderCount = currentCount;
+  }
+
+  /// 🔔 Menampilkan notifikasi jika ada order baru
+  void _showNewOrderNotification(int count) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('🔔 Ada $count pesanan baru!'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  /// ⏱️ Memulai polling tiap 30 detik
+  void _startPolling() {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _fetchAndCheckOrders();
+    });
+  }
+
+  /// 🚫 Stop polling saat keluar
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Widget _buildOrderItem(int index, Order order) {
     return InkWell(
@@ -117,12 +159,6 @@ class _IncomingOrderState extends State<IncomingOrder> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 
   @override

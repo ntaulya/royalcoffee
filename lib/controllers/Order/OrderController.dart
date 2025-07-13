@@ -46,5 +46,41 @@ class OrderController with ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<void> confirmPayment({
+    required String idCheckout,
+    required String methodPembayaran,
+    required int nominalPembayaran,
+    BuildContext? context,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
 
+      await _orderService.confirmPayment(
+        idCheckout: idCheckout,
+        methodPembayaran: methodPembayaran,
+        nominalPembayaran: nominalPembayaran,
+      );
+
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Konfirmasi pembayaran berhasil")),
+        );
+      }
+
+      // Refresh order list after confirmation
+      await getOrders(context: context);
+
+    } catch (e) {
+      debugPrint("❌ Error confirmPayment: $e");
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal konfirmasi: $e")),
+        );
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }
