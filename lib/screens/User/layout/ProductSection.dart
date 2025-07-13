@@ -67,7 +67,10 @@ class ProductSection extends StatelessWidget {
               Product? detail;
 
               try {
-                detail = await controller.fetchProductDetail(selectedCategoryId,product.id);
+               detail = await controller.fetchProductDetail(
+                  int.parse(selectedCategoryId),
+                  product.id.toString(),
+                );
               } catch (e) {
                 debugPrint('Error fetching product detail: $e');
               }

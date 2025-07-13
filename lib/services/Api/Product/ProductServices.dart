@@ -51,13 +51,13 @@ class ProductServices extends Config {
   }
 
   // Get Single Product by ID
-  Future<Product> getProductById(String idProduct ,String id) async {
+  Future<Product> getProductById(int idCategori ,String id) async {
     try {
       String url = '${_config.baseUrl}/product';
       String? token = await _storageService.getToken();
       final uri = Uri.parse(url).replace(queryParameters: {
-        'id_categori': idProduct,
-        'id_product': id,
+        'id_categori': idCategori.toString(),
+        'id_product': id.toString(),
         'search': '',
         'page': '1',
       });
@@ -69,7 +69,6 @@ class ProductServices extends Config {
           'Authorization': 'Bearer $token',
         },
       ).timeout(_config.timeout);
-
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> data = jsonResponse['data']['data'];

@@ -26,4 +26,25 @@ class OrderController with ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<Order?> getOrderById(String id, {BuildContext? context}) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      final data = await _orderService.getOrder(id: id);
+      return data.isNotEmpty ? data.first : null;
+    } catch (e) {
+      debugPrint("Error getOrderById: $e");
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+      return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
 }

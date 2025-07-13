@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../controllers/CartController.dart'; // <== ini penting!
+import '../../../services/Api/Product/CheckOrderService.dart';
 
 class PesananBerhasilDiProses extends StatelessWidget {
   const PesananBerhasilDiProses({super.key});
@@ -17,7 +19,6 @@ class PesananBerhasilDiProses extends StatelessWidget {
               color: Color(0xFF4D2C12),
             ),
             const SizedBox(height: 16),
-
             const Text(
               'Terima Kasih',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -30,11 +31,10 @@ class PesananBerhasilDiProses extends StatelessWidget {
                 style: TextStyle(fontSize: 14, height: 1.5),
               ),
             ),
-
             const SizedBox(height: 32),
-
             ElevatedButton(
               onPressed: () {
+                CartController().clearCart(); 
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(

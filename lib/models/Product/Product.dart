@@ -1,5 +1,4 @@
-import './Variant.dart'; 
-
+import './Variant.dart';
 class Product {
   final String id;
   final String name;
@@ -7,7 +6,7 @@ class Product {
   final String price;
   final String status;
   final String? description;
-  final List<Variant>? variants;
+  final List<Variant> variants;
 
   Product({
     required this.id,
@@ -16,22 +15,18 @@ class Product {
     required this.price,
     required this.status,
     this.description,
-    this.variants,
+    required this.variants,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] ?? '',
+      id: json['id']?.toString() ?? '',
       name: json['nama_product'] ?? '',
       imageUrl: json['image_path'] ?? '',
-      price: json['harga_product'] ?? '0',
+      price: json['harga_product']?.toString() ?? '0',
       status: json['status_product'] ?? 'aktif',
-      description: json['description'], // Bisa null
-      variants: json['variants'] != null
-          ? (json['variants'] as List)
-              .map((v) => Variant.fromJson(v))
-              .toList()
-          : null,
+      description: json['description'],
+      variants: (json['variants'] as List?)?.map((v) => Variant.fromJson(v)).toList() ?? [],
     );
   }
 }

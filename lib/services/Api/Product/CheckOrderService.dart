@@ -25,7 +25,7 @@ class CheckOrderService extends Config{
       };
       final uri = Uri.parse(url).replace(queryParameters:{
         'search' : search ?? '',
-        'id_checkout' : '',
+        'id_checkout' : id ?? '',
         'page' : '1',
       });
 

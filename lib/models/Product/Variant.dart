@@ -1,5 +1,5 @@
 class Variant {
-  final int idVarian;
+  final String idVarian;
   final String namaVarian;
   final String hargaTambahan;
   final String stock;
@@ -17,12 +17,12 @@ class Variant {
 
   factory Variant.fromJson(Map<String, dynamic> json) {
     return Variant(
-      idVarian: json['id_varian'],
-      namaVarian: json['nama_varian'],
-      hargaTambahan: json['harga_tambahan'],
-      stock: json['stock'],
-      imagePath: json['image_path'],
-      isPrimary: json['is_primary'] == 1,
+      idVarian: json['id_varian'].toString(),               
+      namaVarian: json['nama_varian'] ?? '',
+      hargaTambahan: json['harga_tambahan'].toString(),     
+      stock: json['stock'].toString(),                     
+      imagePath: json['image_path'] ?? '',
+      isPrimary: json['is_primary'] == 1,                  
     );
   }
 }

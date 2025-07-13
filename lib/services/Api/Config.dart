@@ -7,10 +7,9 @@ import '../../models/Product/Product.dart';
 
 
 class Config {
-  final String baseUrl = 'https://restapi.royalcafeandresto.com/api';
+  // final String baseUrl = 'https://restapi.royalcafeandresto.com/api';
+  final String baseUrl = "http://192.168.1.7/api";
   final Duration timeout = const Duration(seconds: 30);
-
-
   /// Default headers untuk semua request
   Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',

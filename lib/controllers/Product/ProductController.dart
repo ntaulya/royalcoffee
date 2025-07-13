@@ -26,7 +26,7 @@ class ProductController with ChangeNotifier {
     }
   }
 
-  Future<Product?> fetchProductDetail(String categoryId , String productId) async {
+  Future<Product?> fetchProductDetail(int categoryId , String productId) async {
     try {
       isLoading = true;
       notifyListeners();
@@ -66,6 +66,8 @@ class ProductController with ChangeNotifier {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Produk berhasil ditambahkan')),
       );
+      
+       Navigator.pop(context);
     } catch (e) {
       errorMessage = e.toString();
       ScaffoldMessenger.of(context).showSnackBar(
