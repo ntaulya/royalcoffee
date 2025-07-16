@@ -60,18 +60,24 @@ class _IncomingOrderState extends State<IncomingOrder> {
 
       final order = orders.first;
 
-      Navigator.push(
+      // ⬇️ Tangkap hasil navigasi (true = perlu refresh)
+      final shouldRefresh = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => DetailOrderPage(order: order),
         ),
       );
+
+      if (shouldRefresh == true) {
+        await _fetchAndCheckOrders(); // ⬅️ Refresh data order manual
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal mengambil detail order: $e')),
       );
     }
   }
+
 
   /// 🔁 Fetch orders dan cek apakah ada yang baru
   Future<void> _fetchAndCheckOrders() async {

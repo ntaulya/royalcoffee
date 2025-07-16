@@ -119,7 +119,7 @@ class CheckOrderService extends Config{
         },
         body: {
           'id_checkout': idCheckout,
-          'method_pembayaran': methodPembayaran,
+          'metode_pembayaran': methodPembayaran,
           'nominal_pembayaran': nominalPembayaran.toString(),
         },
       );

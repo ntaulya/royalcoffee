@@ -12,6 +12,7 @@ import '../../../../models/CheckOut/ItemProduct.dart';
 import '../../../../models/Product/Pajak.dart';
 import '../../../../services/Api/ImageHelper.dart';
 import '../../../../services/Api/Product/ProductServices.dart';
+import '../../../../controllers/Order/OrderController.dart'; // Sesuaikan path-nya
 import '../../layout/formatCurrency.dart';
 
 class DetailOrderPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   Pajak? pajak;
   bool isLoading = true;
 
-  String paymentMethod = 'QRIS';
+  String paymentMethod = 'qris';
   final TextEditingController paymentAmountController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
 
@@ -216,7 +217,7 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
   Widget _paymentMethodSelector() {
     return Column(
-      children: ['QRIS', 'Tunai'].map((method) {
+      children: ['qris', 'tunai'].map((method) {
         return RadioListTile(
           value: method,
           groupValue: paymentMethod,
@@ -240,16 +241,43 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
     );
   }
 
-  void _showConfirmationDialog(double total) {
-    showDialog(
+  void _showConfirmationDialog(double total) async {
+    final nominalStr = paymentAmountController.text.trim();
+    final nominal = int.tryParse(nominalStr);
+
+    if (nominal == null || nominal <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Nominal pembayaran tidak valid")),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Pesanan Diterima'),
-        content: Text('Pembayaran Rp${formatCurrency(total)} berhasil dikonfirmasi.'),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+        title: const Text('Konfirmasi Pembayaran'),
+        content: Text(
+          'Yakin ingin mengkonfirmasi pembayaran sebesar ${formatCurrency(nominal)} dengan metode $paymentMethod?',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Ya')),
+        ],
       ),
     );
+
+    if (confirm == true) {
+      await OrderController().confirmPayment(
+        idCheckout: widget.order.id,
+        methodPembayaran: paymentMethod,
+        nominalPembayaran: nominal,
+        context: context,
+      );
+
+      Navigator.pop(context, true);
+    }
   }
+
 
   Future<void> _printReceipt(double total) async {
     final pdf = pw.Document();

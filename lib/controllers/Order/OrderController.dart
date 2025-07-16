@@ -55,7 +55,6 @@ class OrderController with ChangeNotifier {
     try {
       isLoading = true;
       notifyListeners();
-
       await _orderService.confirmPayment(
         idCheckout: idCheckout,
         methodPembayaran: methodPembayaran,
@@ -68,7 +67,6 @@ class OrderController with ChangeNotifier {
         );
       }
 
-      // Refresh order list after confirmation
       await getOrders(context: context);
 
     } catch (e) {
