@@ -220,10 +220,104 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
           const SizedBox(width: 12),
           Expanded(child: Text(item.nama_product)),
           Text('${item.qty}x', style: const TextStyle(color: Colors.grey)),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _confirmDeleteItem(item),
+          ),
         ],
       ),
     );
   }
+
+  void _confirmDeleteItem(ItemProduct item) async {
+  final isLastItem = widget.order.Item != null && widget.order.Item!.length == 1;
+
+  if (isLastItem) {
+    // Jika ini adalah item terakhir, langsung minta password untuk hapus pesanan
+    final TextEditingController passwordController = TextEditingController();
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Konfirmasi Hapus Pesanan"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Item ini adalah item terakhir.\nMasukkan password admin untuk membatalkan pesanan."),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password Admin',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
+          TextButton(
+            onPressed: () {
+              if (passwordController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Password tidak boleh kosong")),
+                );
+              } else {
+                Navigator.pop(context, true);
+              }
+            },
+            child: const Text('Hapus Pesanan'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await OrderController().deleteOrder(
+        idCheckout: widget.order.id,
+        password: passwordController.text.trim(),
+        context: context,
+      );
+      Navigator.pop(context, true); // kembali ke halaman sebelumnya
+    }
+  } else {
+    // Jika bukan item terakhir, tetap hapus seperti biasa
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Hapus Item'),
+        content: Text('Yakin ingin menghapus ${item.nama_product}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Hapus')),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await OrderController().deleteItemFromOrder(
+        idCheckout: widget.order.id,
+        idProduct: item.product_id.toString(),
+        idVarian: item.varian_id.toString(),
+        context: context,
+      );
+
+      setState(() {
+        widget.order.Item?.removeWhere((i) =>
+            i.product_id == item.product_id &&
+            i.varian_id == item.varian_id);
+      });
+
+      await _fetchPajak(); // refresh pajak
+    }
+  }
+}
+
+
+
+
+
+
 
   Widget _orderSummary(String label, num amount, {bool isTotal = false}) {
     return Padding(

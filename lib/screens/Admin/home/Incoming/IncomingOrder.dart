@@ -22,7 +22,7 @@ class _IncomingOrderState extends State<IncomingOrder> {
   final TextEditingController _searchController = TextEditingController();
   bool _initialized = false;
   late OrderController _orderController;
-
+bool _isFetching = false;
   Timer? _pollingTimer;
   int _lastOrderCount = 0;
 
@@ -83,15 +83,34 @@ class _IncomingOrderState extends State<IncomingOrder> {
 
   /// 🔁 Fetch orders dan cek apakah ada yang baru
   Future<void> _fetchAndCheckOrders() async {
-    await _orderController.getOrders(context: context);
-    final currentCount = _orderController.orders.length;
+    if (_isFetching) return; // Hindari double fetch
+    _isFetching = true;
 
-    if (_lastOrderCount != 0 && currentCount > _lastOrderCount) {
-      final newOrders = currentCount - _lastOrderCount;
-      _showNewOrderNotification(newOrders);
+    try {
+      await _orderController.getOrders(context: context).timeout(
+        const Duration(seconds: 10), // tambahkan batas waktu
+        onTimeout: () => throw TimeoutException("Waktu habis saat mengambil data"),
+      );
+
+      final currentCount = _orderController.orders.length;
+      if (_lastOrderCount != 0 && currentCount > _lastOrderCount) {
+        final newOrders = currentCount - _lastOrderCount;
+        _showNewOrderNotification(newOrders);
+      }
+      _lastOrderCount = currentCount;
+    } catch (e) {
+      debugPrint("Error getOrders: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("⚠️ Gagal mengambil order: ${e is TimeoutException ? "Permintaan terlalu lama" : e.toString()}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      _isFetching = false;
     }
-
-    _lastOrderCount = currentCount;
   }
 
   /// 🔔 Menampilkan notifikasi jika ada order baru
@@ -107,7 +126,7 @@ class _IncomingOrderState extends State<IncomingOrder> {
 
   /// ⏱️ Memulai polling tiap 30 detik
   void _startPolling() {
-    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 60), (_) {
       _fetchAndCheckOrders();
     });
   }

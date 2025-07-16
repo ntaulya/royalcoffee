@@ -168,4 +168,40 @@ class CheckOrderService extends Config{
       throw Exception('Gagal menghapus order: $e');
     }
   }
+
+  Future<void> deleteItemFromOrder({
+    required String idCheckout,
+    required String idProduct,
+    required String idVarian,
+  }) async {
+    try {
+      String url = '${_config.baseUrl}/product/carts/item';
+      String? token = await _storageService.getToken();
+
+      var uri = Uri.parse(url);
+      var response = await http.delete(
+        uri,
+        headers: {
+          ..._config.defaultHeaders,
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+          'id_checkout': idCheckout,
+          'id_product': idProduct,
+          'id_varian': idVarian,
+        },
+      );
+
+      print("🗑️ Response delete item: ${response.body}");
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(_config.getErrorMessage(response, 'deleteItemFromOrder'));
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } catch (e) {
+      throw Exception('Gagal menghapus item pesanan: $e');
+    }
+  }
 }

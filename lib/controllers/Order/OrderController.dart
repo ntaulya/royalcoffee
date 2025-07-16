@@ -113,4 +113,41 @@ class OrderController with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> deleteItemFromOrder({
+    required String idCheckout,
+    required String idProduct,
+    required String idVarian,
+    BuildContext? context,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      await _orderService.deleteItemFromOrder(
+        idCheckout: idCheckout,
+        idProduct: idProduct,
+        idVarian: idVarian,
+      );
+
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Item berhasil dihapus")),
+        );
+      }
+
+      await getOrders(context: context); // Optional: refresh list
+    } catch (e) {
+      debugPrint("❌ Error deleteItemFromOrder: $e");
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal menghapus item: $e")),
+        );
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
 }

@@ -258,52 +258,19 @@ class IncomingOrder_Old_version extends StatelessWidget {
     final orders = _getIncomingOrders();
     return Scaffold(
       appBar: AppBar(
-      automaticallyImplyLeading: true, // ⬅️ Aktifkan agar hamburger muncul
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      iconTheme: const IconThemeData(color: Colors.black), // ⬅️ Untuk warna hamburger
-      title: const Text(
-        "Incoming Order",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-          color: Colors.black,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          "Incoming Order",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.black,
+          ),
         ),
       ),
-    ),
-    drawer: Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.brown,
-            ),
-            child: Text(
-              'Admin Menu',
-              style: TextStyle(color: Colors.white, fontSize: 24),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.dashboard),
-            title: const Text('Dashboard'),
-            onTap: () {
-              // Navigasi ke dashboard
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
-            onTap: () {
-              // Aksi logout
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    ),
       body: orders.isEmpty
           ? Center(
               child: Column(
