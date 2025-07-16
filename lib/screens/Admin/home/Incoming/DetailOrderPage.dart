@@ -358,10 +358,35 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         context: context,
       );
 
-      await _printReceipt(total);
-      Navigator.pop(context, true);
+      // Tanyakan apakah ingin mencetak struk
+      final printConfirm = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Cetak Struk'),
+          content: const Text('Apakah Anda ingin mencetak struk?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Tidak')),
+            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Ya')),
+          ],
+        ),
+      );
+
+      if (printConfirm == true) {
+        try {
+          await _printReceipt(total);
+        } catch (e) {
+          debugPrint('Print gagal: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Gagal mencetak struk")),
+          );
+        }
+      }
+
+      Navigator.pop(context, true); // kembali ke halaman sebelumnya
     }
   }
+
+
 
   Future<void> _printReceipt(double total) async {
     final pdf = await generateReceiptPdf(widget.order, total, paymentMethod, noteController.text);
