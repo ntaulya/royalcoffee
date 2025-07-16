@@ -129,8 +129,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         children: [
           _bottomButton("Batalkan", Colors.red, () => _showDeleteDialog()),
           const SizedBox(width: 8),
-          _bottomButton("Cetak Struk", Colors.orange, () => _printReceipt(total)),
-          const SizedBox(width: 8),
           _bottomButton("Konfirmasi", Colors.green, () => _showConfirmationDialog(total)),
         ],
       ),
@@ -323,6 +321,8 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         nominalPembayaran: nominal,
         context: context,
       );
+
+      await _printReceipt(total);
 
       Navigator.pop(context, true);
     }

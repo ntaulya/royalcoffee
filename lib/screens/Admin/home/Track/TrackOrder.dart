@@ -7,6 +7,9 @@ import '../Incoming/IncomingOrder.dart';
 import '../Menu/MenuScreen.dart';
 import '../Customer/Customer.dart';
 
+
+import '../../layout/CustomTopBar.dart';
+
 class TrackOrder extends StatefulWidget {
   const TrackOrder({super.key});
 
@@ -255,19 +258,7 @@ class _TrackOrderState extends State<TrackOrder> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          "Cek Antrian & Proses",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.black,
-          ),
-        ),
-      ),
+      appBar: const CustomTopBar(title: "Cek Antrian & Proses",),
       body: Column(
         children: [
           const SizedBox(height: 12),

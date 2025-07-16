@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../layout/BottomNavBarAdmin.dart';
 
+
+import '../../layout/CustomTopBar.dart';
+
 import '../../../../controllers/User/UserController.dart';
 import '../../../../models/User/User.dart';
 
@@ -86,19 +89,7 @@ class _CustomerState extends State<Customer> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          "Data Pelanggan",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.black,
-          ),
-        ),
-      ),
+      appBar: const CustomTopBar(title: "Data Pelanggan"),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : users.isEmpty

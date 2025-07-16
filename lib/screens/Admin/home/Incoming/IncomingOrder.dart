@@ -4,6 +4,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 
 import '../../layout/SearchBox.dart';
+import '../../layout/CustomTopBar.dart';
+
 import '../../../../controllers/Order/OrderController.dart';
 import '../../../../models/CheckOut/Order.dart';
 import '../../../../services/Api/Product/CheckOrderService.dart';
@@ -175,20 +177,7 @@ class _IncomingOrderState extends State<IncomingOrder> {
         builder: (context, controller, _) {
           return Scaffold(
             backgroundColor: const Color(0xFFF9F9F9),
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              centerTitle: true,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              title: const Text(
-                "Incoming Order",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black,
-                ),
-              ),
-            ),
+            appBar: const CustomTopBar(title: "Incoming Order"),
             body: Column(
               children: [
                 SearchBox(

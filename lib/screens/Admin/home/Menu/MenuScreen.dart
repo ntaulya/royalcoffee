@@ -9,6 +9,8 @@ import '../../layout/AdminCategoryTabs.dart';
 import './AddMenu.dart';
 import './EditMenu.dart';
 
+import '../../layout/CustomTopBar.dart';
+
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
 
@@ -246,16 +248,7 @@ class _MenuScreenState extends State<MenuScreen> {
       create: (_) => ProductController(), // <-- ini penting
       child: Scaffold(
         backgroundColor: const Color(0xFFF9F9F9),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text(
-            "Atur Status Menu",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
-          ),
-        ),
+        appBar: const CustomTopBar(title:"Atur Status Menu"),
         body: Consumer<ProductController>(
           builder: (context, controller, _) {
             return Column(
