@@ -80,5 +80,37 @@ class OrderController with ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }Future<void> deleteOrder({
+    required String idCheckout,
+    required String password,
+    BuildContext? context,
+  }) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      await _orderService.deleteOrder(
+        idCheckout: idCheckout,
+        password: password,
+      );
+
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Pesanan berhasil dihapus")),
+        );
+      }
+
+      await getOrders(context: context);
+    } catch (e) {
+      debugPrint("❌ Error deleteOrder: $e");
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal menghapus pesanan: $e")),
+        );
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }

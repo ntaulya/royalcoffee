@@ -127,11 +127,61 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
       color: Colors.white,
       child: Row(
         children: [
-          _bottomButton("Batalkan", Colors.red, () => Navigator.pop(context)),
+          _bottomButton("Batalkan", Colors.red, () => _showDeleteDialog()),
           const SizedBox(width: 8),
           _bottomButton("Cetak Struk", Colors.orange, () => _printReceipt(total)),
           const SizedBox(width: 8),
           _bottomButton("Konfirmasi", Colors.green, () => _showConfirmationDialog(total)),
+        ],
+      ),
+    );
+  }
+  void _showDeleteDialog() {
+    final TextEditingController passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Konfirmasi Hapus Pesanan"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Masukkan password admin untuk menghapus pesanan."),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password Admin',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          TextButton(
+            onPressed: () async {
+              final password = passwordController.text.trim();
+              if (password.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Password tidak boleh kosong")),
+                );
+                return;
+              }
+
+              Navigator.pop(context); 
+
+              await OrderController().deleteOrder(
+                idCheckout: widget.order.id,
+                password: password,
+                context: context,
+              );
+
+              Navigator.pop(context, true); 
+            },
+            child: const Text('Hapus'),
+          ),
         ],
       ),
     );
