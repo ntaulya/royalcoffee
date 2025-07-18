@@ -101,219 +101,236 @@ class _DetailPesananState extends State<DetailPesanan> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final variants = widget.product.variants ?? [];
+ @override
+Widget build(BuildContext context) {
+  final variants = widget.product.variants ?? [];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF834D1E),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
+  return Scaffold(
+    backgroundColor: const Color(0xFF834D1E),
+    body: SafeArea(
+      child: Column(
+        children: [
+          // Header Back & Title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const Text(
+                  'Detail Pesanan',
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+
+          // Body Container
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
+                  // ✅ Nama Produk di Atas
+                  Center(
+                    child: Text(
+                      widget.product.name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  const Text(
-                    'Detail Pesanan',
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 16),
+
+                  // ✅ Carousel Gambar
+                  if (variants.isNotEmpty)
+                    SizedBox(
+                      height: 200,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: variants.length,
+                        itemBuilder: (_, i) {
+                          final v = variants[i];
+                          final imageUrl = v.imagePath;
+
+                          return FutureBuilder<Uint8List?>(
+                            future: ImageHelper.loadImage(imageUrl),
+                            builder: (context, snapshot) {
+                              Widget imageWidget;
+
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                imageWidget = const Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasData && snapshot.data != null) {
+                                imageWidget = Image.memory(
+                                  snapshot.data!,
+                                  width: 180,
+                                  height: 180,
+                                  fit: BoxFit.cover,
+                                );
+                              } else {
+                                imageWidget = Container(
+                                  width: 180,
+                                  height: 180,
+                                  color: Colors.grey[300],
+                                  child: const Icon(Icons.broken_image, size: 80),
+                                );
+                              }
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: imageWidget,
+                                      ),
+                                      if (v.isPrimary)
+                                        Positioned(
+                                          top: 8,
+                                          left: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Text(
+                                              'Varian Utama',
+                                              style: TextStyle(fontSize: 10, color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    )
+                  else
+                    const Center(child: Icon(Icons.broken_image, size: 100)),
+
+                  const SizedBox(height: 16),
+
+                  // ✅ Deskripsi
+                  Text(
+                    widget.product.description ?? 'Tidak ada deskripsi.',
+                    style: const TextStyle(fontSize: 13, height: 1.5),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  const Text('Varian', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+
+                  // ✅ List Varian
+                  Expanded(
+                    child: ListView(
+                      children: variants.map((v) {
+                        final hargaDasar = int.tryParse(widget.product.price) ?? 0;
+                        final hargaTambahan = int.tryParse(v.hargaTambahan) ?? 0;
+                        final stok = int.tryParse(v.stock) ?? 0;
+                        final hargaTotal = hargaDasar + hargaTambahan;
+                        final qty = quantityPerVariant[v.namaVarian] ?? 0;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: v.namaVarian.toLowerCase().contains("dingin")
+                                ? const Color(0xFFFFF1C5)
+                                : const Color(0xFFF2F2F2),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '${v.namaVarian}\n${formatRupiah(hargaTotal)}\nStok: $stok',
+                                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove_circle_outline),
+                                    onPressed: qty > 0
+                                        ? () => setState(() => quantityPerVariant[v.namaVarian] = qty - 1)
+                                        : null,
+                                  ),
+                                  Text('$qty'),
+                                  IconButton(
+                                    icon: const Icon(Icons.add_circle_outline),
+                                    onPressed: qty < stok
+                                        ? () => setState(() => quantityPerVariant[v.namaVarian] = qty + 1)
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ✅ Footer Total dan Button
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(formatRupiah(totalHarga), style: const TextStyle(fontWeight: FontWeight.bold)),
+                            Text('Total Item : $totalItem', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: totalItem > 0 ? _handleAddToCart : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF8B4A0C),
+                            minimumSize: const Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text(
+                            'Tambahkan ke dalam Keranjang',
+                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ✅ Gambar Varian dengan Bearer Token
-                    if (variants.isNotEmpty)
-                      SizedBox(
-                        height: 200,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: variants.length,
-                          itemBuilder: (_, i) {
-                            final v = variants[i];
-                            final imageUrl = v.imagePath;
-
-                            return FutureBuilder<Uint8List?>(
-                              future: ImageHelper.loadImage(imageUrl),
-                              builder: (context, snapshot) {
-                                Widget imageWidget;
-
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  imageWidget = const Center(child: CircularProgressIndicator());
-                                } else if (snapshot.hasData && snapshot.data != null) {
-                                  imageWidget = Image.memory(
-                                    snapshot.data!,
-                                    width: 180,
-                                    height: 180,
-                                    fit: BoxFit.cover,
-                                  );
-                                } else {
-                                  imageWidget = Container(
-                                    width: 180,
-                                    height: 180,
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.broken_image, size: 80),
-                                  );
-                                }
-
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(16),
-                                          child: imageWidget,
-                                        ),
-                                        if (v.isPrimary)
-                                          Positioned(
-                                            top: 8,
-                                            left: 8,
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.orange,
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: const Text(
-                                                'Varian Utama',
-                                                style: TextStyle(fontSize: 10, color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      )
-                    else
-                      const Center(child: Icon(Icons.broken_image, size: 100)),
-
-                    const SizedBox(height: 16),
-
-                    // Deskripsi
-                    Text(
-                      widget.product.description ?? 'Tidak ada deskripsi.',
-                      style: const TextStyle(fontSize: 13, height: 1.5),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    const Text('Varian', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-
-                    // ✅ List Varian
-                    ...variants.map((v) {
-                      final hargaDasar = int.tryParse(widget.product.price) ?? 0;
-                      final hargaTambahan = int.tryParse(v.hargaTambahan) ?? 0;
-                      final stok = int.tryParse(v.stock) ?? 0;
-                      final hargaTotal = hargaDasar + hargaTambahan;
-                      final qty = quantityPerVariant[v.namaVarian] ?? 0;
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: v.namaVarian.toLowerCase().contains("dingin")
-                              ? const Color(0xFFFFF1C5)
-                              : const Color(0xFFF2F2F2),
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                '${v.namaVarian}\n${formatRupiah(hargaTotal)}\nStok: $stok',
-                                style: const TextStyle(fontSize: 13, color: Colors.black54),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  onPressed: qty > 0
-                                      ? () => setState(() => quantityPerVariant[v.namaVarian] = qty - 1)
-                                      : null,
-                                ),
-                                Text('$qty'),
-                                IconButton(
-                                  icon: const Icon(Icons.add_circle_outline),
-                                  onPressed: qty < stok
-                                      ? () => setState(() => quantityPerVariant[v.namaVarian] = qty + 1)
-                                      : null,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-
-                    const Spacer(),
-
-                    // ✅ Footer Total dan Button
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(formatRupiah(totalHarga), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              Text('Total Item : $totalItem', style: const TextStyle(fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          ElevatedButton(
-                            onPressed: totalItem > 0
-                                ? () {
-                                    _handleAddToCart();
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF8B4A0C),
-                              minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: const Text(
-                              'Tambahkan ke dalam Keranjang',
-                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

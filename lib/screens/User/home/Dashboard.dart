@@ -3,19 +3,17 @@ import 'package:iconsax/iconsax.dart';
 
 import '../../../controllers/CartController.dart';
 import '../../../controllers/Product/ProductController.dart';
-import '../../../models/Product/Product.dart';
+
 // Header & Layout
 import '../layout/DashboardHeader.dart';
 import '../layout/BottomNavBar.dart';
 import '../layout/BannerWidget.dart';
 import '../layout/CategoryTabs.dart';
+import '../layout/ProductSection.dart';
 
 // Views
 import './PesananSaya.dart';
-import './DetailPesanan.dart';
 import './CekProses.dart';
-
-import '../layout/ProductSection.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -29,19 +27,15 @@ class _DashboardView extends State<Dashboard> {
   late ProductController _productController;
   final TextEditingController _searchController = TextEditingController();
 
-
-
   int _selectedBottomNavIndex = 0;
   String _selectedCategory = "";
   bool _isLoadingProduct = false;
-
 
   @override
   void initState() {
     super.initState();
     _productController = ProductController();
   }
-
 
   void _fetchProducts({String? categoryId, String? searchQuery}) async {
     if (!mounted) return;
@@ -67,11 +61,8 @@ class _DashboardView extends State<Dashboard> {
       searchQuery: _searchController.text,
     );
 
-    setState(() {
-      _isLoadingProduct = false;
-    });
+    setState(() => _isLoadingProduct = false);
   }
-
 
   void _onSearchSubmitted(String value) {
     _fetchProducts(searchQuery: value);
@@ -88,7 +79,7 @@ class _DashboardView extends State<Dashboard> {
             child: Column(
               children: [
                 // Header
-               DashboardHeader(
+                DashboardHeader(
                   cartController: _cartController,
                   onCartTap: () {
                     if (_cartController.items.isEmpty) {
@@ -100,13 +91,12 @@ class _DashboardView extends State<Dashboard> {
                         context,
                         MaterialPageRoute(builder: (context) => const PesananSaya()),
                       ).then((_) {
-                        setState(() {
-                          _selectedBottomNavIndex = 0;
-                        });
+                        setState(() => _selectedBottomNavIndex = 0);
                       });
                     }
                   },
                 ),
+
                 // Content
                 Expanded(
                   child: SingleChildScrollView(
@@ -118,14 +108,14 @@ class _DashboardView extends State<Dashboard> {
                           padding: const EdgeInsets.all(16),
                           child: TextField(
                             controller: _searchController,
-                            onSubmitted: _onSearchSubmitted, 
+                            onSubmitted: _onSearchSubmitted,
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
                               hintText: "Search Coffee",
                               prefixIcon: IconButton(
                                 icon: const Icon(Iconsax.search_normal),
-                                onPressed: () => _onSearchSubmitted(_searchController.text), 
+                                onPressed: () => _onSearchSubmitted(_searchController.text),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -134,6 +124,7 @@ class _DashboardView extends State<Dashboard> {
                             ),
                           ),
                         ),
+
                         // Banner
                         BannerWidget(imagePath: 'assets/images/Banner.png'),
 
@@ -153,12 +144,11 @@ class _DashboardView extends State<Dashboard> {
                               searchQuery: _searchController.text,
                             );
 
-                            setState(() {
-                              _isLoadingProduct = false;
-                            });
+                            setState(() => _isLoadingProduct = false);
                           },
                         ),
-                        // Product 
+
+                        // Product
                         _isLoadingProduct
                             ? const Padding(
                                 padding: EdgeInsets.all(32),
@@ -169,7 +159,7 @@ class _DashboardView extends State<Dashboard> {
                                 controller: _productController,
                                 selectedCategoryId: _selectedCategory,
                               ),
-                        ],
+                      ],
                     ),
                   ),
                 ),
@@ -177,8 +167,8 @@ class _DashboardView extends State<Dashboard> {
             ),
           ),
 
-          // Floating BottomNavBar
-         BottomNavBar(selectedIndex: 0)
+          // Bottom Nav
+          BottomNavBar(selectedIndex: 0),
         ],
       ),
     );
