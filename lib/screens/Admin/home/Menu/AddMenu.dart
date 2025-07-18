@@ -178,13 +178,14 @@ class _AddMenuState extends State<AddMenu> {
       varianProductList: variantList,
       context: context,
     );
+    Navigator.pop(context, true); 
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: Colors.grey.shade50,
     appBar: AppBar(
-      leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), color: Colors.black, onPressed: () => Navigator.pop(context)),
+      leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new), color: Colors.black, onPressed: () => Navigator.pop(context,true)),
       backgroundColor: Colors.transparent,
       elevation: 0,
       title: const Text("Tambah Menu", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),

@@ -19,6 +19,7 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  final ProductController controller = ProductController();
   String selectedCategoryId = '';
   Map<String, Uint8List?> _productImages = {};
   bool _isImageLoading = false;
@@ -41,10 +42,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
 
   String getPrimaryVariantStock(Product product) {
-    if (product.variants != null && product.variants!.isNotEmpty) {
-      return product.variants!.first.stock;
-    }
-    return "0";
+    return product.stock.toString();
   }
   String formatRupiah(String value) {
     if (value.contains('~')) {
@@ -245,7 +243,7 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProductController(), // <-- ini penting
+      create: (_) => controller, // <-- ini penting
       child: Scaffold(
         backgroundColor: const Color(0xFFF9F9F9),
         appBar: const CustomTopBar(title:"Atur Status Menu"),
@@ -294,12 +292,18 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: const Color(0xFF844C29),
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AddMenu()),
             );
+             if (result == true) {
+              final controller = ProductController();
+              await controller.fetchProducts(categoryId: selectedCategoryId);
+              await _loadImages(controller.products);
+            }
           },
+         
           child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
         ),
       ),

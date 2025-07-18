@@ -115,9 +115,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildButton(
                       label: 'Switch to Dashboard Admin',
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => DashboardAdmin()),
+                          
                         );
                       }, 
                       backgroundColor: Colors.white,

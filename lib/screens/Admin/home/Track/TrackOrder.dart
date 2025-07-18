@@ -1,93 +1,98 @@
 import 'package:flutter/material.dart';
-import '../../layout/BottomNavBarAdmin.dart';
-
-
-// Belum Selesai
-import '../Incoming/IncomingOrder.dart';
-import '../Menu/MenuScreen.dart';
-import '../Customer/Customer.dart';
-
-
+import '../../../../controllers/Antrian/AntrianController.dart';
+import '../../../../models/Antrian/Antrian.dart';
 import '../../layout/CustomTopBar.dart';
 
 class TrackOrder extends StatefulWidget {
-  const TrackOrder({super.key});
+  const TrackOrder({Key? key}) : super(key: key);
 
   @override
   State<TrackOrder> createState() => _TrackOrderState();
 }
 
 class _TrackOrderState extends State<TrackOrder> {
-  int _selectedBottomNavIndex = 1;
+  final AntrianController _controller = AntrianController();
   String _currentStep = "Menunggu Diproses";
 
-  void _onTap(int index) {
-    if (index == _selectedBottomNavIndex) return;
-
-    setState(() {
-      _selectedBottomNavIndex = index;
-    });
-
-    // switch (index) {
-    //   case 0:
-    //     // Navigator.pushReplacement(
-    //     //   context,
-    //     //   MaterialPageRoute(builder: (context) => const IncomingOrder()),
-    //     // );
-    //     break;
-    //   case 1:
-    //     // Stay here
-    //     break;
-    //   case 2:
-    //     Navigator.pushReplacement(
-    //       context,
-    //       MaterialPageRoute(builder: (context) => const Menu()),
-    //     );
-    //     break;
-    //   case 3:
-    //     Navigator.pushReplacement(
-    //       context,
-    //       MaterialPageRoute(builder: (context) => const Customer()),
-    //     );
-    //     break;
-    // }
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
   }
 
-  List<Map<String, dynamic>> _getAllOrders() {
-    return [
-      {
-        "orderId": "ORD001",
-        "customerName": "Muhammad Andi Syaifullah",
-        "status": "Menunggu Diproses",
-        "time": "10:30 AM",
-        "statusColor": Colors.brown,
-      },
-      {
-        "orderId": "ORD002",
-        "customerName": "Siti Nurhaliza",
-        "status": "Proses",
-        "time": "09:45 AM",
-        "statusColor": Colors.orange,
-      },
-      {
-        "orderId": "ORD003",
-        "customerName": "Ahmad Fauzi",
-        "status": "Selesai",
-        "time": "08:20 AM",
-        "statusColor": Colors.green,
-      },
-      {
-        "orderId": "ORD004",
-        "customerName": "Dewi Sartika",
-        "status": "Proses",
-        "time": "07:15 AM",
-        "statusColor": Colors.orange,
-      },
-    ];
+  Future<void> _loadData() async {
+    await _controller.fetchAntrean();
+    setState(() {});
   }
 
-  List<Map<String, dynamic>> _getFilteredOrders(String status) {
-    return _getAllOrders().where((order) => order["status"] == status).toList();
+  /// Ubah "proces" dari API ke status UI
+  String _mapProcesToStatus(String proses) {
+    switch (proses.trim().toLowerCase()) {
+      case "dapur":
+        return "Menunggu Diproses";
+      case "kasir":
+        return "Proses";
+      case "selesai":
+        return "Selesai";
+      default:
+        return proses;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'menunggu diproses':
+        return Colors.brown;
+      case 'proses':
+        return Colors.orange;
+      case 'selesai':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget _buildProgressIndicator() {
+    final steps = ["Menunggu Diproses", "Proses", "Selesai"];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: List.generate(steps.length, (index) {
+          final isActive = steps[index] == _currentStep;
+          return Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _currentStep = steps[index];
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isActive ? const Color(0xFF4B1D0D) : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    steps[index],
+                    style: TextStyle(
+                      color: isActive ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              if (index != steps.length - 1)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6),
+                  child: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                ),
+            ],
+          );
+        }),
+      ),
+    );
   }
 
   Widget _buildOrderCard({
@@ -173,52 +178,25 @@ class _TrackOrderState extends State<TrackOrder> {
     );
   }
 
-  Widget _buildProgressIndicator() {
-    final steps = ["Menunggu Diproses", "Proses", "Selesai"];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: List.generate(steps.length, (index) {
-          final isActive = steps[index] == _currentStep;
-          return Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _currentStep = steps[index];
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isActive ? const Color(0xFF4B1D0D) : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    steps[index],
-                    style: TextStyle(
-                      color: isActive ? Colors.white : Colors.black87,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              if (index != steps.length - 1)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 6),
-                  child: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
-                ),
-            ],
-          );
-        }),
-      ),
-    );
-  }
+  Widget _buildOrderList() {
+    if (_controller.isLoading) {
+      return const Expanded(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
 
-  Widget _buildOrderList(String status) {
-    final orders = _getFilteredOrders(status);
-    if (orders.isEmpty) {
+    if (_controller.error != null) {
+      return Expanded(
+        child: Center(child: Text("Terjadi kesalahan: ${_controller.error}")),
+      );
+    }
+
+    final filtered = _controller.antreanList.where((antrian) {
+      final status = _mapProcesToStatus(antrian.proces);
+      return status.toLowerCase() == _currentStep.toLowerCase();
+    }).toList();
+
+    if (filtered.isEmpty) {
       return Expanded(
         child: Center(
           child: Column(
@@ -227,7 +205,7 @@ class _TrackOrderState extends State<TrackOrder> {
               Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
               const SizedBox(height: 16),
               Text(
-                "Tidak ada pesanan dengan status \"$status\"",
+                "Tidak ada pesanan dengan status \"$_currentStep\"",
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
             ],
@@ -239,15 +217,16 @@ class _TrackOrderState extends State<TrackOrder> {
     return Expanded(
       child: ListView.builder(
         padding: const EdgeInsets.only(top: 16, bottom: 100),
-        itemCount: orders.length,
+        itemCount: filtered.length,
         itemBuilder: (context, index) {
-          final order = orders[index];
+          final item = filtered[index];
+          final status = _mapProcesToStatus(item.proces);
           return _buildOrderCard(
-            orderId: order["orderId"],
-            customerName: order["customerName"],
-            status: order["status"],
-            time: order["time"],
-            statusColor: order["statusColor"],
+            orderId: item.idCheckout,
+            customerName: item.namaUser,
+            status: status,
+            time: item.create_at,
+            statusColor: _getStatusColor(status),
           );
         },
       ),
@@ -258,13 +237,13 @@ class _TrackOrderState extends State<TrackOrder> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
-      appBar: const CustomTopBar(title: "Cek Antrian & Proses",),
+      appBar: const CustomTopBar(title: "Cek Antrian & Proses"),
       body: Column(
         children: [
           const SizedBox(height: 12),
           _buildProgressIndicator(),
           const SizedBox(height: 12),
-          _buildOrderList(_currentStep),
+          _buildOrderList(),
         ],
       ),
     );

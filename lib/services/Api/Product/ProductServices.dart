@@ -72,6 +72,7 @@ class ProductServices extends Config {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> data = jsonResponse['data']['data'];
+        print(data);
         if (data.isEmpty) throw Exception('Produk tidak ditemukan');
         return Product.fromJson(data.first);
       } else {
