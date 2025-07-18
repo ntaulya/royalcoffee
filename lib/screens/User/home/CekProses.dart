@@ -1,192 +1,101 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../layout/BottomNavBar.dart';
 
 class CekProses extends StatelessWidget {
   const CekProses({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF7A491F),
-      bottomNavigationBar: _buildBottomBar(),
-      body: Column(
-        children: [
-          const SizedBox(height: 50),
-          // Header
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Cek Antrian & Proses',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Container putih isi konten
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF9F9F9),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildAntrianItem(
-                    nomor: '1',
-                    nama: 'AndiSyaifullah',
-                    status: 'proses',
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Color(0xFF7A491F), // <<< status bar warna cokelat
+        statusBarIconBrightness: Brightness.light, // icon jadi putih
       ),
-    );
-  }
-
-  Widget _buildAntrianItem({
-    required String nomor,
-    required String nama,
-    required String status,
-  }) {
-    Color getColor(String step) {
-      if (status == step) {
-        return const Color(0xFF7A491F);
-      } else {
-        return const Color(0xFFE0DFDF);
-      }
-    }
-
-    Color getTextColor(String step) {
-      return (status == step) ? Colors.white : Colors.black;
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        CircleAvatar(
-          radius: 12,
-          backgroundColor: const Color(0xFF4C2609),
-          child: Text(
-            nomor,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          nama,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(width: 20),
-        // Step indicators
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: getColor('menunggu'),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            'Menunggu diproses',
-            style: TextStyle(
-              fontSize: 12,
-              color: getTextColor('menunggu'),
-            ),
-          ),
-        ),
-        const SizedBox(width: 4),
-        const Icon(Icons.arrow_right_alt, color: Colors.black54),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: getColor('proses'),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            'Proses',
-            style: TextStyle(
-              fontSize: 12,
-              color: getTextColor('proses'),
-            ),
-          ),
-        ),
-        const SizedBox(width: 4),
-        const Icon(Icons.arrow_right_alt, color: Colors.black54),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: getColor('selesai'),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            'Selesai',
-            style: TextStyle(
-              fontSize: 12,
-              color: getTextColor('selesai'),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: BottomAppBar(
-        elevation: 0,
-        color: Colors.transparent,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: Colors.white,
+        body: Stack(
           children: [
-            IconButton(
-              icon: const Icon(Icons.home_outlined),
-              onPressed: () {},
-            ),
-            Stack(
+            // Latar belakang backup
+            Container(color: Colors.white),
+
+            // Konten
+            Column(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.shopping_cart_outlined),
-                  onPressed: () {},
+                // =========== HEADER ===========
+                Container(
+                  width: double.infinity,
+                  color: const Color(0xFF7A491F),
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + 12, // tambah padding top agar tidak nabrak notch
+                    left: 20,
+                    right: 20,
+                    bottom: 16,
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Cek Antrian & Proses',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Positioned(
-                  top: 2,
-                  right: 2,
-                  child: _buildBadge('2'),
+
+                // =========== KONTEN ===========
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF9F9F9),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildAntrianItem(
+                            nomor: '1',
+                            nama: 'Andi Syaifullah',
+                            status: 'proses',
+                          ),
+                          const SizedBox(height: 20),
+                          _buildAntrianItem(
+                            nomor: '2',
+                            nama: 'Dewi Sartika',
+                            status: 'selesai',
+                          ),
+                          const SizedBox(height: 20),
+                          _buildAntrianItem(
+                            nomor: '3',
+                            nama: 'Rahmat Hidayat',
+                            status: 'menunggu',
+                          ),
+                          const SizedBox(height: 80),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            IconButton(
-              icon: const Icon(Icons.credit_card_outlined),
-              onPressed: () {},
-            ),
-            Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.notifications_none),
-                  onPressed: () {},
-                ),
-                Positioned(
-                  top: 2,
-                  right: 2,
-                  child: _buildBadge('1'),
-                ),
-              ],
+
+            // =========== BOTTOM NAVBAR ===========
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: BottomNavBar(selectedIndex: 1),
             ),
           ],
         ),
@@ -194,20 +103,89 @@ class CekProses extends StatelessWidget {
     );
   }
 
-  Widget _buildBadge(String count) {
+  // =========== ITEM ANTRIAN ===========
+  static Widget _buildAntrianItem({
+    required String nomor,
+    required String nama,
+    required String status,
+  }) {
+    Color getColor(String step) =>
+        (status == step) ? const Color(0xFF7A491F) : const Color(0xFFE0DFDF);
+
+    Color getTextColor(String step) =>
+        (status == step) ? Colors.white : Colors.black;
+
     return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: const BoxDecoration(
-        color: Colors.red,
-        shape: BoxShape.circle,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Text(
-        count,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 10,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: const Color(0xFF4C2609),
+                child: Text(
+                  nomor,
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                nama,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: ['menunggu', 'proses', 'selesai'].map((step) {
+              return Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(right: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: getColor(step),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      step == 'menunggu' ? 'Menunggu diproses' : step.capitalize(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: getTextColor(step),
+                      ),
+                    ),
+                  ),
+                  if (step != 'selesai')
+                    const Icon(Icons.arrow_right_alt, size: 18, color: Colors.black45),
+                ],
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
+}
+
+// =========== EXTENSION UTK CAPITALIZE ===========
+extension CapExtension on String {
+  String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
 }

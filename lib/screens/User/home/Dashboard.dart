@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../controllers/CartController.dart';
@@ -13,7 +14,6 @@ import '../layout/ProductSection.dart';
 
 // Views
 import './PesananSaya.dart';
-import './CekProses.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -70,15 +70,19 @@ class _DashboardView extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: const Color(0xFFFCF2D9),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Column(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Color(0xFF7A491F), // warna cokelat header
+        statusBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: const Color(0xFFFCF2D9), // krem
+        body: Stack(
+          children: [
+            Column(
               children: [
-                // Header
+                // ✅ Header dipindahkan ke luar SafeArea
                 DashboardHeader(
                   cartController: _cartController,
                   onCartTap: () {
@@ -97,79 +101,81 @@ class _DashboardView extends State<Dashboard> {
                   },
                 ),
 
-                // Content
+                // ✅ Konten dibungkus SafeArea dengan top: false
                 Expanded(
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        // Search
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: TextField(
-                            controller: _searchController,
-                            onSubmitted: _onSearchSubmitted,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: "Search Coffee",
-                              prefixIcon: IconButton(
-                                icon: const Icon(Iconsax.search_normal),
-                                onPressed: () => _onSearchSubmitted(_searchController.text),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
+                  child: SafeArea(
+                    top: false,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          // Search Bar
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: TextField(
+                              controller: _searchController,
+                              onSubmitted: _onSearchSubmitted,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                hintText: "Search Coffee",
+                                prefixIcon: IconButton(
+                                  icon: const Icon(Iconsax.search_normal),
+                                  onPressed: () => _onSearchSubmitted(_searchController.text),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
                             ),
                           ),
-                        ),
 
-                        // Banner
-                        BannerWidget(imagePath: 'assets/images/Banner.png'),
+                          // Banner
+                          BannerWidget(imagePath: 'assets/images/Banner.png'),
 
-                        // Category Tabs
-                        CategoryTabs(
-                          selectedCategory: _selectedCategory,
-                          onCategorySelected: _onCategorySelected,
-                          onInitialCategoryReady: (categoryId) async {
-                            if (!mounted) return;
-                            setState(() {
-                              _selectedCategory = categoryId;
-                              _isLoadingProduct = true;
-                            });
+                          // Category Tabs
+                          CategoryTabs(
+                            selectedCategory: _selectedCategory,
+                            onCategorySelected: _onCategorySelected,
+                            onInitialCategoryReady: (categoryId) async {
+                              if (!mounted) return;
+                              setState(() {
+                                _selectedCategory = categoryId;
+                                _isLoadingProduct = true;
+                              });
 
-                            await _productController.fetchProducts(
-                              categoryId: categoryId,
-                              searchQuery: _searchController.text,
-                            );
+                              await _productController.fetchProducts(
+                                categoryId: categoryId,
+                                searchQuery: _searchController.text,
+                              );
 
-                            setState(() => _isLoadingProduct = false);
-                          },
-                        ),
-
-                        // Product
-                        _isLoadingProduct
-                            ? const Padding(
-                                padding: EdgeInsets.all(32),
-                                child: CircularProgressIndicator(),
-                              )
-                            : ProductSection(
-                                products: _productController.products,
-                                controller: _productController,
-                                selectedCategoryId: _selectedCategory,
-                              ),
-                      ],
+                              setState(() => _isLoadingProduct = false);
+                            },
+                          ),
+                          // Product Section
+                          _isLoadingProduct
+                              ? const Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: CircularProgressIndicator(),
+                                )
+                              : ProductSection(
+                                  products: _productController.products,
+                                  controller: _productController,
+                                  selectedCategoryId: _selectedCategory,
+                                ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-          ),
 
-          // Bottom Nav
-          BottomNavBar(selectedIndex: 0),
-        ],
+            // Bottom Navigation
+            BottomNavBar(selectedIndex: 0),
+          ],
+        ),
       ),
     );
   }

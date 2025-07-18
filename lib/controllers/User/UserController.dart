@@ -20,11 +20,7 @@ class UserController with ChangeNotifier {
 
       final result = await _userService.getList(); 
       users = result;
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Data pengguna berhasil dimuat')),
-        );
-      }
+     
     } catch (e) {
       errorMessage = e.toString();
       if (context != null) {

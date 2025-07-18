@@ -80,7 +80,7 @@ class _CategoryTabsState extends State<CategoryTabs> {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      margin: const EdgeInsets.only(left:16 ,top: 16, bottom: 0),
       height: 40,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,

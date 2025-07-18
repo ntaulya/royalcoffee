@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../controllers/CartController.dart';
 import '../../../models/CartItem.dart';
-
-
-// Screen
 import '../../Auth/User/ProfilePage.dart';
 
 class DashboardHeader extends StatelessWidget {
@@ -19,9 +16,11 @@ class DashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double topPadding = MediaQuery.of(context).padding.top;
+
     return Container(
+      padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 16),
       color: const Color(0xFF834D1E),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
