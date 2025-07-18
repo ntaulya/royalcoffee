@@ -26,7 +26,7 @@ class Product {
       name: json['nama_product'] ?? '',
       imageUrl: json['image_path'] ?? '',
       price: json['harga_product']?.toString() ?? '0',
-      stock: json['stock'] ?? 0,
+      stock: int.parse(json['stock']?.toString() ?? '0') ?? 0,
       status: json['status_product'] ?? 'aktif',
       description: json['description'],
       variants: (json['variants'] as List?)?.map((v) => Variant.fromJson(v)).toList() ?? [],
