@@ -13,10 +13,10 @@ class Antrian {
 
   factory Antrian.fromJson(Map<String, dynamic> json) {
     return Antrian(
-      idCheckout: json['id_checkout'],
-      namaUser: json['nama_user'],
-      proces: json['proces'],
-      create_at : json['create_at'],
+      idCheckout: json['id_checkout'] ?? '',
+      namaUser: json['nama_user'] ?? '',
+      proces: json['proces'] ?? '',
+      create_at: json['create_at'] ?? '',
     );
   }
 }

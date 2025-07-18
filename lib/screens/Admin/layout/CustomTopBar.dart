@@ -1,22 +1,84 @@
 import 'package:flutter/material.dart';
+import '../home/Track/Barista/BaristaView.dart';
+import '../home/Track/Waiters/WaitersView.dart';
+import '../home/DashboardAdmin.dart';
 
 class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final VoidCallback? onBack;
 
   const CustomTopBar({
-    super.key,
+    Key? key,
     required this.title,
-    this.onBack, // bisa diset Navigator.pop atau custom function
-  });
+  }) : super(key: key);
+
+  void _openMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.dashboard),
+                title: const Text('Dashboard'),
+                onTap: () {
+                  Navigator.pop(context); // close menu
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const DashboardAdmin()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.people),
+                title: const Text('Waiters'),
+                onTap: () {
+                  Navigator.pop(context); // close menu
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => WaitersView()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.local_cafe),
+                title: const Text('Dapur'),
+                onTap: () {
+                  Navigator.pop(context); // close menu
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => BaristaView()),
+                  );
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.switch_account),
+                title: const Text('Switch Mode: User'),
+                onTap: () {
+                  Navigator.pop(context); // close menu
+                  Navigator.pop(context); // close menu
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      centerTitle: true,
       backgroundColor: Colors.transparent,
       elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.menu, color: Colors.brown),
+        onPressed: () => _openMenu(context),
+      ),
+      centerTitle: true,
       title: Text(
         title,
         style: const TextStyle(
@@ -25,12 +87,6 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
           color: Colors.black,
         ),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.logout, color: Colors.brown),
-          onPressed: onBack ?? () => Navigator.pop(context),
-        ),
-      ],
     );
   }
 

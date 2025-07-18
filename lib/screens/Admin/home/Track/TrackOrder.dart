@@ -237,7 +237,7 @@ class _TrackOrderState extends State<TrackOrder> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
-      appBar: const CustomTopBar(title: "Cek Antrian & Proses"),
+      appBar: CustomTopBar(title: "Cek Antrian & Proses"),
       body: Column(
         children: [
           const SizedBox(height: 12),
