@@ -72,45 +72,6 @@ class _DashboardView extends State<Dashboard> {
     });
   }
 
-  void _onBottomNavTapped(int index) {
-    setState(() {
-      _selectedBottomNavIndex = index;
-    });
-
-    switch (index) {
-      case 0:
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CekProses()),
-        ).then((_) {
-          setState(() {
-            _selectedBottomNavIndex = 0;
-          });
-        });
-        break;
-      case 2:
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => const DetailPesanan()),
-        // ).then((_) {
-        //   setState(() {
-        //     _selectedBottomNavIndex = 0;
-        //   });
-        // });
-        break;
-      case 3:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Fitur notifikasi belum tersedia')),
-        );
-        setState(() {
-          _selectedBottomNavIndex = 0;
-        });
-        break;
-    }
-  }
-
 
   void _onSearchSubmitted(String value) {
     _fetchProducts(searchQuery: value);
@@ -217,10 +178,7 @@ class _DashboardView extends State<Dashboard> {
           ),
 
           // Floating BottomNavBar
-          BottomNavBar(
-            selectedIndex: _selectedBottomNavIndex,
-            onTap: _onBottomNavTapped,
-          ),
+         BottomNavBar(selectedIndex: 0)
         ],
       ),
     );

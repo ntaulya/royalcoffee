@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
+// Import semua screen tujuan di sini
+import '../home/PesananSaya.dart';
+import '../home/Dashboard.dart';
+import '../home/CekProses.dart';
+
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
-  final ValueChanged<int> onTap;
 
   const BottomNavBar({
-    super.key,
+    Key? key,
     required this.selectedIndex,
-    required this.onTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0), // jarak dari bawah
+        padding: const EdgeInsets.only(bottom: 16.0),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(30),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 10,
@@ -34,10 +37,10 @@ class BottomNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildNavItem(Iconsax.home, "Home", 0),
-              _buildNavItem(Iconsax.shopping_cart, "Order", 1),
-              _buildNavItem(Iconsax.wallet, "History", 2),
-              _buildNavItem(Iconsax.notification, "Notification", 3),
+              _buildNavItem(context, Iconsax.home, "Home", 0, const Dashboard()),
+              _buildNavItem(context, Iconsax.shopping_cart, "Order", 1, const CekProses()),
+              // _buildNavItem(context, Iconsax.wallet, "History", 2, const DetailPesanan()),
+              _buildNavItem(context, Iconsax.notification, "Notification", 3, const Placeholder()),
             ],
           ),
         ),
@@ -45,16 +48,30 @@ class BottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    int index,
+    Widget screen,
+  ) {
     final isSelected = selectedIndex == index;
     final color = isSelected ? const Color(0xFF8B4A0C) : Colors.grey;
 
     return GestureDetector(
-      onTap: () => onTap(index),
+      onTap: () {
+        if (!isSelected) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => screen),
+          );
+        }
+      },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: color),
+          const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(fontSize: 12, color: color),

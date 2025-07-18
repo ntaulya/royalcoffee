@@ -24,7 +24,7 @@ Widget buildProductItem(ItemProduct item, OnDeleteCallback onDelete) {
           },
         ),
         const SizedBox(width: 12),
-        Expanded(child: Text(item.nama_product)),
+        Expanded(child: Text(item.nama_product  + ' - ' + item.nama_varian)),
         Text('${item.qty}x', style: const TextStyle(color: Colors.grey)),
         IconButton(
           icon: const Icon(Icons.delete, color: Colors.red),
