@@ -1,0 +1,62 @@
+import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart' as path;
+import 'package:mime/mime.dart';
+
+
+import '../../SecureStorageService.dart';
+import '../Config.dart';
+import '../../../models/Dapur/DapurItem.dart';
+
+
+class DapurService extends Config {
+  final Config _config = Config();
+  final SecureStorageService _storageService = SecureStorageService();
+
+    Future<List<DapurItem>> getDapurList() async {
+    try {
+        String url = '${_config.baseUrl}/product/dapur';
+        String? token = await _storageService.getToken();
+
+        Map<String, String> headers = {
+        ..._config.defaultHeaders,
+        'Authorization': 'Bearer $token',
+        };
+
+        final uri = Uri.parse(url).replace(queryParameters: {
+        'page': '1',
+        });
+
+        final response = await http.get(uri, headers: headers).timeout(_config.timeout);
+
+        if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        /// 🧠 Perhatikan: data["data"]["data"] adalah List<List<dynamic>>
+        final List<dynamic> rawOuterList = data['data']['data'];
+
+        /// Flatten all inner lists to a single list
+        final List<DapurItem> allItems = [];
+
+        for (var innerList in rawOuterList) {
+            for (var item in innerList) {
+            allItems.add(DapurItem.fromJson(item));
+            }
+        }
+
+        return allItems;
+        } else {
+        throw Exception(_config.getErrorMessage(response, 'getDapurList'));
+        }
+    } on SocketException {
+        throw Exception('Tidak ada koneksi internet');
+    } on http.ClientException {
+        throw Exception('Gagal terhubung ke server');
+    } catch (e) {
+        print('🛑 Error di getDapurList: $e');
+        throw Exception('Terjadi kesalahan: $e');
+    }
+    }
+}
