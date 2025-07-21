@@ -30,7 +30,7 @@ class _TrackOrderState extends State<TrackOrder> {
     switch (proses.trim().toLowerCase()) {
       case "dapur":
         return "Menunggu Diproses";
-      case "kasir":
+      case "waiters":
         return "Proses";
       case "selesai":
         return "Selesai";

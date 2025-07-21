@@ -1,27 +1,41 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import '../../../../../controllers/Dapur/DapurController.dart';
-import '../../../../../models/Dapur/DapurItem.dart';
-import '../../../layout/CustomTopBar.dart';
-import '../../../../../services/Api/ImageHelper.dart';
 
-class BaristaView extends StatefulWidget {
-  const BaristaView({super.key});
+import '../../../../../controllers/Dapur/DapurController.dart';
+import '../../../../../controllers/Waiters/WaitersController.dart';
+
+import '../../../../../models/Dapur/DapurItem.dart';
+import '../../../../../models/Waiter/WaiterItem.dart';
+import '../../../../../models/StaffRole.dart';
+import '../../../../../services/Api/ImageHelper.dart';
+import '../../layout/CustomTopBar.dart';
+
+class StaffOrderView extends StatefulWidget {
+  final StaffRole role;
+
+  const StaffOrderView({super.key, required this.role});
 
   @override
-  State<BaristaView> createState() => _BaristaViewState();
+  State<StaffOrderView> createState() => _StaffOrderViewState();
 }
 
-class _BaristaViewState extends State<BaristaView> {
-  final DapurController _controller = DapurController();
+class _StaffOrderViewState extends State<StaffOrderView> {
+  late final bool isBarista;
   final Map<String, Uint8List?> _imageCache = {};
   bool _isImageLoading = false;
   Timer? _refreshTimer;
 
+  late final DapurController _baristaController;
+  late final WaitersController _waiterController;
+
   @override
   void initState() {
     super.initState();
+    isBarista = widget.role == StaffRole.barista;
+    _baristaController = DapurController();
+    _waiterController = WaitersController();
+
     _startAutoReload();
     _fetchDataAndImages();
   }
@@ -39,30 +53,49 @@ class _BaristaViewState extends State<BaristaView> {
   }
 
   Future<void> _fetchDataAndImages() async {
+    if (!mounted) return;
     setState(() => _isImageLoading = true);
-    await _controller.fetchDapur();
-    await _loadImages(_controller.dapurList);
+
+    if (isBarista) {
+      await _baristaController.fetchDapur();
+      await _loadImages<DapurItem>(_baristaController.dapurList);
+    } else {
+      await _waiterController.fetchDapur();
+      await _loadImages<WaiterItem>(_waiterController.dapurList);
+    }
+
+    if (!mounted) return;
     setState(() => _isImageLoading = false);
   }
 
-  Future<void> _loadImages(List<DapurItem> items) async {
+  Future<void> _loadImages<T>(List<T> items) async {
     _imageCache.clear();
     for (var item in items) {
-      final cacheKey = "${item.idCheckout}_${item.idVarian}";
-      final image = await ImageHelper.loadImage(item.imagePath);
-      _imageCache[cacheKey] = image;
+      if (item is DapurItem || item is WaiterItem) {
+        final cacheKey = "${(item as dynamic).idCheckout}_${(item as dynamic).idVarian}";
+        final image = await ImageHelper.loadImage(item.imagePath);
+        _imageCache[cacheKey] = image;
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = _controller.isLoading || _isImageLoading;
-    final error = _controller.error;
-    final dapurList = _controller.dapurList;
+    final isLoading = isBarista
+        ? _baristaController.isLoading || _isImageLoading
+        : _waiterController.isLoading || _isImageLoading;
+
+    final error = isBarista
+        ? _baristaController.error
+        : _waiterController.error;
+
+    final items = isBarista
+        ? _baristaController.dapurList
+        : _waiterController.dapurList;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3F3),
-      appBar: const CustomTopBar(title: "Tampilan Khusus Barista"),
+      appBar: CustomTopBar(title: isBarista ? "Tampilan Khusus Barista" : "Tampilan Waiters"),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : error != null
@@ -70,10 +103,11 @@ class _BaristaViewState extends State<BaristaView> {
               : RefreshIndicator(
                   onRefresh: _fetchDataAndImages,
                   child: ListView.builder(
-                    itemCount: dapurList.length,
+                    itemCount: items.length,
                     itemBuilder: (context, index) {
-                      final DapurItem order = dapurList[index];
-                      final cacheKey = "${order.idCheckout}_${order.idVarian}";
+                      final order = items[index];
+                      final dynamic item = order;
+                      final cacheKey = "${item.idCheckout}_${item.idVarian}";
                       final imageBytes = _imageCache[cacheKey];
 
                       return Column(
@@ -83,30 +117,19 @@ class _BaristaViewState extends State<BaristaView> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 26,
-                                  height: 26,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(0xFF4B1D0D),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      (index + 1).toString(),
-                                      style: const TextStyle(color: Colors.white),
-                                    ),
+                                CircleAvatar(
+                                  radius: 13,
+                                  backgroundColor: const Color(0xFF4B1D0D),
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: const TextStyle(color: Colors.white, fontSize: 12),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: imageBytes != null
-                                      ? Image.memory(
-                                          imageBytes,
-                                          width: 64,
-                                          height: 64,
-                                          fit: BoxFit.cover,
-                                        )
+                                      ? Image.memory(imageBytes, width: 64, height: 64, fit: BoxFit.cover)
                                       : Container(
                                           width: 64,
                                           height: 64,
@@ -120,20 +143,17 @@ class _BaristaViewState extends State<BaristaView> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        order.namaProduct,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        item.namaProduct,
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        "${order.item} Item, ${order.namaPemesan}, ${order.namaVarian}",
+                                        "${item.item} Item, ${item.namaPemesan}, ${item.namaVarian}",
                                         style: const TextStyle(fontSize: 13),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        "Status Pesanan : ${order.status}",
+                                        "Status Pesanan : ${item.status}",
                                         style: const TextStyle(fontSize: 13),
                                       ),
                                       const SizedBox(height: 6),
@@ -152,13 +172,20 @@ class _BaristaViewState extends State<BaristaView> {
                                           ),
                                           const SizedBox(width: 10),
                                           OutlinedButton(
-                                          onPressed: () async {
-                                            await _controller.updatePesananStatus(
-                                              order.idCheckout,
-                                              order.idVarian,
-                                            );
-                                            await _fetchDataAndImages();
-                                          },
+                                            onPressed: () async {
+                                              if (isBarista) {
+                                                await _baristaController.updatePesananStatus(
+                                                  item.idCheckout,
+                                                  item.idVarian,
+                                                );
+                                              } else {
+                                                await _waiterController.updatePesananStatus(
+                                                  item.idCheckout,
+                                                  item.idVarian,
+                                                );
+                                              }
+                                              await _fetchDataAndImages();
+                                            },
                                             style: OutlinedButton.styleFrom(
                                               side: const BorderSide(color: Colors.grey),
                                               shape: RoundedRectangleBorder(

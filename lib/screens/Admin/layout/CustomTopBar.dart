@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../home/Track/Barista/BaristaView.dart';
-import '../home/Track/Waiters/WaitersView.dart';
+import '../home/Track/StaffOrderView.dart';
 import '../home/DashboardAdmin.dart';
+import '../../../../models/StaffRole.dart';
 
 class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -37,7 +37,9 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.pop(context); // close menu
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => WaitersView()),
+                    MaterialPageRoute(
+                      builder: (_) => const StaffOrderView(role: StaffRole.waiter),
+                    ),
                   );
                 },
               ),
@@ -48,7 +50,9 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.pop(context); // close menu
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => BaristaView()),
+                    MaterialPageRoute(
+                      builder: (_) => const StaffOrderView(role: StaffRole.barista),
+                    ),
                   );
                 },
               ),
