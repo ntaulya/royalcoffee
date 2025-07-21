@@ -59,4 +59,40 @@ class DapurService extends Config {
         throw Exception('Terjadi kesalahan: $e');
     }
     }
+
+
+    Future<void> updateStatusPesanan({
+    required String idCheckout,
+    required String idVarian,
+    }) async {
+    try {
+        final String url = '${_config.baseUrl}/product/dapur';
+        final String? token = await _storageService.getToken();
+
+        final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+            ..._config.defaultHeaders,
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+            'id_checkout': idCheckout,
+            'id_varian': idVarian,
+        },
+        ).timeout(_config.timeout);
+
+        if (response.statusCode != 201) {
+            throw Exception(_config.getErrorMessage(response, 'updateStatusPesanan'));
+        }
+    } on SocketException {
+        throw Exception('Tidak ada koneksi internet');
+    } on http.ClientException {
+        throw Exception('Gagal terhubung ke server');
+    } catch (e) {
+        print('🛑 Error di updateStatusPesanan: $e');
+        throw Exception('Terjadi kesalahan: $e');
+    }
+    }
+
 }

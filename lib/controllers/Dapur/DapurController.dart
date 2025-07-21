@@ -14,17 +14,34 @@ class DapurController extends ChangeNotifier {
   String? get error => _error;
 
   Future<void> fetchDapur() async {
-    _loading = true;
-    _error = null;
-    notifyListeners();
+    _setLoading(true);
 
     try {
-      _list = await _service.getDapurList(); // metode dari DapurService
+      _list = await _service.getDapurList();
+      _error = null;
     } catch (e) {
       _error = e.toString();
     }
 
-    _loading = false;
+    _setLoading(false);
+  }
+
+  Future<void> updatePesananStatus(String idCheckout, String idVarian) async {
+    try {
+      await _service.updateStatusPesanan(
+        idCheckout: idCheckout,
+        idVarian: idVarian,
+      );
+      await fetchDapur(); // Refresh data setelah update
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners(); // Penting hanya jika error ditampilkan
+    }
+  }
+
+  // Helper agar DRY (Don’t Repeat Yourself)
+  void _setLoading(bool value) {
+    _loading = value;
     notifyListeners();
   }
 }

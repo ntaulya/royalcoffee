@@ -152,7 +152,13 @@ class _BaristaViewState extends State<BaristaView> {
                                           ),
                                           const SizedBox(width: 10),
                                           OutlinedButton(
-                                            onPressed: () {},
+                                          onPressed: () async {
+                                            await _controller.updatePesananStatus(
+                                              order.idCheckout,
+                                              order.idVarian,
+                                            );
+                                            await _fetchDataAndImages();
+                                          },
                                             style: OutlinedButton.styleFrom(
                                               side: const BorderSide(color: Colors.grey),
                                               shape: RoundedRectangleBorder(

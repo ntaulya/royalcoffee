@@ -1,6 +1,6 @@
 class DapurItem {
   final String idCheckout;
-  final int idVarian;
+  final String idVarian;
   final String namaPemesan;
   final String namaProduct;
   final String namaVarian;
@@ -22,7 +22,7 @@ class DapurItem {
   factory DapurItem.fromJson(Map<String, dynamic> json) {
     return DapurItem(
       idCheckout: json['id_checkout'] ?? '',
-      idVarian: json['id_varian'] ?? 0,
+      idVarian: json['id_varian'].toString() ?? '0',
       namaPemesan: json['nama_pemesan'] ?? '',
       namaProduct: json['nama_product'] ?? '',
       namaVarian: json['nama_varian'] ?? '',
