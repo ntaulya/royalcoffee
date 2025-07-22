@@ -63,7 +63,6 @@ class _PesananSayaState extends State<PesananSaya> {
         pajak = pajakResponse;
       });
     } catch (e) {
-      print("Gagal hitung pajak: $e");
     }
   }
 

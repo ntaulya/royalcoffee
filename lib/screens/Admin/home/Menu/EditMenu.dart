@@ -48,7 +48,6 @@ class _EditMenuState extends State<EditMenu> {
     _nameController.text = widget.product.name;
     _priceController.text = widget.product.price;
     _descriptionController.text = widget.product.description ?? '';
-    print(widget.product.description);
 
     _categories = await _categoryController.loadCategories();
     selectedCategory = _categories.firstWhere(

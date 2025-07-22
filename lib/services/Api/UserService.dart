@@ -13,7 +13,7 @@ class UserService extends Config {
   final Config _config = Config();
   final SecureStorageService _storageService = SecureStorageService();
 
-  Future<List<User>>  getList() async {
+  Future<List<User>> getList() async {
     try {
         String url = '${_config.baseUrl}/user';
         String? token = await _storageService.getToken();

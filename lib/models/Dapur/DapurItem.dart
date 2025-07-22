@@ -4,8 +4,10 @@ class DapurItem {
   final String namaPemesan;
   final String namaProduct;
   final String namaVarian;
+  final String tipePemesanan;
   final String status;
   final String imagePath;
+  final String createAt;
   final int item;
 
   DapurItem({
@@ -16,6 +18,8 @@ class DapurItem {
     required this.namaVarian,
     required this.status,
     required this.imagePath,
+    required this.tipePemesanan,
+    required this.createAt,
     required this.item,
   });
 
@@ -29,6 +33,8 @@ class DapurItem {
       status: json['status'] ?? '',
       imagePath: json['image_path'] ?? '',
       item: json['item'] ?? 0,
+      tipePemesanan : json['status_pemesanan'] ?? '',
+      createAt : json['create_at'] ?? '',
     );
   }
 }

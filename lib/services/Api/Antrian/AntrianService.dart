@@ -38,7 +38,6 @@ class AntrianService extends Config {
     } on http.ClientException {
       throw Exception('Gagal menghubungi server');
     } catch (e) {
-      print('🛑 Error di AntreanService: $e');
       throw Exception('Terjadi kesalahan: $e');
     }
   }

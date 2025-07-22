@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../../models/Login.dart';
 import '../../models/Product/Product.dart';
+import '../../screens/Auth/LoginView.dart';
+import './UserService.dart';
+import '../SecureStorageService.dart';
 
 
 
@@ -14,7 +17,13 @@ class Config {
     'Accept': 'application/json',
   };
 
-  
+  Future<void> handleUnauthorized(http.Response response) async {
+    if (response.statusCode == 401) {
+      final SecureStorageService _storageService = SecureStorageService();
+      await _storageService.deleteToken();
+      throw Exception('Token tidak valid. Silakan login ulang.');
+    }
+  } 
 
   String getErrorMessage(http.Response response, String action) {
     try {

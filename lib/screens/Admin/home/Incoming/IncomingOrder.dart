@@ -99,7 +99,6 @@ bool _isFetching = false;
       }
       _lastOrderCount = currentCount;
     } catch (e) {
-      debugPrint("Error getOrders: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

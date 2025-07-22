@@ -1,11 +1,12 @@
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import '../SecureStorageService.dart';
+import './Config.dart';
 
 class ImageHelper {
   static Future<Uint8List?> loadImage(String url) async {
+    final Config _config = Config();
     if (url.isEmpty) return null;
-
     try {
       final token = await SecureStorageService().getToken();
       final response = await http.get(

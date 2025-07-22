@@ -15,7 +15,6 @@ class OrderController with ChangeNotifier {
 
       orders = await _orderService.getOrder(search: search);
     } catch (e) {
-      debugPrint("Error getOrders: $e");
       if (context != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
@@ -34,7 +33,6 @@ class OrderController with ChangeNotifier {
       final data = await _orderService.getOrder(id: id);
       return data.isNotEmpty ? data.first : null;
     } catch (e) {
-      debugPrint("Error getOrderById: $e");
       if (context != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
@@ -70,7 +68,6 @@ class OrderController with ChangeNotifier {
       await getOrders(context: context);
 
     } catch (e) {
-      debugPrint("❌ Error confirmPayment: $e");
       if (context != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Gagal konfirmasi: $e")),
@@ -102,7 +99,6 @@ class OrderController with ChangeNotifier {
 
       await getOrders(context: context);
     } catch (e) {
-      debugPrint("❌ Error deleteOrder: $e");
       if (context != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Gagal menghapus pesanan: $e")),
@@ -138,7 +134,6 @@ class OrderController with ChangeNotifier {
 
       await getOrders(context: context); // Optional: refresh list
     } catch (e) {
-      debugPrint("❌ Error deleteItemFromOrder: $e");
       if (context != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Gagal menghapus item: $e")),

@@ -9,7 +9,6 @@ class CategoryController {
     try {
       return await _categoryService.getCategories();
     } catch (e) {
-      print('Error loading categories: $e');
       return []; // bisa juga lempar error, tapi disini kita return kosong
     }
   }

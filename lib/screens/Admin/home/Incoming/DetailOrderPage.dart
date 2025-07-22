@@ -375,7 +375,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         try {
           await _printReceipt(total);
         } catch (e) {
-          debugPrint('Print gagal: $e');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Gagal mencetak struk")),
           );

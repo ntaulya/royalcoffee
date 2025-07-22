@@ -48,7 +48,6 @@ class CheckOrderService extends Config{
     }on http.ClientException{
       throw Exception('Gagal terhubung ke server');
     }catch (e) {
-      print(e);
       throw Exception('Gagal mengambil order: $e');
     }
   }
@@ -88,7 +87,6 @@ class CheckOrderService extends Config{
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(_config.getErrorMessage(response, 'checkout'));
       }
@@ -124,7 +122,6 @@ class CheckOrderService extends Config{
         },
       );
 
-      print("🔁 Response confirm: ${response.body}");
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(_config.getErrorMessage(response, 'confirmPayment'));
@@ -157,7 +154,6 @@ class CheckOrderService extends Config{
         },
       );
 
-      print("🔁 Response delete: ${response.body}");
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(_config.getErrorMessage(response, 'deleteOrder'));
@@ -193,7 +189,6 @@ class CheckOrderService extends Config{
         },
       );
 
-      print("🗑️ Response delete item: ${response.body}");
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(_config.getErrorMessage(response, 'deleteItemFromOrder'));

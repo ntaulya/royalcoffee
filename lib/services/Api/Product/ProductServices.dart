@@ -72,7 +72,6 @@ class ProductServices extends Config {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> data = jsonResponse['data']['data'];
-        print(data);
         if (data.isEmpty) throw Exception('Produk tidak ditemukan');
         return Product.fromJson(data.first);
       } else {
@@ -170,7 +169,6 @@ class ProductServices extends Config {
       }
 
       final response = await request.send();
-
       if (response.statusCode != 201) {
         final resBody = await response.stream.bytesToString();
         try {
@@ -206,6 +204,7 @@ class ProductServices extends Config {
           'status_product': statusProduct,
         },
       ).timeout(_config.timeout);
+
       if (response.statusCode != 201) {
         final body = jsonDecode(response.body);
         throw Exception(body['message'] ?? 'Gagal memperbarui status produk');

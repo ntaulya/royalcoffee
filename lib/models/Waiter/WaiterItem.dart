@@ -4,8 +4,11 @@ class WaiterItem {
   final String namaPemesan;
   final String namaProduct;
   final String namaVarian;
+  final String tipePemesanan;
   final String status;
   final String imagePath;
+  final String createAt;
+  final String pesan;
   final int item;
 
   WaiterItem({
@@ -17,6 +20,9 @@ class WaiterItem {
     required this.status,
     required this.imagePath,
     required this.item,
+    required this.tipePemesanan,
+    required this.createAt,
+    required this.pesan,
   });
 
   factory WaiterItem.fromJson(Map<String, dynamic> json) {
@@ -29,6 +35,9 @@ class WaiterItem {
       status: json['status'] ?? '',
       imagePath: json['image_path'] ?? '',
       item: int.tryParse(json['item'].toString()) ?? 0,
+      tipePemesanan : json['status_pemesanan'].toString() ?? '',
+      createAt : json['create_at'].toString() ?? '',
+      pesan: json['note'].toString() ?? '',
     );
   }
 }

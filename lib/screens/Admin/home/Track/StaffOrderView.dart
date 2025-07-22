@@ -1,6 +1,8 @@
+// import
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../controllers/Dapur/DapurController.dart';
 import '../../../../../controllers/Waiters/WaitersController.dart';
@@ -79,19 +81,35 @@ class _StaffOrderViewState extends State<StaffOrderView> {
     }
   }
 
+  String formatTanggal(String tanggal) {
+    try {
+      final dateTime = DateTime.parse(tanggal).toLocal();
+      final formatter = DateFormat('dd MMM yyyy, HH:mm', 'id_ID');
+      return formatter.format(dateTime);
+    } catch (e) {
+      return tanggal;
+    }
+  }
+
+  Icon _getTipePemesananIcon(String tipe) {
+    switch (tipe.toLowerCase()) {
+      case 'dine_in':
+        return const Icon(Icons.restaurant, color: Colors.green, size: 20);
+      case 'take_away':
+        return const Icon(Icons.shopping_bag, color: Colors.orange, size: 20);
+      default:
+        return const Icon(Icons.help_outline, color: Colors.grey, size: 20);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = isBarista
         ? _baristaController.isLoading || _isImageLoading
         : _waiterController.isLoading || _isImageLoading;
 
-    final error = isBarista
-        ? _baristaController.error
-        : _waiterController.error;
-
-    final items = isBarista
-        ? _baristaController.dapurList
-        : _waiterController.dapurList;
+    final error = isBarista ? _baristaController.error : _waiterController.error;
+    final items = isBarista ? _baristaController.dapurList : _waiterController.dapurList;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3F3),
@@ -129,10 +147,10 @@ class _StaffOrderViewState extends State<StaffOrderView> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: imageBytes != null
-                                      ? Image.memory(imageBytes, width: 64, height: 64, fit: BoxFit.cover)
+                                      ? Image.memory(imageBytes, width: 80, height: 100, fit: BoxFit.cover)
                                       : Container(
-                                          width: 64,
-                                          height: 64,
+                                          width: 80,
+                                          height: 100,
                                           color: Colors.grey[300],
                                           child: const Icon(Icons.broken_image),
                                         ),
@@ -142,21 +160,62 @@ class _StaffOrderViewState extends State<StaffOrderView> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        item.namaProduct,
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "${item.namaProduct} - ${item.namaVarian}",
+                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              _getTipePemesananIcon(item.tipePemesanan),
+                                              const SizedBox(height: 4),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        "${item.item} Item, ${item.namaPemesan}, ${item.namaVarian}",
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        "Status Pesanan : ${item.status}",
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                      const SizedBox(height: 6),
+                                      Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("${item.namaPemesan}", style: const TextStyle(fontSize: 13)),
+                                                  const SizedBox(height: 2),
+                                                  Text(formatTanggal(item.createAt), style: const TextStyle(fontSize: 13)),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  const Text(
+                                                    "Jumlah",
+                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    "${item.item}",
+                                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      if (!isBarista && item.pesan != null && item.pesan.isNotEmpty)
+                                        Text(
+                                          "Catatan: ${item.pesan}",
+                                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                                        ),
                                       Row(
                                         children: [
                                           ElevatedButton(
@@ -168,32 +227,38 @@ class _StaffOrderViewState extends State<StaffOrderView> {
                                               ),
                                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                             ),
-                                            child: Text("Pesanan ${index + 1}"),
+                                            child: Text("Pesanan ${index + 1}", style: const TextStyle(color: Colors.white)),
                                           ),
                                           const SizedBox(width: 10),
                                           OutlinedButton(
-                                            onPressed: () async {
-                                              if (isBarista) {
-                                                await _baristaController.updatePesananStatus(
-                                                  item.idCheckout,
-                                                  item.idVarian,
-                                                );
-                                              } else {
-                                                await _waiterController.updatePesananStatus(
-                                                  item.idCheckout,
-                                                  item.idVarian,
-                                                );
-                                              }
-                                              await _fetchDataAndImages();
-                                            },
+                                            onPressed: index == 0
+                                                ? () async {
+                                                    if (isBarista) {
+                                                      await _baristaController.updatePesananStatus(
+                                                        item.idCheckout,
+                                                        item.idVarian,
+                                                      );
+                                                    } else {
+                                                      await _waiterController.updatePesananStatus(
+                                                        item.idCheckout,
+                                                        item.idVarian,
+                                                      );
+                                                    }
+                                                    await _fetchDataAndImages();
+                                                  }
+                                                : null,
                                             style: OutlinedButton.styleFrom(
                                               side: const BorderSide(color: Colors.grey),
+                                              backgroundColor: index != 0 ? Colors.grey[300] : null,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(20),
                                               ),
                                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                             ),
-                                            child: const Text("Sudah Beres", style: TextStyle(color: Colors.black87)),
+                                            child: const Text(
+                                              "Sudah Beres",
+                                              style: TextStyle(color: Colors.black87),
+                                            ),
                                           ),
                                         ],
                                       )
