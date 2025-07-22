@@ -8,6 +8,7 @@ class ProductController with ChangeNotifier {
   List<Product> products = [];
   bool isLoading = false;
   String? errorMessage;
+  
 
   Future<void> fetchProducts({String? categoryId, String? searchQuery}) async {
     try {

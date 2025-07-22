@@ -124,7 +124,7 @@ class _CekProsesState extends State<CekProses> {
       switch (status.toLowerCase()) {
         case 'dapur':
           return 'menunggu';
-        case 'kasir':
+        case 'waiters':
           return 'proses';
         case 'selesai':
           return 'selesai';

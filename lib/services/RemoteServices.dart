@@ -6,7 +6,7 @@ class RemoteServices {
   Future<List<Login>?> getPosts() async {
     var client = http.Client();
 
-    var uri = Uri.parse('https://restapi.royalcafeandresto.com/api/login');
+    var uri = Uri.parse('https://restapi.royalcafeandresto.com/api');
     var response = await client.get(uri);
 
     if (response.statusCode == 200) {

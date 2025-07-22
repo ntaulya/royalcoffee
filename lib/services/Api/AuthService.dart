@@ -5,9 +5,10 @@ import '../../models/Login.dart';
 import 'Config.dart';
 
 class AuthService extends Config {
-
+ 
   Future<Login> loginUser(String email, String password) async {
     try {
+      
       final response = await http.post(
         Uri.parse('$baseUrl/login'),
         headers: defaultHeaders,

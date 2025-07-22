@@ -16,7 +16,11 @@ class ProductServices extends Config {
   final SecureStorageService _storageService = SecureStorageService();
 
   // Get All Products
-  Future<List<Product>> getProducts({String? categoryId, String? search}) async {
+  Future<List<Product>> getProducts({
+    String? categoryId,
+    String? search,
+    int page = 1,
+  }) async {
     try {
       String url = '${_config.baseUrl}/product';
       String? token = await _storageService.getToken();
@@ -25,7 +29,7 @@ class ProductServices extends Config {
         'id_categori': categoryId ?? '',
         'id_product': '',
         'search': search ?? '',
-        'page': '1',
+        'page': page.toString(),
       });
 
       final response = await http.get(
@@ -49,6 +53,7 @@ class ProductServices extends Config {
       throw Exception('Gagal mengambil produk: $e');
     }
   }
+
 
   // Get Single Product by ID
   Future<Product> getProductById(int idCategori ,String id) async {
