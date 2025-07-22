@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Tambahkan ini
 import '../../../../controllers/Antrian/AntrianController.dart';
 import '../../../../models/Antrian/Antrian.dart';
 import '../../layout/CustomTopBar.dart';
@@ -25,7 +26,6 @@ class _TrackOrderState extends State<TrackOrder> {
     setState(() {});
   }
 
-  /// Ubah "proces" dari API ke status UI
   String _mapProcesToStatus(String proses) {
     switch (proses.trim().toLowerCase()) {
       case "dapur":
@@ -49,6 +49,16 @@ class _TrackOrderState extends State<TrackOrder> {
         return Colors.green;
       default:
         return Colors.grey;
+    }
+  }
+
+  String _formatTanggal(String tanggal) {
+    try {
+      final dateTime = DateTime.parse(tanggal).toLocal();
+      final formatter = DateFormat('dd MMM yyyy, HH:mm', 'id_ID');
+      return formatter.format(dateTime);
+    } catch (e) {
+      return tanggal;
     }
   }
 
@@ -100,8 +110,27 @@ class _TrackOrderState extends State<TrackOrder> {
     required String customerName,
     required String status,
     required String time,
+    required String tipePemesanan,
     required Color statusColor,
   }) {
+    IconData tipeIcon;
+    Color tipeColor;
+    switch (tipePemesanan.toLowerCase()) {
+      case 'dine_in':
+        tipePemesanan = "Dine In";
+        tipeIcon = Icons.restaurant;
+        tipeColor = Colors.green;
+        break;
+      case 'take_away':
+        tipePemesanan = "Take Away";
+        tipeIcon = Icons.shopping_bag;
+        tipeColor = Colors.orange;
+        break;
+      default:
+        tipeIcon = Icons.help_outline;
+        tipeColor = Colors.grey;
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -138,7 +167,7 @@ class _TrackOrderState extends State<TrackOrder> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  orderId,
+                  customerName,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -146,9 +175,19 @@ class _TrackOrderState extends State<TrackOrder> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  customerName,
-                  style: const TextStyle(fontSize: 14),
+                Row(
+                  children: [
+                    Icon(tipeIcon, size: 16, color: tipeColor),
+                    const SizedBox(width: 6),
+                    Text(
+                      tipePemesanan.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: tipeColor,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -225,7 +264,8 @@ class _TrackOrderState extends State<TrackOrder> {
             orderId: item.idCheckout,
             customerName: item.namaUser,
             status: status,
-            time: item.create_at,
+            time: _formatTanggal(item.create_at),
+            tipePemesanan: item.tipePemesanan,
             statusColor: _getStatusColor(status),
           );
         },
