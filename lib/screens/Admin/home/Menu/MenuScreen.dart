@@ -18,7 +18,6 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-
   final ProductController controller = ProductController();
   final ScrollController _scrollController = ScrollController();
   String selectedCategoryId = '';
@@ -51,7 +50,6 @@ class _MenuScreenState extends State<MenuScreen> {
       setState(() => _isLoadingMore = false);
     }
   }
-
 
   @override
   void dispose() {
@@ -155,8 +153,7 @@ class _MenuScreenState extends State<MenuScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(product.name,
-                    style:
-                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 4),
                 Text(
                   "Harga ${formatRupiah(product.price)}, Stok ${getPrimaryVariantStock(product)}",
@@ -233,10 +230,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditMenu(
-                              product: product,
-                              categoryId: selectedCategoryId,
-                            ),
+                            builder: (context) => EditMenu(categoryId: selectedCategoryId,productId: product.id),
                           ),
                         );
                       },
@@ -268,23 +262,26 @@ class _MenuScreenState extends State<MenuScreen> {
                     setState(() => selectedCategoryId = initialId);
                     await controller.fetchInitialProducts(categoryId: initialId);
                     await _loadImages(controller.products);
-                    _shouldRestoreScroll = true; // Tandai agar scroll dipulihkan
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (_shouldRestoreScroll) {
+                    _savedScrollOffset = 0.0;
+                    _shouldRestoreScroll = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await Future.delayed(const Duration(milliseconds: 50));
+                      if (_shouldRestoreScroll && _scrollController.hasClients) {
                         _scrollController.jumpTo(_savedScrollOffset);
                         _shouldRestoreScroll = false;
                       }
                     });
                   },
                   onCategorySelected: (newCategoryId) async {
-                    if (_scrollController.hasClients) {
-                      _savedScrollOffset = _scrollController.offset;
-                    }; // Simpan posisi sebelum refresh
+                    _savedScrollOffset = _scrollController.hasClients
+                        ? _scrollController.offset
+                        : 0.0;
                     setState(() => selectedCategoryId = newCategoryId);
                     await controller.fetchInitialProducts(categoryId: newCategoryId);
                     await _loadImages(controller.products);
                     _shouldRestoreScroll = true;
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await Future.delayed(const Duration(milliseconds: 50));
                       if (_shouldRestoreScroll && _scrollController.hasClients) {
                         _scrollController.jumpTo(_savedScrollOffset);
                         _shouldRestoreScroll = false;
@@ -335,12 +332,15 @@ class _MenuScreenState extends State<MenuScreen> {
               MaterialPageRoute(builder: (context) => const AddMenu()),
             );
             if (result == true) {
-              _savedScrollOffset = _scrollController.offset;
+              _savedScrollOffset = _scrollController.hasClients
+                  ? _scrollController.offset
+                  : 0.0;
               await controller.fetchInitialProducts(categoryId: selectedCategoryId);
               await _loadImages(controller.products);
               _shouldRestoreScroll = true;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (_shouldRestoreScroll) {
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                await Future.delayed(const Duration(milliseconds: 50));
+                if (_shouldRestoreScroll && _scrollController.hasClients) {
                   _scrollController.jumpTo(_savedScrollOffset);
                   _shouldRestoreScroll = false;
                 }
