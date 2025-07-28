@@ -35,6 +35,11 @@ class _DashboardView extends State<Dashboard> {
   void initState() {
     super.initState();
     _productController = ProductController();
+
+    // Auto fetch data saat halaman muncul
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchProducts();
+    });
   }
 
   void _fetchProducts({String? categoryId, String? searchQuery}) async {
@@ -46,6 +51,7 @@ class _DashboardView extends State<Dashboard> {
       searchQuery: searchQuery ?? _searchController.text,
     );
 
+    if (!mounted) return;
     setState(() => _isLoadingProduct = false);
   }
 
@@ -61,6 +67,7 @@ class _DashboardView extends State<Dashboard> {
       searchQuery: _searchController.text,
     );
 
+    if (!mounted) return;
     setState(() => _isLoadingProduct = false);
   }
 
@@ -72,17 +79,17 @@ class _DashboardView extends State<Dashboard> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF7A491F), // warna cokelat header
+        statusBarColor: Color(0xFF7A491F),
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
         extendBody: true,
-        backgroundColor: const Color(0xFFFCF2D9), // krem
+        backgroundColor: const Color(0xFFFCF2D9),
         body: Stack(
           children: [
             Column(
               children: [
-                // ✅ Header dipindahkan ke luar SafeArea
+                // Header
                 DashboardHeader(
                   cartController: _cartController,
                   onCartTap: () {
@@ -101,70 +108,77 @@ class _DashboardView extends State<Dashboard> {
                   },
                 ),
 
-                // ✅ Konten dibungkus SafeArea dengan top: false
+                // Konten utama
                 Expanded(
                   child: SafeArea(
                     top: false,
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          // Search Bar
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: TextField(
-                              controller: _searchController,
-                              onSubmitted: _onSearchSubmitted,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: "Search Coffee",
-                                prefixIcon: IconButton(
-                                  icon: const Icon(Iconsax.search_normal),
-                                  onPressed: () => _onSearchSubmitted(_searchController.text),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        _fetchProducts(); // Pull to refresh
+                      },
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            // Search Bar
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: TextField(
+                                controller: _searchController,
+                                onSubmitted: _onSearchSubmitted,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hintText: "Search Coffee",
+                                  prefixIcon: IconButton(
+                                    icon: const Icon(Iconsax.search_normal),
+                                    onPressed: () => _onSearchSubmitted(_searchController.text),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          // Banner
-                          BannerWidget(imagePath: 'assets/images/Banner.png'),
+                            // Banner
+                            BannerWidget(imagePath: 'assets/images/Banner.png'),
 
-                          // Category Tabs
-                          CategoryTabs(
-                            selectedCategory: _selectedCategory,
-                            onCategorySelected: _onCategorySelected,
-                            onInitialCategoryReady: (categoryId) async {
-                              if (!mounted) return;
-                              setState(() {
-                                _selectedCategory = categoryId;
-                                _isLoadingProduct = true;
-                              });
+                            // Category Tabs
+                            CategoryTabs(
+                              selectedCategory: _selectedCategory,
+                              onCategorySelected: _onCategorySelected,
+                              onInitialCategoryReady: (categoryId) async {
+                                if (!mounted) return;
+                                setState(() {
+                                  _selectedCategory = categoryId;
+                                  _isLoadingProduct = true;
+                                });
 
-                              await _productController.fetchProducts(
-                                categoryId: categoryId,
-                                searchQuery: _searchController.text,
-                              );
+                                await _productController.fetchProducts(
+                                  categoryId: categoryId,
+                                  searchQuery: _searchController.text,
+                                );
 
-                              setState(() => _isLoadingProduct = false);
-                            },
-                          ),
-                          // Product Section
-                          _isLoadingProduct
-                              ? const Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: CircularProgressIndicator(),
-                                )
-                              : ProductSection(
-                                  products: _productController.products,
-                                  controller: _productController,
-                                  selectedCategoryId: _selectedCategory,
-                                ),
-                        ],
+                                if (!mounted) return;
+                                setState(() => _isLoadingProduct = false);
+                              },
+                            ),
+
+                            // Product Section
+                            _isLoadingProduct
+                                ? const Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : ProductSection(
+                                    products: _productController.products,
+                                    controller: _productController,
+                                    selectedCategoryId: _selectedCategory,
+                                  ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
