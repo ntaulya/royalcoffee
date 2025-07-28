@@ -255,12 +255,12 @@ class _MenuScreenState extends State<MenuScreen> {
                   selectedCategory: selectedCategoryId,
                   onInitialCategoryReady: (initialId) async {
                     setState(() => selectedCategoryId = initialId);
-                    await controller.fetchProducts(categoryId: initialId);
+                    await controller.fetchInitialProducts(categoryId: initialId);
                     await _loadImages(controller.products);
                   },
                   onCategorySelected: (newCategoryId) async {
                     setState(() => selectedCategoryId = newCategoryId);
-                    await controller.fetchProducts(categoryId: newCategoryId);
+                    await controller.fetchInitialProducts(categoryId: newCategoryId);
                     await _loadImages(controller.products);
                   },
                 ),
@@ -299,7 +299,7 @@ class _MenuScreenState extends State<MenuScreen> {
             );
              if (result == true) {
               final controller = ProductController();
-              await controller.fetchProducts(categoryId: selectedCategoryId);
+              await controller.fetchInitialProducts(categoryId: selectedCategoryId);
               await _loadImages(controller.products);
             }
           },

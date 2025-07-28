@@ -7,55 +7,92 @@ class ProductController with ChangeNotifier {
 
   List<Product> products = [];
   bool isLoading = false;
+  bool isLoadingMore = false;
+  bool hasMore = true;
+  int currentPage = 1;
+  String? lastCategoryId;
+  String? lastSearchQuery;
   String? errorMessage;
-  
 
-  Future<void> fetchProducts({String? categoryId, String? searchQuery}) async {
+  Future<void> fetchInitialProducts({String? categoryId, String? searchQuery}) async {
+    _setLoading(true);
+    currentPage = 1;
+    hasMore = true;
+    lastCategoryId = categoryId;
+    lastSearchQuery = searchQuery;
+
     try {
-      isLoading = true;
-      notifyListeners();
-      products = await _productService.getProducts(
+      final fetched = await _productService.getProducts(
         categoryId: categoryId,
         search: searchQuery,
+        page: currentPage,
       );
+
+      products = fetched;
+      hasMore = fetched.isNotEmpty;
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();
+      products = [];
+      hasMore = false;
     } finally {
-      isLoading = false;
+      _setLoading(false);
+    }
+  }
+
+  Future<void> fetchMoreProducts({String? categoryId}) async {
+    if (isLoadingMore || !hasMore) return;
+
+    isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      final nextPage = currentPage + 1;
+      final fetched = await _productService.getProducts(
+        categoryId: categoryId ?? lastCategoryId,
+        search: lastSearchQuery,
+        page: nextPage, // <-- INI YANG PENTING
+      );
+
+      if (fetched.isNotEmpty) {
+        products.addAll(fetched);
+        currentPage = nextPage; // simpan page terbaru
+        hasMore = true;
+      } else {
+        hasMore = false;
+      }
+    } catch (e) {
+      errorMessage = e.toString();
+      hasMore = false;
+    } finally {
+      isLoadingMore = false;
       notifyListeners();
     }
   }
 
-  Future<Product?> fetchProductDetail(int categoryId , String productId) async {
+  Future<Product?> fetchProductDetail(int categoryId, String productId) async {
+    _setLoading(true);
     try {
-      isLoading = true;
-      notifyListeners();
-      final product = await _productService.getProductById(categoryId,productId);
+      final product = await _productService.getProductById(categoryId, productId);
       errorMessage = null;
       return product;
     } catch (e) {
       errorMessage = e.toString();
       return null;
     } finally {
-      isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
-  Future<void> createProduct({
+  Future<bool> createProduct({
     required String namaProduct,
     required String hargaProduct,
     required String descriptionProduct,
     required String kategoriId,
     required List<Map<String, dynamic>> varianProductList,
-    required BuildContext context,
   }) async {
+    _setLoading(true);
     try {
-      isLoading = true;
-      notifyListeners();
-     
-
       await _productService.createProduct(
         namaProduct: namaProduct,
         hargaProduct: hargaProduct,
@@ -63,23 +100,14 @@ class ProductController with ChangeNotifier {
         kategoriId: kategoriId,
         varianProductList: varianProductList,
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Produk berhasil ditambahkan')),
-      );
-      
-       Navigator.pop(context);
+      return true;
     } catch (e) {
       errorMessage = e.toString();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal menambahkan produk: $e')),
-      );
+      return false;
     } finally {
-      isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
-
 
   Future<void> toggleProductStatus({
     required String productId,
@@ -88,20 +116,22 @@ class ProductController with ChangeNotifier {
   }) async {
     final newStatus = currentStatus.toLowerCase() == 'aktif' ? 'non_aktif' : 'aktif';
 
+    _setLoading(true);
     try {
-      isLoading = true;
-      notifyListeners();
-
       await _productService.updateProductStatus(
         productId: productId,
         statusProduct: newStatus,
       );
-      await fetchProducts(categoryId: categoryId);
+      await fetchInitialProducts(categoryId: categoryId);
     } catch (e) {
       errorMessage = e.toString();
     } finally {
-      isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
+  }
+
+  void _setLoading(bool value) {
+    isLoading = value;
+    notifyListeners();
   }
 }

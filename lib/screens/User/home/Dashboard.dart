@@ -29,50 +29,33 @@ class _DashboardView extends State<Dashboard> {
 
   int _selectedBottomNavIndex = 0;
   String _selectedCategory = "";
-  bool _isLoadingProduct = false;
 
   @override
   void initState() {
     super.initState();
     _productController = ProductController();
 
-    // Auto fetch data saat halaman muncul
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchProducts();
+      _productController.fetchInitialProducts(); // Initial load
     });
   }
 
-  void _fetchProducts({String? categoryId, String? searchQuery}) async {
-    if (!mounted) return;
-    setState(() => _isLoadingProduct = true);
-
-    await _productController.fetchProducts(
-      categoryId: categoryId ?? _selectedCategory,
-      searchQuery: searchQuery ?? _searchController.text,
-    );
-
-    if (!mounted) return;
-    setState(() => _isLoadingProduct = false);
-  }
-
-  void _onCategorySelected(String category) async {
-    if (!mounted) return;
+  void _onCategorySelected(String category) {
     setState(() {
       _selectedCategory = category;
-      _isLoadingProduct = true;
     });
 
-    await _productController.fetchProducts(
+    _productController.fetchInitialProducts(
       categoryId: category,
       searchQuery: _searchController.text,
     );
-
-    if (!mounted) return;
-    setState(() => _isLoadingProduct = false);
   }
 
   void _onSearchSubmitted(String value) {
-    _fetchProducts(searchQuery: value);
+    _productController.fetchInitialProducts(
+      categoryId: _selectedCategory,
+      searchQuery: value,
+    );
   }
 
   @override
@@ -108,85 +91,85 @@ class _DashboardView extends State<Dashboard> {
                   },
                 ),
 
-                // Konten utama
+                // Main Content
                 Expanded(
                   child: SafeArea(
                     top: false,
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        _fetchProducts(); // Pull to refresh
-                      },
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          children: [
-                            // Search Bar
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: TextField(
-                                controller: _searchController,
-                                onSubmitted: _onSearchSubmitted,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hintText: "Search Coffee",
-                                  prefixIcon: IconButton(
-                                    icon: const Icon(Iconsax.search_normal),
-                                    onPressed: () => _onSearchSubmitted(_searchController.text),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
+                    child: Column(
+                      children: [
+                        // Search
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: TextField(
+                            controller: _searchController,
+                            onSubmitted: _onSearchSubmitted,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              hintText: "Search Coffee",
+                              prefixIcon: IconButton(
+                                icon: const Icon(Iconsax.search_normal),
+                                onPressed: () => _onSearchSubmitted(_searchController.text),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
                               ),
                             ),
+                          ),
+                        ),
 
-                            // Banner
-                            BannerWidget(imagePath: 'assets/images/Banner.png'),
+                        // Banner
+                        BannerWidget(imagePath: 'assets/images/Banner.png'),
 
-                            // Category Tabs
-                            CategoryTabs(
-                              selectedCategory: _selectedCategory,
-                              onCategorySelected: _onCategorySelected,
-                              onInitialCategoryReady: (categoryId) async {
-                                if (!mounted) return;
-                                setState(() {
-                                  _selectedCategory = categoryId;
-                                  _isLoadingProduct = true;
-                                });
+                        // Category Tabs
+                        CategoryTabs(
+                          selectedCategory: _selectedCategory,
+                          onCategorySelected: _onCategorySelected,
+                          onInitialCategoryReady: (categoryId) {
+                            setState(() {
+                              _selectedCategory = categoryId;
+                            });
 
-                                await _productController.fetchProducts(
-                                  categoryId: categoryId,
-                                  searchQuery: _searchController.text,
-                                );
+                            _productController.fetchInitialProducts(
+                              categoryId: categoryId,
+                              searchQuery: _searchController.text,
+                            );
+                          },
+                        ),
 
-                                if (!mounted) return;
-                                setState(() => _isLoadingProduct = false);
-                              },
-                            ),
-
-                            // Product Section
-                            _isLoadingProduct
-                                ? const Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: CircularProgressIndicator(),
+                        // Product Grid (with its own scroll controller)
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              await _productController.fetchInitialProducts(
+                                categoryId: _selectedCategory,
+                                searchQuery: _searchController.text,
+                              );
+                            },
+                            child: _productController.errorMessage != null
+                                ? Center(
+                                    child: Text(
+                                      'Gagal memuat produk:\n${_productController.errorMessage}',
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 14,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   )
                                 : ProductSection(
-                                    products: _productController.products,
                                     controller: _productController,
                                     selectedCategoryId: _selectedCategory,
                                   ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
               ],
             ),
-
-            // Bottom Navigation
             BottomNavBar(selectedIndex: 0),
           ],
         ),
