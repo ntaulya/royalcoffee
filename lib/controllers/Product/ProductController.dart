@@ -8,6 +8,7 @@ class ProductController with ChangeNotifier {
   List<Product> products = [];
   bool isLoading = false;
   bool isLoadingMore = false;
+  bool get isEndReached => !hasMore;
   bool hasMore = true;
   int currentPage = 1;
   String? lastCategoryId;
@@ -48,6 +49,7 @@ class ProductController with ChangeNotifier {
 
     try {
       final nextPage = currentPage + 1;
+      print("🔄 Fetching more products for page: ${currentPage + 1}");
       final fetched = await _productService.getProducts(
         categoryId: categoryId ?? lastCategoryId,
         search: lastSearchQuery,

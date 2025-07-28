@@ -8,7 +8,6 @@ import '../../../../controllers/Product/ProductController.dart';
 import '../../layout/AdminCategoryTabs.dart';
 import './AddMenu.dart';
 import './EditMenu.dart';
-
 import '../../layout/CustomTopBar.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -19,15 +18,51 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+
   final ProductController controller = ProductController();
+  final ScrollController _scrollController = ScrollController();
   String selectedCategoryId = '';
   Map<String, Uint8List?> _productImages = {};
   bool _isImageLoading = false;
+  bool _isLoadingMore = false;
+  double _savedScrollOffset = 0.0;
+  bool _shouldRestoreScroll = false;
 
-  Future<void> _loadImages(List<Product> products) async {
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() async {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        !_isLoadingMore &&
+        !controller.isLoading &&
+        !controller.isEndReached) {
+      setState(() => _isLoadingMore = true);
+
+      final previousLength = controller.products.length;
+      await controller.fetchMoreProducts(categoryId: selectedCategoryId);
+      final newProducts = controller.products.sublist(previousLength);
+
+      await _loadImages(newProducts, append: true);
+
+      setState(() => _isLoadingMore = false);
+    }
+  }
+
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadImages(List<Product> products, {bool append = false}) async {
     setState(() {
       _isImageLoading = true;
-      _productImages.clear();
+      if (!append) _productImages.clear();
     });
 
     for (var product in products) {
@@ -40,39 +75,29 @@ class _MenuScreenState extends State<MenuScreen> {
     });
   }
 
+  String getPrimaryVariantStock(Product product) => product.stock.toString();
 
-  String getPrimaryVariantStock(Product product) {
-    return product.stock.toString();
-  }
   String formatRupiah(String value) {
     if (value.contains('~')) {
       final parts = value.split('~');
       final start = int.tryParse(parts[0].trim());
       final end = int.tryParse(parts[1].trim());
-
       if (start != null && end != null) {
         return 'Rp.${_formatNumber(start)} ~ Rp.${_formatNumber(end)}';
-      } else {
-        return value; 
       }
+      return value;
     }
 
-    // Harga tunggal
     final number = int.tryParse(value.trim());
-    if (number != null) {
-      return 'Rp.${_formatNumber(number)}';
-    }
-
-    return value; 
+    return number != null ? 'Rp.${_formatNumber(number)}' : value;
   }
 
   String _formatNumber(int value) {
     return value.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
+      (m) => '${m[1]}.',
     );
   }
-
 
   Widget _buildStatusButton(String text, Color color,
       {Color? textColor, VoidCallback? onPressed}) {
@@ -129,16 +154,14 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  product.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
+                Text(product.name,
+                    style:
+                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 4),
                 Text(
                   "Harga ${formatRupiah(product.price)}, Stok ${getPrimaryVariantStock(product)}",
                   style: const TextStyle(fontSize: 13),
                 ),
-
                 if ((product.variants?.length ?? 0) > 1)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
@@ -166,24 +189,17 @@ class _MenuScreenState extends State<MenuScreen> {
                       textColor: Colors.white,
                       onPressed: isActive
                           ? () async {
-                              try {
-                                await controller.toggleProductStatus(
-                                  productId: product.id,
-                                  currentStatus: product.status,
-                                  categoryId: selectedCategoryId,
-                                );
-                                await _loadImages(controller.products);
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${product.name} berhasil dinonaktifkan'),
-                                  ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Gagal mengubah status: $e')),
-                                );
-                              }
+                              await controller.toggleProductStatus(
+                                productId: product.id,
+                                currentStatus: product.status,
+                                categoryId: selectedCategoryId,
+                              );
+                              await _loadImages(controller.products);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${product.name} berhasil dinonaktifkan'),
+                                ),
+                              );
                             }
                           : null,
                     ),
@@ -195,24 +211,17 @@ class _MenuScreenState extends State<MenuScreen> {
                       onPressed: isActive
                           ? null
                           : () async {
-                              try {
-                                await controller.toggleProductStatus(
-                                  productId: product.id,
-                                  currentStatus: product.status,
-                                  categoryId: selectedCategoryId,
-                                );
-                                await _loadImages(controller.products);
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${product.name} berhasil diaktifkan'),
-                                  ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Gagal mengubah status: $e')),
-                                );
-                              }
+                              await controller.toggleProductStatus(
+                                productId: product.id,
+                                currentStatus: product.status,
+                                categoryId: selectedCategoryId,
+                              );
+                              await _loadImages(controller.products);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${product.name} berhasil diaktifkan'),
+                                ),
+                              );
                             },
                     ),
                     const SizedBox(width: 6),
@@ -220,13 +229,15 @@ class _MenuScreenState extends State<MenuScreen> {
                       "✏️ Edit",
                       const Color(0xFF4B1D0D),
                       textColor: Colors.white,
-                     onPressed: () {
+                      onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => EditMenu(
-                            product: product,
-                            categoryId: selectedCategoryId,
-                            )),
+                          MaterialPageRoute(
+                            builder: (context) => EditMenu(
+                              product: product,
+                              categoryId: selectedCategoryId,
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -243,10 +254,10 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => controller, // <-- ini penting
+      create: (_) => controller,
       child: Scaffold(
         backgroundColor: const Color(0xFFF9F9F9),
-        appBar: const CustomTopBar(title:"Atur Status Menu"),
+        appBar: const CustomTopBar(title: "Atur Status Menu"),
         body: Consumer<ProductController>(
           builder: (context, controller, _) {
             return Column(
@@ -257,11 +268,28 @@ class _MenuScreenState extends State<MenuScreen> {
                     setState(() => selectedCategoryId = initialId);
                     await controller.fetchInitialProducts(categoryId: initialId);
                     await _loadImages(controller.products);
+                    _shouldRestoreScroll = true; // Tandai agar scroll dipulihkan
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (_shouldRestoreScroll) {
+                        _scrollController.jumpTo(_savedScrollOffset);
+                        _shouldRestoreScroll = false;
+                      }
+                    });
                   },
                   onCategorySelected: (newCategoryId) async {
+                    if (_scrollController.hasClients) {
+                      _savedScrollOffset = _scrollController.offset;
+                    }; // Simpan posisi sebelum refresh
                     setState(() => selectedCategoryId = newCategoryId);
                     await controller.fetchInitialProducts(categoryId: newCategoryId);
                     await _loadImages(controller.products);
+                    _shouldRestoreScroll = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (_shouldRestoreScroll && _scrollController.hasClients) {
+                        _scrollController.jumpTo(_savedScrollOffset);
+                        _shouldRestoreScroll = false;
+                      }
+                    });
                   },
                 ),
                 Expanded(
@@ -278,10 +306,19 @@ class _MenuScreenState extends State<MenuScreen> {
                       }
 
                       return ListView.builder(
+                        controller: _scrollController,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        itemCount: controller.products.length,
-                        itemBuilder: (context, index) =>
-                            _buildMenuItem(controller.products[index], controller),
+                        itemCount: controller.products.length + (_isLoadingMore ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index < controller.products.length) {
+                            return _buildMenuItem(controller.products[index], controller);
+                          } else {
+                            return const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
+                        },
                       );
                     },
                   ),
@@ -297,13 +334,19 @@ class _MenuScreenState extends State<MenuScreen> {
               context,
               MaterialPageRoute(builder: (context) => const AddMenu()),
             );
-             if (result == true) {
-              final controller = ProductController();
+            if (result == true) {
+              _savedScrollOffset = _scrollController.offset;
               await controller.fetchInitialProducts(categoryId: selectedCategoryId);
               await _loadImages(controller.products);
+              _shouldRestoreScroll = true;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (_shouldRestoreScroll) {
+                  _scrollController.jumpTo(_savedScrollOffset);
+                  _shouldRestoreScroll = false;
+                }
+              });
             }
           },
-         
           child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
         ),
       ),
