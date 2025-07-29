@@ -2,7 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mime/mime.dart';
+import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
+
+
+import '../../../../services/Api/ImageHelper.dart';
 
 import '../../../../controllers/Product/CategoryController.dart';
 import '../../../../controllers/Product/ProductController.dart';
@@ -10,6 +14,7 @@ import '../../../../models/Category.dart';
 import '../../../../models/Product/Product.dart';
 class MenuVariant {
   File? image;
+  Uint8List? networkImageBytes;
   String name = '', price = '', stock = '';
   MenuVariant({this.image});
 }
@@ -30,6 +35,7 @@ class EditMenu extends StatefulWidget {
 
 class _EditMenuState extends State<EditMenu> {
   Product? _product;
+  Uint8List? _networkMainImageBytes;
   final _categoryController = CategoryController();
   final _productController = ProductController();
   final _nameController = TextEditingController();
@@ -41,12 +47,14 @@ class _EditMenuState extends State<EditMenu> {
   Category? selectedCategory;
   File? _mainImage;
   List<MenuVariant> _variants = [MenuVariant()];
+  bool _isProductLoading = true;
 
   @override
   void initState() {
     super.initState();
     _loadData();
   }
+
   Future<void> _loadData() async {
     await _loadCategories();
     await _loadProduct();
@@ -59,34 +67,67 @@ class _EditMenuState extends State<EditMenu> {
     _descriptionController.dispose();
     super.dispose();
   }
+
   Future<void> _loadProduct() async {
+    setState(() {
+      _isProductLoading = true;
+      _mainImage = null;
+      _networkMainImageBytes = null;
+    });
+
     final product = await _productController.fetchProductDetail(
       int.parse(widget.categoryId),
       widget.productId,
     );
 
     if (product != null) {
-      setState(() {
-        _product = product;
-        _nameController.text = product.name;
-        _priceController.text = product.price;
-        _descriptionController.text = product.description ?? '';
+      _product = product;
+      _nameController.text = product.name;
+      _priceController.text = product.price;
+      _descriptionController.text = product.description ?? '';
 
-        if (_categories.isNotEmpty) {
-          selectedCategory = _categories.firstWhere(
-            (c) => c.id.toString() == widget.categoryId,
-            orElse: () => _categories.first,
-          );
+      if (_categories.isNotEmpty) {
+        selectedCategory = _categories.firstWhere(
+          (c) => c.id.toString() == widget.categoryId,
+          orElse: () => _categories.first,
+        );
+      }
+
+      
+
+      _variants = [];
+      for (final v in product.variants) {
+        final variant = MenuVariant()
+          ..name = v.namaVarian ?? ''
+          ..price = v.hargaTambahan.toString()
+          ..stock = v.stock.toString();
+
+        // Kalau bukan primary dan punya gambar
+        if (!v.isPrimary && v.imagePath.isNotEmpty) {
+          final bytes = await ImageHelper.loadImage(v.imagePath);
+          variant.networkImageBytes = bytes;
         }
 
-        _variants = product.variants.map((v) => MenuVariant()
-          ..name = v.namaVarian ?? ''
-          ..price = v.hargaTambahan.toString() ?? ''
-          ..stock = v.stock.toString() ?? ''
-        ).toList();
-      });
+        _variants.add(variant);
+      }
+
+      final primaryVariant = product.variants.firstWhere(
+        (v) => v.isPrimary,
+        orElse: () => product.variants.first,
+      );
+
+      if (primaryVariant.imagePath.isNotEmpty) {
+        final bytes = await ImageHelper.loadImage(primaryVariant.imagePath);
+        _networkMainImageBytes = bytes;
+      }
     }
+
+    setState(() {
+      _isProductLoading = false;
+    });
   }
+
+
 
   Future<void> _loadCategories() async {
     final categories = await _categoryController.loadCategories();
@@ -129,28 +170,47 @@ class _EditMenuState extends State<EditMenu> {
       ),
     );
 
-  Widget _buildImageBox(File? image, VoidCallback onTap, {double size = 100, String? caption}) =>
-    GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(12),
-              image: image != null ? DecorationImage(image: FileImage(image), fit: BoxFit.cover) : null,
-            ),
-            child: image == null ? const Center(child: Icon(Icons.add_a_photo)) : null,
+Widget _buildImageBox(
+  File? image,
+  VoidCallback onTap, {
+  double size = 100,
+  String? caption,
+  Uint8List? networkImageBytes,
+}) {
+  final hasLocalImage = image != null;
+  final hasNetworkImage = !hasLocalImage && networkImageBytes != null;
+
+  return GestureDetector(
+    onTap: onTap,
+    child: Column(
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(12),
           ),
-          if (caption != null) Padding(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: hasLocalImage
+                ? Image.file(image!, fit: BoxFit.cover, width: size, height: size)
+                : hasNetworkImage
+                    ? Image.memory(networkImageBytes!, fit: BoxFit.cover, width: size, height: size)
+                    : const Center(child: Icon(Icons.add_a_photo)),
+          ),
+        ),
+        if (caption != null)
+          Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(caption, style: const TextStyle(fontSize: 12, color: Colors.grey)),
           ),
-        ],
-      ),
-    );
+      ],
+    ),
+  );
+}
+
+
 
   Widget _buildVariantCard(int index) {
     final v = _variants[index];
@@ -165,10 +225,17 @@ class _EditMenuState extends State<EditMenu> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (!isFirst) _buildImageBox(v.image, () => _pickImage(
-              onSelected: (file) => setState(() => v.image = file),
-              errorLabel: 'Varian ke-${index + 1}')),
-            if (!isFirst) const SizedBox(width: 12),
+            if (!isFirst) ...[
+              _buildImageBox(
+                v.image,
+                () => _pickImage(
+                  onSelected: (file) => setState(() => v.image = file),
+                  errorLabel: 'Varian ke-${index + 1}',
+                ),
+                networkImageBytes: v.networkImageBytes,
+              ),
+              const SizedBox(width: 12),
+            ],
             Expanded(child: Column(children: [
               _buildTextField("Nama Varian", icon: Iconsax.edit, initialValue: v.name, onChanged: (val) => v.name = val),
               if (!isFirst)
@@ -231,12 +298,25 @@ class _EditMenuState extends State<EditMenu> {
       title: const Text("Edit Menu", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       centerTitle: true,
     ),
-    body: SafeArea(
-      child: SingleChildScrollView(
+    body: _isProductLoading
+        ? const Center(child: CircularProgressIndicator()) : 
+        SafeArea(
+        child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _buildSectionTitle("Foto Menu Utama"),
-          Center(child: _buildImageBox(_mainImage, () => _pickImage(onSelected: (f) => setState(() => _mainImage = f), errorLabel: 'Gambar utama'), size: 180, caption: "Ukuran ideal 1080 x 1080 px (PNG only)")),
+          Center(
+            child: _buildImageBox(
+              _mainImage,
+              () => _pickImage(
+                onSelected: (f) => setState(() => _mainImage = f),
+                errorLabel: 'Gambar utama',
+              ),
+              size: 180,
+              caption: "Ukuran ideal 1080 x 1080 px (PNG only)",
+              networkImageBytes: _networkMainImageBytes,
+            ),
+          ),
           const SizedBox(height: 20),
           _buildSectionTitle("Informasi Menu"),
           _buildTextField("Nama Menu", icon: Iconsax.coffee, controller: _nameController),

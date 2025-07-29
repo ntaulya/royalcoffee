@@ -76,7 +76,6 @@ class ProductController with ChangeNotifier {
     _setLoading(true);
     try {
       final product = await _productService.getProductById(categoryId, productId);
-      print(product);
       errorMessage = null;
       return product;
     } catch (e) {
