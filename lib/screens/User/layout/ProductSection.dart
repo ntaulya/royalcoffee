@@ -88,6 +88,7 @@ class _ProductSectionState extends State<ProductSection> {
 
             final product = products[index];
             return ProductCard(
+              key: ValueKey(product.id),
               product: product,
               onAddToCart: () {
                 ScaffoldMessenger.of(context).showSnackBar(

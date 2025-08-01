@@ -147,8 +147,11 @@ class _DashboardView extends State<Dashboard> {
                                 searchQuery: _searchController.text,
                               );
                             },
-                            child: _productController.errorMessage != null
-                                ? Center(
+                            child: AnimatedBuilder(
+                              animation: _productController,
+                              builder: (context, _) {
+                                if (_productController.errorMessage != null) {
+                                  return Center(
                                     child: Text(
                                       'Gagal memuat produk:\n${_productController.errorMessage}',
                                       style: const TextStyle(
@@ -157,11 +160,15 @@ class _DashboardView extends State<Dashboard> {
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-                                  )
-                                : ProductSection(
-                                    controller: _productController,
-                                    selectedCategoryId: _selectedCategory,
-                                  ),
+                                  );
+                                }
+
+                                return ProductSection(
+                                  controller: _productController,
+                                  selectedCategoryId: _selectedCategory,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ],

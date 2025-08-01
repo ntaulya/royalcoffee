@@ -29,14 +29,24 @@ class _ProductCardState extends State<ProductCard> {
     _loadImage();
   }
 
+  @override
+  void didUpdateWidget(covariant ProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.product.imageUrl != widget.product.imageUrl) {
+      _loadImage(); // reload gambar saat produk berubah
+    }
+  }
+
   Future<void> _loadImage() async {
     final url = widget.product.imageUrl;
     if (url == null || url.isEmpty) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
       return;
     }
 
     final imageData = await ImageHelper.loadImage(url);
+    if (!mounted) return;
     setState(() {
       _imageBytes = imageData;
       _isLoading = false;
@@ -44,37 +54,31 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   String formatRupiah(String value) {
-    // Jika mengandung rentang harga (~)
     if (value.contains('~')) {
       final parts = value.split('~');
       final start = int.tryParse(parts[0].trim());
       final end = int.tryParse(parts[1].trim());
-
       if (start != null && end != null) {
         return 'Rp.${_formatNumber(start)} ~ Rp.${_formatNumber(end)}';
       } else {
-        return value; // fallback
+        return value;
       }
     }
 
-    // Harga tunggal
     final number = int.tryParse(value.trim());
     if (number != null) {
       return 'Rp.${_formatNumber(number)}';
     }
 
-    return value; // fallback jika format aneh
+    return value;
   }
 
-  // Fungsi helper untuk memformat angka
   String _formatNumber(int value) {
     return value.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +111,11 @@ class _ProductCardState extends State<ProductCard> {
                       child: _isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : _imageBytes != null
-                              ? Image.memory(_imageBytes!, fit: BoxFit.cover)
+                              ? Image.memory(
+                                  _imageBytes!,
+                                  fit: BoxFit.cover,
+                                  key: ValueKey(widget.product.imageUrl), // ini penting
+                                )
                               : const Icon(Icons.broken_image, size: 50),
                     ),
                   ),
