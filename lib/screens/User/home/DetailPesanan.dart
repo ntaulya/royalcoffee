@@ -240,51 +240,54 @@ Widget build(BuildContext context) {
                   // ✅ List Varian
                   Expanded(
                     child: ListView(
-                      children: variants.map((v) {
-                        final hargaDasar = int.tryParse(widget.product.price) ?? 0;
-                        final hargaTambahan = int.tryParse(v.hargaTambahan) ?? 0;
-                        final stok = int.tryParse(v.stock) ?? 0;
-                        final hargaTotal = hargaDasar + hargaTambahan;
-                        final qty = quantityPerVariant[v.namaVarian] ?? 0;
+                     children: variants
+                        .where((v) => int.tryParse(v.stock) != null && int.parse(v.stock) > 0)
+                        .map((v) {
+                          final hargaDasar = int.tryParse(widget.product.price) ?? 0;
+                          final hargaTambahan = int.tryParse(v.hargaTambahan) ?? 0;
+                          final stok = int.tryParse(v.stock) ?? 0;
+                          final hargaTotal = hargaDasar + hargaTambahan;
+                          final qty = quantityPerVariant[v.namaVarian] ?? 0;
 
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: v.namaVarian.toLowerCase().contains("dingin")
-                                ? const Color(0xFFFFF1C5)
-                                : const Color(0xFFF2F2F2),
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${v.namaVarian}\n${formatRupiah(hargaTotal)}\nStok: $stok',
-                                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: v.namaVarian.toLowerCase().contains("dingin")
+                                  ? const Color(0xFFFFF1C5)
+                                  : const Color(0xFFF2F2F2),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '${v.namaVarian}\n${formatRupiah(hargaTotal)}\nStok: $stok',
+                                    style: const TextStyle(fontSize: 13, color: Colors.black54),
+                                  ),
                                 ),
-                              ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove_circle_outline),
-                                    onPressed: qty > 0
-                                        ? () => setState(() => quantityPerVariant[v.namaVarian] = qty - 1)
-                                        : null,
-                                  ),
-                                  Text('$qty'),
-                                  IconButton(
-                                    icon: const Icon(Icons.add_circle_outline),
-                                    onPressed: qty < stok
-                                        ? () => setState(() => quantityPerVariant[v.namaVarian] = qty + 1)
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove_circle_outline),
+                                      onPressed: qty > 0
+                                          ? () => setState(() => quantityPerVariant[v.namaVarian] = qty - 1)
+                                          : null,
+                                    ),
+                                    Text('$qty'),
+                                    IconButton(
+                                      icon: const Icon(Icons.add_circle_outline),
+                                      onPressed: qty < stok
+                                          ? () => setState(() => quantityPerVariant[v.namaVarian] = qty + 1)
+                                          : null,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                    }).toList(),
+
                     ),
                   ),
 

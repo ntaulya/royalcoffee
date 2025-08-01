@@ -140,42 +140,151 @@ class _EditMenuState extends State<EditMenu> {
     }
   }
 
-  Widget _buildVariantCard(int index) {
-    final v = _variants[index];
-    final isFirst = index == 0;
-    if (isFirst) v.price = '0';
+Widget _buildVariantCard(int index) {
+  final v = _variants[index];
+  final isFirst = index == 0;
+  if (isFirst) v.price = '0';
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (!isFirst)
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: ImageBoxWidget(
-                  image: v.image,
-                  onTap: () => _pickImage(onSelected: (file) => setState(() => v.image = file), errorLabel: 'Varian ke-${index + 1}'),
-                  networkImageBytes: v.networkImageBytes,
+  return Card(
+    margin: const EdgeInsets.symmetric(vertical: 6),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Baris atas: Gambar dan input
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isFirst)
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: ImageBoxWidget(
+                    image: v.image,
+                    onTap: () => _pickImage(
+                      onSelected: (file) => setState(() => v.image = file),
+                      errorLabel: 'Varian ke-${index + 1}',
+                    ),
+                    networkImageBytes: v.networkImageBytes,
+                  ),
+                ),
+              Expanded(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FormTextField(
+                            hint: "Nama Varian",
+                            icon: Iconsax.edit,
+                            initialValue: v.name,
+                            onChanged: (val) => v.name = val,
+                          ),
+                        ),
+                        if (!isFirst)
+                          IconButton(
+                            onPressed: () => setState(() => _variants.removeAt(index)),
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                          ),
+                      ],
+                    ),
+                    if (!isFirst)
+                      FormTextField(
+                        hint: "Harga Penambahan",
+                        icon: Iconsax.money_2,
+                        initialValue: v.price,
+                        onChanged: (val) => v.price = val,
+                      ),
+                  ],
                 ),
               ),
-            Expanded(
-              child: Column(children: [
-                FormTextField(hint: "Nama Varian", icon: Iconsax.edit, initialValue: v.name, onChanged: (val) => v.name = val),
-                if (!isFirst)
-                  FormTextField(hint: "Harga Penambahan", icon: Iconsax.money_2, initialValue: v.price, onChanged: (val) => v.price = val),
-                FormTextField(hint: "Stock", icon: Iconsax.archive, initialValue: v.stock, onChanged: (val) => v.stock = val),
-              ]),
-            ),
-            IconButton(onPressed: () => setState(() => _variants.removeAt(index)), icon: const Icon(Icons.delete, color: Colors.red)),
-          ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Stock + tombol tambah sejajar
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Iconsax.archive, size: 20),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          "Stock: ${v.stock}",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () => _showAddStockDialog(index),
+                icon: const Icon(Icons.add_circle, color: Colors.green),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
+
+
+
+  void _showAddStockDialog(int index) {
+    final v = _variants[index];
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Tambah Stok - Varian ke-${index + 1}'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Jumlah tambahan stok',
+            border: OutlineInputBorder(),
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final input = int.tryParse(controller.text);
+              if (input != null && input > 0) {
+                setState(() {
+                  final currentStock = int.tryParse(v.stock) ?? 0;
+                  v.stock = (currentStock + input).toString();
+                });
+                Navigator.of(ctx).pop();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Masukkan jumlah yang valid')),
+                );
+              }
+            },
+            child: const Text('Tambah'),
+          )
+        ],
       ),
     );
   }
+
 
   void _submitProduct() async {
     if (_variants.isEmpty || selectedCategory == null ||
