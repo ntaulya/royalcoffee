@@ -34,7 +34,7 @@ class WaiterItem {
       namaVarian: json['nama_varian'] ?? '',
       status: json['status'] ?? '',
       imagePath: json['image_path'] ?? '',
-      item: int.tryParse(json['item'].toString()) ?? 0,
+      item: int.parse(json['item'].toString()) ?? 0,
       tipePemesanan : json['status_pemesanan'].toString() ?? '',
       createAt : json['create_at'].toString() ?? '',
       pesan: json['note'].toString() ?? '',

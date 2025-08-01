@@ -71,7 +71,6 @@ class CheckOrderService extends Config{
         
       });
 
-     
       request.fields['tipe_pemesanan'] = tipePemesanan;
       request.fields['notes'] = notes;
       request.fields['product'] = ''; 

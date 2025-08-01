@@ -8,7 +8,7 @@ class DapurItem {
   final String status;
   final String imagePath;
   final String createAt;
-  final String item;
+  final int item;
 
   DapurItem({
     required this.idCheckout,
@@ -32,7 +32,7 @@ class DapurItem {
       namaVarian: json['nama_varian'] ?? '',
       status: json['status'] ?? '',
       imagePath: json['image_path'] ?? '',
-      item: json['item'] ?? 0,
+      item: int.parse(json['item'].toString()) ?? 0,
       tipePemesanan : json['status_pemesanan'] ?? '',
       createAt : json['create_at'] ?? '',
     );
