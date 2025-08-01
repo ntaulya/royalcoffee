@@ -10,7 +10,7 @@ import '../SecureStorageService.dart';
 
 
 class Config {
-  final String baseUrl = "http://192.168.66.1/api";
+  final String baseUrl = "https://restapi.royalcafeandresto.com/api";
   final Duration timeout = const Duration(seconds: 30);
   Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',

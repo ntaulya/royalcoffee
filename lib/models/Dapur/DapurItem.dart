@@ -8,7 +8,7 @@ class DapurItem {
   final String status;
   final String imagePath;
   final String createAt;
-  final int item;
+  final String item;
 
   DapurItem({
     required this.idCheckout,
