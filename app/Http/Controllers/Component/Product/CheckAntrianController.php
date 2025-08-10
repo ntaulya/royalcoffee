@@ -9,11 +9,24 @@ use Illuminate\Support\Facades\URL;
 
 class CheckAntrianController extends Controller
 {
-    public function getlist($limit = 10)
+    public function getlist($limit = 10 , $section = null )
     {
-        $carts = Carts::where('status_pemesanan', 'processing')
-            ->orderBy('created_at', 'asc')
-            ->paginate($limit);
+        $twoMinutesAgo = now()->subMinutes(2);
+        if (!is_null($section)) {
+            $carts = Carts::whereDate('updated_at', today())
+                ->orderBy('created_at', 'desc')
+                ->paginate($limit);
+        } else {
+            $carts = Carts::where(function ($query) use ($twoMinutesAgo) {
+                    $query->where('status_pemesanan', 'processing')
+                        ->orWhere(function ($q) use ($twoMinutesAgo) {
+                            $q->where('status_pemesanan', 'done')
+                                ->where('updated_at', '>=', $twoMinutesAgo);
+                        });
+                })
+                ->orderBy('created_at', 'asc')
+                ->paginate($limit);
+        }
 
         $carts->setCollection(
             $carts->getCollection()->transform(function ($item) {
@@ -26,6 +39,7 @@ class CheckAntrianController extends Controller
                 ];
             })
         );
+
 
         return $carts;
     }
@@ -60,6 +74,7 @@ class CheckAntrianController extends Controller
             }
         })->orderBy('updated_at', 'asc')->paginate($limit);
 
+
         $carts->setCollection(
             $carts->getCollection()->map(function ($item) use ($view) {
                 return $this->detailItem($view, $item);
@@ -82,6 +97,7 @@ class CheckAntrianController extends Controller
 
         if ($total === $done) {
             $cart->logs?->update(['status' => $nextStatus]);
+            $cart->update(['status_pemesanan' => 'done']);
         }
 
         return true;

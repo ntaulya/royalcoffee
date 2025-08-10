@@ -18,7 +18,11 @@ class CheckAntrianController extends Controller
 
     public function listAntrian(Request $request)
     {
-        return new R_D_Success(['data' => $this->antrian->getlist()]);
+        $value = $request->validate([
+            'section' => ['nullable','in:true,false'],
+        ]);
+       $value['section'] = filter_var($value['section'] ?? null, FILTER_VALIDATE_BOOLEAN) ?: null;
+        return new R_D_Success(['data' => $this->antrian->getlist(section: $value['section'])]);
     }
 
     public function listDapur()
