@@ -378,7 +378,7 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
       if (printConfirm == true) {
         try {
-          await _printReceipt(total);
+          await _printReceipt(total,nominal);
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Gagal mencetak struk")),
@@ -392,8 +392,14 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
 
 
-  Future<void> _printReceipt(double total) async {
-    final pdf = await generateReceiptPdf(widget.order, total, paymentMethod, noteController.text);
-    await Printing.layoutPdf(onLayout: (_) async => pdf.save());
-  }
+  Future<void> _printReceipt(double total, int nominalDibayar) async {
+  final pdf = await generateReceiptPdf(
+    widget.order,
+    total,
+    paymentMethod,
+    noteController.text,
+    nominalDibayar,
+  );
+  await Printing.layoutPdf(onLayout: (_) async => pdf.save());
+}
 }

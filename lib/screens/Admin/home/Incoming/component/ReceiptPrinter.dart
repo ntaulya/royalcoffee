@@ -9,8 +9,15 @@ String formatDate(String utcString) {
   return formatter.format(dateTime);
 }
 
-Future<pw.Document> generateReceiptPdf(Order order, double total, String method, String note) async {
+Future<pw.Document> generateReceiptPdf(
+  Order order, 
+  double total, 
+  String method, 
+  String note,
+  int nominalDibayar,
+  ) async {
   final pdf = pw.Document();
+  final kembalian = nominalDibayar - total;
   pdf.addPage(
     pw.Page(
       build: (_) => pw.Column(
@@ -26,7 +33,8 @@ Future<pw.Document> generateReceiptPdf(Order order, double total, String method,
           ...order.Item!.map((item) => pw.Text('${item.qty}x ${item.nama_product + " - " +item.nama_varian}')),
           pw.Divider(),
           pw.Text('Total: ${formatCurrency(total)}'),
-          pw.Text('Pembayaran: $method'),
+          pw.Text('Pembayaran: ${formatCurrency(nominalDibayar)} ($method)'),
+          pw.Text('Kembalian: ${formatCurrency(kembalian > 0 ? kembalian : 0)}'),
           pw.Text('Catatan: $note'),
         ],
       ),
