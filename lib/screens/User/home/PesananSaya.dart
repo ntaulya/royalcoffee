@@ -166,9 +166,12 @@ class _PesananSayaState extends State<PesananSaya> {
               Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold)),
               IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () {
-                  cartController.updateItemQuantity(item.productId, item.variantId, item.quantity + 1);
-                },
+                onPressed: item.quantity >= item.stock
+                ? null
+                : () {
+                    cartController.updateItemQuantity(
+                        item.productId, item.variantId, item.quantity + 1);
+                  },
               ),
             ],
           ),

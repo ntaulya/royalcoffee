@@ -211,10 +211,13 @@ class _StaffOrderViewState extends State<StaffOrderView> {
                                             ),
                                           ],
                                         ),
-                                      if (!isBarista && item.pesan != null && item.pesan.isNotEmpty)
-                                        Text(
-                                          "Catatan: ${item.pesan}",
-                                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                                      if ((item.pesan ?? '').trim().isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text(
+                                            "Catatan: ${item.pesan}",
+                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                                          ),
                                         ),
                                       Row(
                                         children: [

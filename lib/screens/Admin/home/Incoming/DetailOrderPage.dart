@@ -99,7 +99,11 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
                 children: [
                   Center(child: Text(formatDate(widget.order.create_at))),
                   Center(child: Text(widget.order.nama_pemesan)),
-                  Center(child: Text(widget.order.tipe_pemesanan)),
+                  Center(child: Text(
+                    widget.order.tipe_pemesanan == "take_away"
+                      ? "Take Away"
+                      : "Drive In",
+                    )),
                   const SizedBox(height: 16),
                   ...items.map((item) => buildProductItem(item, () => _confirmDeleteItem(item))).toList(),
                   const Divider(),

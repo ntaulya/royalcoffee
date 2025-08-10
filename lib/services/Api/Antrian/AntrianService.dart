@@ -10,7 +10,7 @@ class AntrianService extends Config {
   final Config _config = Config();
   final SecureStorageService _storageService = SecureStorageService();
 
-  Future<List<Antrian>> getAntreanList() async {
+  Future<List<Antrian>> getAntreanList({bool? section}) async {
     try {
       String url = '${_config.baseUrl}/product/history';
       String? token = await _storageService.getToken();
@@ -22,10 +22,10 @@ class AntrianService extends Config {
 
       final uri = Uri.parse(url).replace(queryParameters: {
         'page': '1',
+       'section': (section ?? false).toString(),
       });
 
       final response = await http.get(uri, headers: headers).timeout(_config.timeout);
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> antreanJson = data['data']['data'];

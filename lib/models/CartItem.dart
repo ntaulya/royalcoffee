@@ -5,6 +5,7 @@ class CartItem {
   final String price;
   final String imagePath;
   final int quantity;
+  final int stock;
 
   CartItem({
     required this.productId,
@@ -13,6 +14,7 @@ class CartItem {
     required this.price,
     required this.imagePath,
     required this.quantity,
+    required this.stock,
   });
 
   double get priceAsDouble {
@@ -29,6 +31,7 @@ class CartItem {
     String? price,
     String? imagePath,
     int? quantity,
+    int? stock,
   }) {
     return CartItem(
       productId: productId ?? this.productId,
@@ -37,6 +40,7 @@ class CartItem {
       price: price ?? this.price,
       imagePath: imagePath ?? this.imagePath,
       quantity: quantity ?? this.quantity,
+      stock: stock ?? this.stock,
     );
   }
 

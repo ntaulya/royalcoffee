@@ -22,7 +22,7 @@ class _TrackOrderState extends State<TrackOrder> {
   }
 
   Future<void> _loadData() async {
-    await _controller.fetchAntrean();
+    await _controller.fetchAntrean(section: true);
     setState(() {});
   }
 
@@ -244,9 +244,10 @@ class _TrackOrderState extends State<TrackOrder> {
               Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
               const SizedBox(height: 16),
               Text(
-                "Tidak ada pesanan dengan status \"$_currentStep\"",
+                "Tidak ada pesanan",
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
+              
             ],
           ),
         ),

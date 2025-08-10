@@ -70,6 +70,7 @@ class _DetailPesananState extends State<DetailPesanan> {
           price: (hargaDasar + tambahan).toString(),
           imagePath: v.imagePath,
           quantity: qty,
+          stock : int.parse(v.stock),
         ));
       }
     }

@@ -13,13 +13,13 @@ class AntrianController extends ChangeNotifier {
   bool get isLoading => _loading;
   String? get error => _error;
 
-  Future<void> fetchAntrean() async {
+  Future<void> fetchAntrean({bool? section}) async {
     _loading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _list = await _service.getAntreanList();
+      _list = await _service.getAntreanList(section: section);
     } catch (e) {
       _error = e.toString();
     }

@@ -82,7 +82,7 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = widget.product.status == 'non_aktif';
+    final isDisabled = widget.product.status == "non_aktif";
 
     return GestureDetector(
       onTap: widget.onTap,

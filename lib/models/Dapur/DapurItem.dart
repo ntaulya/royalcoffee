@@ -9,6 +9,7 @@ class DapurItem {
   final String imagePath;
   final String createAt;
   final int item;
+  final String pesan;
 
   DapurItem({
     required this.idCheckout,
@@ -21,6 +22,7 @@ class DapurItem {
     required this.tipePemesanan,
     required this.createAt,
     required this.item,
+    required this.pesan,
   });
 
   factory DapurItem.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class DapurItem {
       item: int.parse(json['item'].toString()) ?? 0,
       tipePemesanan : json['status_pemesanan'] ?? '',
       createAt : json['create_at'] ?? '',
+      pesan: json['note']?.toString() ?? '',
     );
   }
 }
