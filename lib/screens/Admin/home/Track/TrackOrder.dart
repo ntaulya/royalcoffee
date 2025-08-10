@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Tambahkan ini
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import '../../../../controllers/Antrian/AntrianController.dart';
 import '../../../../models/Antrian/Antrian.dart';
 import '../../layout/CustomTopBar.dart';
@@ -18,7 +19,12 @@ class _TrackOrderState extends State<TrackOrder> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _initLocale();
+  }
+
+  Future<void> _initLocale() async {
+    await initializeDateFormatting('id_ID', null); // inisialisasi locale Indonesia
+    await _loadData();
   }
 
   Future<void> _loadData() async {
@@ -58,6 +64,7 @@ class _TrackOrderState extends State<TrackOrder> {
       final formatter = DateFormat('dd MMM yyyy, HH:mm', 'id_ID');
       return formatter.format(dateTime);
     } catch (e) {
+      print(e);
       return tanggal;
     }
   }
@@ -247,7 +254,6 @@ class _TrackOrderState extends State<TrackOrder> {
                 "Tidak ada pesanan",
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
-              
             ],
           ),
         ),
