@@ -255,7 +255,7 @@ class _PesananSayaState extends State<PesananSaya> {
               TextField(
                 controller: notesController,
                 decoration: const InputDecoration(
-                  labelText: 'Catatan',
+                  labelText: 'Tulis nomor meja dan catatan disini',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 2,
