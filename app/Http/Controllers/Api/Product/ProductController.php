@@ -98,6 +98,7 @@ class ProductController extends Controller
             'qty' => ['required','integer','min:1'],
         ]);
         $this->varianController->addStock(varian_id:$value['varian_id'],status_upload:"in",stock:$value['qty'],node:"Barang Masuk");
+        $this->productController->update(product_id:$value['product_id'],status_barang_masuk:"in",stock:$value['qty']);
         return new R_Success(['message' => "Berhasil menambahkan stock"]);
     }
 

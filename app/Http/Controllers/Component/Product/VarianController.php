@@ -66,7 +66,7 @@ class VarianController extends Controller
                 "stock" => $stock,
             ]);
         }
-        
+
     }
 
 
