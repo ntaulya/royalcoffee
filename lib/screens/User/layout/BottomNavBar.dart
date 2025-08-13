@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import '../home/PesananSaya.dart';
 import '../home/Dashboard.dart';
 import '../home/CekProses.dart';
+import '../home/NotificationPage.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -39,8 +40,8 @@ class BottomNavBar extends StatelessWidget {
             children: [
               _buildNavItem(context, Iconsax.home, "Home", 0, const Dashboard()),
               _buildNavItem(context, Iconsax.shopping_cart, "Order", 1, const CekProses()),
-              // _buildNavItem(context, Iconsax.wallet, "History", 2, const DetailPesanan()),
-              _buildNavItem(context, Iconsax.notification, "Notification", 3, const Placeholder()),
+              //_buildNavItem(context, Iconsax.wallet, "History", 2, const Notification()),
+              _buildNavItem(context, Iconsax.notification, "Notification", 3,  NotificationPage()),
             ],
           ),
         ),

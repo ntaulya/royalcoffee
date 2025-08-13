@@ -1,9 +1,9 @@
 // history_screen.dart
 import 'package:flutter/material.dart';
 
-class HistoryScreen extends StatelessWidget {
+class History extends StatelessWidget {
   final Function(int) onItemSelected;
-  const HistoryScreen({super.key, required this.onItemSelected});
+  const History({super.key, required this.onItemSelected});
 
   @override
   Widget build(BuildContext context) {

@@ -26,11 +26,30 @@ class _MenuScreenState extends State<MenuScreen> {
   bool _isLoadingMore = false;
   double _savedScrollOffset = 0.0;
   bool _shouldRestoreScroll = false;
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (selectedCategoryId.isNotEmpty) {
+        await controller.fetchInitialProducts(categoryId: selectedCategoryId);
+        await _loadImages(controller.products);
+      }
+    });
+  }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isFirstLoad && selectedCategoryId.isNotEmpty) {
+      _refreshMenu();
+      _isFirstLoad = false;
+    }
+  }
+  Future<void> _refreshMenu() async {
+    await controller.fetchInitialProducts(categoryId: selectedCategoryId);
+    await _loadImages(controller.products);
   }
 
   void _onScroll() async {

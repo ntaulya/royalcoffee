@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
+class NotificationPage extends StatelessWidget {
+  const NotificationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,15 +55,20 @@ class NotificationScreen extends StatelessWidget {
               ],
             ),
             child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.brown[100],
-                child: Icon(
-                  notif["icon"] as IconData,
-                  color: Colors.brown[700],
+                leading: CircleAvatar(
+                  backgroundColor: Colors.brown[100],
+                  child: Icon(
+                    notif["icon"] as IconData,
+                    color: Colors.brown[700],
+                  ),
                 ),
+                title: Text(notif["title"] as String),
+                subtitle: Text(
+                  "${notif["message"]}\n${notif["time"]}",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                isThreeLine: true,
               ),
-              isThreeLine: true,
-            ),
           );
         },
       ),

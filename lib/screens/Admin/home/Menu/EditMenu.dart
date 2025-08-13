@@ -14,6 +14,7 @@ import './widgets/ImageBoxWidget.dart';
 import './widgets/FormTextField.dart';
 
 class MenuVariant {
+  String idVarian = '';
   File? image;
   Uint8List? networkImageBytes;
   String name = '', price = '', stock = '';
@@ -86,13 +87,14 @@ class _EditMenuState extends State<EditMenu> {
       _priceController.text = product.price;
       _descriptionController.text = product.description ?? '';
       selectedCategory = _categories.firstWhere(
-        (c) => c.id.toString() == widget.categoryId,
+        (c) => c.id.toString() == product.categories,
         orElse: () => _categories.first,
       );
 
       _variants = [];
       for (final v in product.variants) {
         final variant = MenuVariant()
+          ..idVarian = v.idVarian.toString()
           ..name = v.namaVarian ?? ''
           ..price = v.hargaTambahan.toString()
           ..stock = v.stock.toString();
@@ -267,11 +269,17 @@ Widget _buildVariantCard(int index) {
             onPressed: () {
               final input = int.tryParse(controller.text);
               if (input != null && input > 0) {
-                setState(() {
-                  final currentStock = int.tryParse(v.stock) ?? 0;
-                  v.stock = (currentStock + input).toString();
+                _productController.toggleAddStock(
+                  productId: widget.productId,
+                  varianId: v.idVarian, 
+                  qty: input,
+                ).then((_) {
+                  setState(() {
+                    final currentStock = int.tryParse(v.stock) ?? 0;
+                    v.stock = (currentStock + input).toString();
+                  });
+                  Navigator.of(ctx).pop();
                 });
-                Navigator.of(ctx).pop();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Masukkan jumlah yang valid')),
@@ -286,44 +294,53 @@ Widget _buildVariantCard(int index) {
   }
 
 
-  void _submitProduct() async {
-    if (_variants.isEmpty || selectedCategory == null ||
-        _nameController.text.isEmpty || _priceController.text.isEmpty ||
-        _descriptionController.text.isEmpty || _mainImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lengkapi semua data')));
-      return;
-    }
-
-    if (!_mainImage!.path.toLowerCase().endsWith('.png')) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gambar utama harus PNG')));
-      return;
-    }
-
-    List<Map<String, dynamic>> variantList = [];
-    for (int i = 0; i < _variants.length; i++) {
-      final v = _variants[i];
-      if (v.name.isEmpty || v.price.isEmpty || v.stock.isEmpty || (i > 0 && v.image == null)) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lengkapi data varian ke-${i + 1}')));
-        return;
-      }
-      variantList.add({
-        "nama_varian": v.name,
-        "harga_varian": int.parse(v.price),
-        "stock_varian": int.parse(v.stock),
-        "is_primary": i == 0,
-        "image_varian": i == 0 ? _mainImage! : v.image!,
-      });
-    }
-
-    await _productController.createProduct(
-      namaProduct: _nameController.text,
-      hargaProduct: _priceController.text,
-      descriptionProduct: _descriptionController.text,
-      kategoriId: selectedCategory!.id.toString(),
-      varianProductList: variantList,
-    );
-    Navigator.pop(context, true);
+ void _submitProduct() async {
+  if (_variants.isEmpty || selectedCategory == null ||
+      _nameController.text.isEmpty || _priceController.text.isEmpty ||
+      _descriptionController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lengkapi semua data')));
+    return;
   }
+
+  // Validasi format gambar utama jika diganti
+  if (_mainImage != null && !_mainImage!.path.toLowerCase().endsWith('.png')) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gambar utama harus PNG')));
+    return;
+  }
+
+  List<Map<String, dynamic>> variantList = [];
+  for (int i = 0; i < _variants.length; i++) {
+    final v = _variants[i];
+    if (v.name.isEmpty || v.price.isEmpty || v.stock.isEmpty || (i > 0 && v.image == null && v.networkImageBytes == null)) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lengkapi data varian ke-${i + 1}')));
+      return;
+    }
+    variantList.add({
+      'vairan_id' : v.idVarian,
+      "nama_varian": v.name,
+      "harga_varian": int.parse(v.price),
+      "stock_varian": int.parse(v.stock),
+      "is_primary": i == 0,
+      "image_varian": v.image ?? null, // hanya kirim file jika ada gambar baru
+    });
+  }
+
+  final success = await _productController.updateProduct(
+    productId: widget.productId,
+    namaProduct: _nameController.text,
+    hargaProduct: _priceController.text,
+    descriptionProduct: _descriptionController.text,
+    kategoriId: selectedCategory!.id.toString(),
+    varianProductList: variantList,
+  );
+
+  if (success) {
+    Navigator.pop(context, true);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_productController.errorMessage ?? 'Gagal update produk')));
+  }
+}
+
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -378,7 +395,7 @@ Widget _buildVariantCard(int index) {
             child: ElevatedButton(
               onPressed: _submitProduct,
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4B1D0D), shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14)),
-              child: const Text("Tambahkan Product", style: TextStyle(fontSize: 16, color: Colors.white)),
+              child: const Text("Update Product", style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ),
         ]),

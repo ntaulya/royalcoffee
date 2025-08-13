@@ -220,4 +220,111 @@ class ProductServices extends Config {
       throw Exception('Gagal mengubah status produk: $e');
     }
   }
+
+  Future<void> addStock({
+    required String productId,
+    required String varianId,
+    required int qty,
+  }) async {
+    try{
+      String url = '${_config.baseUrl}/product/stock';
+      String? token = await _storageService.getToken();
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          ..._config.defaultHeaders,
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+          'product_id': productId,
+          'varian_id': varianId,
+          'qty' : qty.toString(),
+        },
+      ).timeout(_config.timeout);
+    } on SocketException{
+      throw Exception("Tidak ada koneksi internet");
+    }catch(e){
+      throw Exception("Gagal mengubah status stock : $e");
+    }
+  }
+
+  Future<void> updateProduct({
+    required String productId,
+    required String namaProduct,
+    required String hargaProduct,
+    required String descriptionProduct,
+    required String kategoriId,
+    required List<Map<String, dynamic>> varianProductList,
+  }) async {
+    try {
+      String url = '${_config.baseUrl}/product';
+      String? token = await _storageService.getToken();
+
+      var request = http.MultipartRequest('post', Uri.parse(url));
+      request.headers.addAll({
+        ..._config.defaultHeaders,
+        'Authorization': 'Bearer $token',
+        'Content-Type' : 'multipart/form-data',
+      });
+
+      // Data utama produk
+      request.fields['product_id'] = productId;
+      request.fields['nama_product'] = namaProduct;
+      request.fields['harga_product'] = hargaProduct;
+      request.fields['description_product'] = descriptionProduct;
+      request.fields['kategori_id'] = kategoriId;
+
+      // Tambah varian
+      for (int i = 0; i < varianProductList.length; i++) {
+        final varian = varianProductList[i];
+        print(varian['stock']);
+        request.fields['varian_product[$i][varian_id]'] = varian['vairan_id'].toString();
+        request.fields['varian_product[$i][nama_varian]'] = varian['nama_varian'];
+        request.fields['varian_product[$i][harga_varian]'] = varian['harga_varian'].toString();
+        request.fields['varian_product[$i][is_primary]'] = varian['is_primary'].toString();
+        // request.fields['varian_product[$i][stock]'] = int.parse(varian['stock']).toString();
+
+        // Upload gambar kalau ada file baru
+        if (varian['image_varian'] != null && varian['image_varian'] is File) {
+          final File imageFile = varian['image_varian'];
+          if (!imageFile.existsSync()) {
+            throw Exception('Gambar varian ke-${i + 1} tidak ditemukan');
+          }
+
+          final mimeType = lookupMimeType(imageFile.path);
+          if (mimeType != 'image/png') {
+            throw Exception('File varian ke-${i + 1} bukan PNG');
+          }
+
+          request.files.add(http.MultipartFile(
+            'varian_product[$i][image_varian]',
+            imageFile.readAsBytes().asStream(),
+            imageFile.lengthSync(),
+            filename: path.basename(imageFile.path),
+            contentType: MediaType('image', 'png'),
+          ));
+        }
+      }
+
+      final response = await request.send();
+      final resBody = await response.stream.bytesToString();
+
+      if (response.statusCode != 200) {
+        try {
+          final json = jsonDecode(resBody);
+          throw Exception(json['message'] ?? 'Gagal memperbarui produk');
+        } catch (_) {
+          throw Exception('Gagal memperbarui produk: $resBody');
+        }
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } catch (e) {
+      print(e);
+      throw Exception('Gagal memperbarui produk: $e');
+    }
+  }
+
 }

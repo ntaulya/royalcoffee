@@ -132,6 +132,52 @@ class ProductController with ChangeNotifier {
     }
   }
 
+  Future<void> toggleAddStock({
+    required String productId,
+    required String varianId,
+    required int qty,
+  }) async {
+    try{
+      await _productService.addStock(
+        productId : productId,
+        varianId : varianId,
+        qty : qty,
+      );
+    }catch (e){
+      errorMessage = e.toString();
+    }finally{
+      _setLoading(false);
+    }
+  }
+
+
+  Future<bool> updateProduct({
+    required String productId,
+    required String namaProduct,
+    required String hargaProduct,
+    required String descriptionProduct,
+    required String kategoriId,
+    required List<Map<String, dynamic>> varianProductList,
+  }) async {
+    _setLoading(true);
+    try {
+      await _productService.updateProduct(
+        productId: productId,
+        namaProduct: namaProduct,
+        hargaProduct: hargaProduct,
+        descriptionProduct: descriptionProduct,
+        kategoriId: kategoriId,
+        varianProductList: varianProductList,
+      );
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   void _setLoading(bool value) {
     isLoading = value;
     notifyListeners();

@@ -5,6 +5,7 @@ class Product {
   final String imageUrl;
   final String price;
   final int stock;
+  final String? categories;
   final String status;
   final String? description;
   final List<Variant> variants;
@@ -17,6 +18,7 @@ class Product {
     required this.status,
     required this.stock,
     this.description,
+    this.categories,
     required this.variants,
   });
 
@@ -29,6 +31,7 @@ class Product {
       stock: int.parse(json['stock']?.toString() ?? '0') ?? 0,
       status: json['status_product'] ?? 'aktif',
       description: json['description'],
+      categories : json['categori_id'].toString() ?? '',
       variants: (json['variants'] as List?)?.map((v) => Variant.fromJson(v)).toList() ?? [],
     );
   }

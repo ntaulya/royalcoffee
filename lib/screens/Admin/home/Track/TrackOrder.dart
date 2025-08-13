@@ -64,7 +64,6 @@ class _TrackOrderState extends State<TrackOrder> {
       final formatter = DateFormat('dd MMM yyyy, HH:mm', 'id_ID');
       return formatter.format(dateTime);
     } catch (e) {
-      print(e);
       return tanggal;
     }
   }
