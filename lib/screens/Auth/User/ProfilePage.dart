@@ -16,7 +16,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final emailController = TextEditingController(text: 'example@gmail.com');
   final phoneController = TextEditingController(text: '08xxxxxxxxxx');
 
-
   List<String> _userRoles = [];
 
   @override
@@ -41,24 +40,23 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: const Color(0xFF7A491F),
       body: Column(
         children: [
-          
           const SizedBox(height: 50),
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Color(0xFFF5CB58)),
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFFFFFFFF)),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
-                SizedBox(width: 10),
-                Text(
+                const SizedBox(width: 10),
+                const Text(
                   'My profile',
                   style: TextStyle(
-                    color: Color(0xFFF5CB58),
+                    color: Color(0xFFFFFFFF),
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -79,7 +77,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
-                  // bottom corners default (Radius.zero) → tidak melengkung
                 ),
               ),
               child: Column(
@@ -117,10 +114,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => DashboardAdmin()),
-                          
+                          MaterialPageRoute(
+                              builder: (context) => DashboardAdmin()),
                         );
-                      }, 
+                      },
                       backgroundColor: Colors.white,
                       textColor: const Color(0xFF7A491F),
                       borderColor: const Color(0xFF7A491F),
@@ -152,14 +149,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, {bool enabled = true}) {
+  Widget _buildTextField(TextEditingController controller,
+      {bool enabled = true}) {
     return TextField(
       controller: controller,
       enabled: enabled,
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
         filled: true,
-        fillColor: enabled ? const Color(0xFFFFF1D7) : Colors.grey[300],
+        fillColor: Colors.grey[300], // disamakan semua jadi abu-abu
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
