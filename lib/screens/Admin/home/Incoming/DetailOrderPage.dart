@@ -26,7 +26,7 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   Pajak? pajak;
   bool isLoading = true;
 
-  String paymentMethod = 'QRIS';
+  String paymentMethod = 'qris';
   final TextEditingController paymentAmountController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
 
@@ -381,7 +381,7 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   Widget _paymentMethodSelector() {
     return Column(
       children:
-          ['QRIS', 'Tunai'].map((method) {
+          ['qris', 'tunai'].map((method) {
             return RadioListTile(
               value: method,
               groupValue: paymentMethod,
