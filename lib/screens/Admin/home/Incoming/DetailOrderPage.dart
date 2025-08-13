@@ -1,4 +1,3 @@
-// DetailOrderPage.dart
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
@@ -27,7 +26,7 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   Pajak? pajak;
   bool isLoading = true;
 
-  String paymentMethod = 'qris';
+  String paymentMethod = 'QRIS';
   final TextEditingController paymentAmountController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
 
@@ -47,7 +46,8 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   }
 
   Future<void> _fetchPajak() async {
-    final totalHarga = widget.order.Item?.fold<double>(
+    final totalHarga =
+        widget.order.Item?.fold<double>(
           0,
           (sum, item) => sum + item.harga_total,
         ) ??
@@ -62,9 +62,9 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         isLoading = false;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal memuat pajak: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal memuat pajak: $e")));
       setState(() => isLoading = false);
     }
   }
@@ -90,51 +90,99 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(child: Text(formatDate(widget.order.create_at))),
-                  Center(child: Text(widget.order.nama_pemesan)),
-                  Center(child: Text(
-                    widget.order.tipe_pemesanan == "take_away"
-                      ? "Take Away"
-                      : "Drive In",
-                    )),
-                  const SizedBox(height: 16),
-                  ...items.map((item) => buildProductItem(item, () => _confirmDeleteItem(item))).toList(),
-                  const Divider(),
-                  orderSummary('Subtotal', subtotal - tax),
-                  orderSummary('Tax and Fees', tax),
-                  const Divider(),
-                  orderSummary('Total', total, isTotal: true),
-                  const SizedBox(height: 16),
-                  _noteField(),
-                  const SizedBox(height: 16),
-                  const Text("Metode Pembayaran", style: TextStyle(fontWeight: FontWeight.bold)),
-                  _paymentMethodSelector(),
-                  const SizedBox(height: 12),
-                  _paymentAmountField(),
-                  const SizedBox(height: 80),
-                ],
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(child: Text(formatDate(widget.order.create_at))),
+                    Center(child: Text(widget.order.nama_pemesan)),
+                    Center(
+                      child: Text(
+                        widget.order.tipe_pemesanan == "take_away"
+                            ? "Take Away"
+                            : "Dine In",
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ...items
+                        .map(
+                          (item) => buildProductItem(
+                            item,
+                            () => _confirmDeleteItem(item),
+                          ),
+                        )
+                        .toList(),
+                    const Divider(),
+                    orderSummary('Subtotal', subtotal - tax),
+                    orderSummary('Tax and Fees', tax),
+                    const Divider(),
+                    orderSummary('Total', total, isTotal: true),
+                    const SizedBox(height: 16),
+                    _noteField(),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Metode Pembayaran",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    _paymentMethodSelector(),
+                    const SizedBox(height: 12),
+                    _paymentAmountField(),
+                    const SizedBox(height: 80),
+                  ],
+                ),
               ),
-            ),
       bottomNavigationBar: _bottomActions(total),
     );
   }
 
   Widget _bottomActions(double total) {
+    const kBrownColor = Color(0xFF834D1E);
+
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.white,
       child: Row(
         children: [
-          _bottomButton("Batalkan", Colors.red, _showDeleteDialog),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: kBrownColor,
+                side: const BorderSide(color: kBrownColor, width: 1.5),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: _showDeleteDialog,
+              child: const Text(
+                "Batalkan",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
           const SizedBox(width: 8),
-          _bottomButton("Konfirmasi", Colors.green, () => _showConfirmationDialog(total)),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kBrownColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () => _showConfirmationDialog(total),
+              child: const Text(
+                "Konfirmasi",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -147,7 +195,9 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         child: Text(label, style: const TextStyle(fontSize: 16)),
       ),
@@ -159,92 +209,107 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Konfirmasi Hapus Pesanan"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Masukkan password admin untuk menghapus pesanan."),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password Admin',
-                border: OutlineInputBorder(),
-              ),
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Konfirmasi Hapus Pesanan"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("Masukkan password admin untuk menghapus pesanan."),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Password Admin',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
-          TextButton(
-            onPressed: () async {
-              final password = passwordController.text.trim();
-              if (password.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Password tidak boleh kosong")),
-                );
-                return;
-              }
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final password = passwordController.text.trim();
+                  if (password.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Password tidak boleh kosong"),
+                      ),
+                    );
+                    return;
+                  }
 
-              Navigator.pop(context);
+                  Navigator.pop(context);
 
-              await OrderController().deleteOrder(
-                idCheckout: widget.order.id,
-                password: password,
-                context: context,
-              );
+                  await OrderController().deleteOrder(
+                    idCheckout: widget.order.id,
+                    password: password,
+                    context: context,
+                  );
 
-              Navigator.pop(context, true);
-            },
-            child: const Text('Hapus'),
+                  Navigator.pop(context, true);
+                },
+                child: const Text('Hapus'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _confirmDeleteItem(ItemProduct item) async {
-    final isLastItem = widget.order.Item != null && widget.order.Item!.length == 1;
+    final isLastItem =
+        widget.order.Item != null && widget.order.Item!.length == 1;
 
     if (isLastItem) {
       final TextEditingController passwordController = TextEditingController();
       final bool? confirm = await showDialog<bool>(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Konfirmasi Hapus Pesanan"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Item ini adalah item terakhir.\nMasukkan password admin untuk membatalkan pesanan."),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password Admin',
-                  border: OutlineInputBorder(),
-                ),
+        builder:
+            (_) => AlertDialog(
+              title: const Text("Konfirmasi Hapus Pesanan"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Item ini adalah item terakhir.\nMasukkan password admin untuk membatalkan pesanan.",
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Password Admin',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
-            TextButton(
-              onPressed: () {
-                if (passwordController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Password tidak boleh kosong")),
-                  );
-                } else {
-                  Navigator.pop(context, true);
-                }
-              },
-              child: const Text('Hapus Pesanan'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Batal'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (passwordController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Password tidak boleh kosong"),
+                        ),
+                      );
+                    } else {
+                      Navigator.pop(context, true);
+                    }
+                  },
+                  child: const Text('Hapus Pesanan'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
 
       if (confirm == true) {
@@ -258,14 +323,21 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
     } else {
       final bool? confirm = await showDialog<bool>(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Hapus Item'),
-          content: Text('Yakin ingin menghapus ${item.nama_product}?'),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
-            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Hapus')),
-          ],
-        ),
+        builder:
+            (_) => AlertDialog(
+              title: const Text('Hapus Item'),
+              content: Text('Yakin ingin menghapus ${item.nama_product}?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Batal'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Hapus'),
+                ),
+              ],
+            ),
       );
 
       if (confirm == true) {
@@ -277,9 +349,11 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         );
 
         setState(() {
-          widget.order.Item?.removeWhere((i) =>
-              i.product_id == item.product_id &&
-              i.varian_id == item.varian_id);
+          widget.order.Item?.removeWhere(
+            (i) =>
+                i.product_id == item.product_id &&
+                i.varian_id == item.varian_id,
+          );
         });
 
         await _fetchPajak();
@@ -306,14 +380,15 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
   Widget _paymentMethodSelector() {
     return Column(
-      children: ['qris', 'tunai'].map((method) {
-        return RadioListTile(
-          value: method,
-          groupValue: paymentMethod,
-          onChanged: (val) => setState(() => paymentMethod = val!),
-          title: Text(method),
-        );
-      }).toList(),
+      children:
+          ['QRIS', 'Tunai'].map((method) {
+            return RadioListTile(
+              value: method,
+              groupValue: paymentMethod,
+              onChanged: (val) => setState(() => paymentMethod = val!),
+              title: Text(method),
+            );
+          }).toList(),
     );
   }
 
@@ -325,7 +400,10 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         hintText: 'Masukkan nominal pembayaran',
         filled: true,
         fillColor: Colors.grey[300],
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }
@@ -343,16 +421,23 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Konfirmasi Pembayaran'),
-        content: Text(
-          'Yakin ingin mengkonfirmasi pembayaran sebesar ${formatCurrency(nominal)} dengan metode $paymentMethod?',
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Ya')),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Konfirmasi Pembayaran'),
+            content: Text(
+              'Yakin ingin mengkonfirmasi pembayaran sebesar ${formatCurrency(nominal)} dengan metode $paymentMethod?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Ya'),
+              ),
+            ],
+          ),
     );
 
     if (confirm == true) {
@@ -363,43 +448,47 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         context: context,
       );
 
-      // Tanyakan apakah ingin mencetak struk
       final printConfirm = await showDialog<bool>(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Cetak Struk'),
-          content: const Text('Apakah Anda ingin mencetak struk?'),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Tidak')),
-            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Ya')),
-          ],
-        ),
+        builder:
+            (_) => AlertDialog(
+              title: const Text('Cetak Struk'),
+              content: const Text('Apakah Anda ingin mencetak struk?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Tidak'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Ya'),
+                ),
+              ],
+            ),
       );
 
       if (printConfirm == true) {
         try {
-          await _printReceipt(total,nominal);
+          await _printReceipt(total, nominal);
         } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Gagal mencetak struk")),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Gagal mencetak struk")));
         }
       }
 
-      Navigator.pop(context, true); // kembali ke halaman sebelumnya
+      Navigator.pop(context, true);
     }
   }
 
-
-
   Future<void> _printReceipt(double total, int nominalDibayar) async {
-  final pdf = await generateReceiptPdf(
-    widget.order,
-    total,
-    paymentMethod,
-    noteController.text,
-    nominalDibayar,
-  );
-  await Printing.layoutPdf(onLayout: (_) async => pdf.save());
-}
+    final pdf = await generateReceiptPdf(
+      widget.order,
+      total,
+      paymentMethod,
+      noteController.text,
+      nominalDibayar,
+    );
+    await Printing.layoutPdf(onLayout: (_) async => pdf.save());
+  }
 }
