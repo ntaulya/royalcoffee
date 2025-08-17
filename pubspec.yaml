@@ -36,11 +36,11 @@ dependencies:
   shared_preferences: ^2.5.3
   image_picker: ^1.1.0
   intl: ^0.20.2
+  iconsax: ^0.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  iconsax: ^0.0.8
   provider: ^6.0.5
   pdf: ^3.10.4
   printing: ^5.12.0

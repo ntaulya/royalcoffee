@@ -302,7 +302,6 @@ Widget _buildVariantCard(int index) {
     return;
   }
 
-  // Validasi format gambar utama jika diganti
   if (_mainImage != null && !_mainImage!.path.toLowerCase().endsWith('.png')) {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gambar utama harus PNG')));
     return;
@@ -332,14 +331,15 @@ Widget _buildVariantCard(int index) {
     descriptionProduct: _descriptionController.text,
     kategoriId: selectedCategory!.id.toString(),
     varianProductList: variantList,
+    oldProduct: _product,
   );
 
   if (success) {
-    Navigator.pop(context, true);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_productController.errorMessage ?? 'Gagal update produk')));
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_productController.errorMessage ?? 'Gagal update produk')));
+    }
   }
-}
 
 
   @override

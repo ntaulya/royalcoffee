@@ -251,40 +251,59 @@ class ProductServices extends Config {
   }
 
   Future<void> updateProduct({
-    required String productId,
-    required String namaProduct,
-    required String hargaProduct,
-    required String descriptionProduct,
-    required String kategoriId,
-    required List<Map<String, dynamic>> varianProductList,
-  }) async {
-    try {
-      String url = '${_config.baseUrl}/product';
-      String? token = await _storageService.getToken();
+  required String productId,
+  String? namaProduct,
+  String? hargaProduct,
+  String? descriptionProduct,
+  String? kategoriId,
+  List<Map<String, dynamic>>? varianProductList,
+}) async {
+  try {
+    String url = '${_config.baseUrl}/product';
+    String? token = await _storageService.getToken();
 
-      var request = http.MultipartRequest('post', Uri.parse(url));
-      request.headers.addAll({
-        ..._config.defaultHeaders,
-        'Authorization': 'Bearer $token',
-        'Content-Type' : 'multipart/form-data',
-      });
+    var request = http.MultipartRequest('post', Uri.parse(url));
+    request.headers.addAll({
+      ..._config.defaultHeaders,
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'multipart/form-data',
+    });
 
-      // Data utama produk
-      request.fields['product_id'] = productId;
-      request.fields['nama_product'] = namaProduct;
-      request.fields['harga_product'] = hargaProduct;
+    // Data utama produk
+    request.fields['product_id'] = productId;
+
+    if (namaProduct != null) request.fields['nama_product'] = namaProduct;
+    if (hargaProduct != null) request.fields['harga_product'] = hargaProduct;
+    if (descriptionProduct != null) {
       request.fields['description_product'] = descriptionProduct;
-      request.fields['kategori_id'] = kategoriId;
+    }
+    if (kategoriId != null) request.fields['kategori_id'] = kategoriId;
 
-      // Tambah varian
+    // Tambah varian (hanya kalau ada)
+    if (varianProductList != null) {
       for (int i = 0; i < varianProductList.length; i++) {
         final varian = varianProductList[i];
-        print(varian['stock']);
-        request.fields['varian_product[$i][varian_id]'] = varian['vairan_id'].toString();
-        request.fields['varian_product[$i][nama_varian]'] = varian['nama_varian'];
-        request.fields['varian_product[$i][harga_varian]'] = varian['harga_varian'].toString();
-        request.fields['varian_product[$i][is_primary]'] = varian['is_primary'].toString();
-        // request.fields['varian_product[$i][stock]'] = int.parse(varian['stock']).toString();
+
+        if (varian['vairan_id'] != null) {
+          request.fields['varian_product[$i][varian_id]'] =
+              varian['vairan_id'].toString();
+        }
+        if (varian['nama_varian'] != null) {
+          request.fields['varian_product[$i][nama_varian]'] =
+              varian['nama_varian'];
+        }
+        if (varian['harga_varian'] != null) {
+          request.fields['varian_product[$i][harga_varian]'] =
+              varian['harga_varian'].toString();
+        }
+        if (varian['is_primary'] != null) {
+          request.fields['varian_product[$i][is_primary]'] =
+              varian['is_primary'].toString();
+        }
+        if (varian['stock_varian'] != null) {
+          request.fields['varian_product[$i][stock]'] =
+              varian['stock_varian'].toString();
+        }
 
         // Upload gambar kalau ada file baru
         if (varian['image_varian'] != null && varian['image_varian'] is File) {
@@ -307,24 +326,25 @@ class ProductServices extends Config {
           ));
         }
       }
-
-      final response = await request.send();
-      final resBody = await response.stream.bytesToString();
-
-      if (response.statusCode != 200) {
-        try {
-          final json = jsonDecode(resBody);
-          throw Exception(json['message'] ?? 'Gagal memperbarui produk');
-        } catch (_) {
-          throw Exception('Gagal memperbarui produk: $resBody');
-        }
-      }
-    } on SocketException {
-      throw Exception('Tidak ada koneksi internet');
-    } catch (e) {
-      print(e);
-      throw Exception('Gagal memperbarui produk: $e');
     }
+
+    final response = await request.send();
+    final resBody = await response.stream.bytesToString();
+
+    if (response.statusCode != 200) {
+      try {
+        final json = jsonDecode(resBody);
+        throw Exception(json['message'] ?? 'Gagal memperbarui produk');
+      } catch (_) {
+        throw Exception('Gagal memperbarui produk: $resBody');
+      }
+    }
+  } on SocketException {
+    throw Exception('Tidak ada koneksi internet');
+  } catch (e) {
+    throw Exception('Gagal memperbarui produk: $e');
   }
+}
+
 
 }

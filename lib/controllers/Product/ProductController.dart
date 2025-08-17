@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/Api/product/ProductServices.dart';
 import '../../models/Product/Product.dart';
+import '../../models/Product/Variant.dart';
 
 class ProductController with ChangeNotifier {
   final ProductServices _productService = ProductServices();
@@ -152,31 +153,76 @@ class ProductController with ChangeNotifier {
 
 
   Future<bool> updateProduct({
-    required String productId,
-    required String namaProduct,
-    required String hargaProduct,
-    required String descriptionProduct,
-    required String kategoriId,
-    required List<Map<String, dynamic>> varianProductList,
-  }) async {
-    _setLoading(true);
-    try {
-      await _productService.updateProduct(
-        productId: productId,
-        namaProduct: namaProduct,
-        hargaProduct: hargaProduct,
-        descriptionProduct: descriptionProduct,
-        kategoriId: kategoriId,
-        varianProductList: varianProductList,
-      );
-      return true;
-    } catch (e) {
-      errorMessage = e.toString();
-      return false;
-    } finally {
-      _setLoading(false);
+  required String productId,
+  required String namaProduct,
+  required String hargaProduct,
+  required String descriptionProduct,
+  required String kategoriId,
+  required List<Map<String, dynamic>> varianProductList,
+  Product? oldProduct,
+}) async {
+  String? newNama = namaProduct;
+  String? newHarga = hargaProduct;
+  String? newDeskripsi = descriptionProduct;
+  String? newKategori = kategoriId;
+  List<Map<String, dynamic>>? newVarianList = varianProductList;
+
+  if (oldProduct != null) {
+    // Per field comparison
+    if (oldProduct.name == namaProduct) {
+      newNama = null;
+    }
+    if (oldProduct.price == hargaProduct) {
+      newHarga = null;
+    }
+    if ((oldProduct.description ?? '') == descriptionProduct) {
+      newDeskripsi = null;
+    }
+    if (oldProduct.categories == kategoriId) {
+      newKategori = null;
+    }
+    if (_isSameVariants(oldProduct.variants, varianProductList)) {
+      newVarianList = null;
     }
   }
+
+  _setLoading(true);
+  try {
+    await _productService.updateProduct(
+      productId: productId,
+      namaProduct: newNama,
+      hargaProduct: newHarga,
+      descriptionProduct: newDeskripsi,
+      kategoriId: newKategori,
+      varianProductList: newVarianList,
+    );
+    return true;
+  } catch (e) {
+    errorMessage = e.toString();
+    return false;
+  } finally {
+    _setLoading(false);
+  }
+}
+
+bool _isSameVariants(List<Variant> oldVariants, List<Map<String, dynamic>> newVariants) {
+  if (oldVariants.length != newVariants.length) return false;
+
+  for (int i = 0; i < oldVariants.length; i++) {
+    final oldV = oldVariants[i];
+    final newV = newVariants[i];
+
+    if (oldV.idVarian.toString() != newV['vairan_id'].toString() ||
+        (oldV.namaVarian ?? '') != newV['nama_varian'] ||
+        oldV.hargaTambahan.toString() != newV['harga_varian'].toString() ||
+        oldV.stock.toString() != newV['stock_varian'].toString()) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
 
   void _setLoading(bool value) {
     isLoading = value;
