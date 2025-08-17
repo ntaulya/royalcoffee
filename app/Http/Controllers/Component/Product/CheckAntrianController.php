@@ -11,7 +11,7 @@ class CheckAntrianController extends Controller
 {
     public function getlist($limit = 10 , $section = null )
     {
-        $twoMinutesAgo = now()->subMinutes(2);
+        $twoMinutesAgo = now()->subMinutes(5);
         if (!is_null($section)) {
             $carts = Carts::whereDate('updated_at', today())
                 ->orderBy('created_at', 'desc')
@@ -21,7 +21,7 @@ class CheckAntrianController extends Controller
                     $query->where('status_pemesanan', 'processing')
                         ->orWhere(function ($q) use ($twoMinutesAgo) {
                             $q->where('status_pemesanan', 'done')
-                                ->where('updated_at', '>=', $twoMinutesAgo);
+                                ->where('updated_at', '>', $twoMinutesAgo);
                         });
                 })
                 ->orderBy('created_at', 'asc')

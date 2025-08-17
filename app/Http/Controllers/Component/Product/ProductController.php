@@ -165,8 +165,10 @@ class ProductController extends Controller
                 'nama_varian' => $variant->nama_varian,
                 'harga_tambahan' => $variant->harga,
                 'stock' => $variant->stock,
-                'image_path' => URL::to('image/' . basename($firstImage->image_name)),
-                'is_primary' => $firstImage->is_primary ? 1 : 0,
+                'image_path' => $firstImage
+                ? URL::to('image/' . basename($firstImage->image_name))
+                : null, // aman kalau tidak ada image
+                'is_primary' => $firstImage? $firstImage->is_primary ? 1 : 0 : null,
             ];
         }
 
@@ -188,9 +190,12 @@ class ProductController extends Controller
             if ($variant->harga > 0) {
                 $harga_tambahan = $item->harga_product + $variant->harga;
             }
+
             $image = $variant->images;
-            if (!$firstPrimaryImage && $image && (int)$image->is_primary === 1) {
-                $firstPrimaryImage = $image;
+            if ($image && isset($image->is_primary) && (int)$image->is_primary === 1) {
+                if (!$firstPrimaryImage) {
+                    $firstPrimaryImage = $image;
+                }
             }
         }
 
@@ -202,7 +207,10 @@ class ProductController extends Controller
                 : (string) $item->harga_product,
             'status_product' => $item->status_product,
             'stock' => $item->stock,
-            'image_path' => URL::to('image/' . basename($firstPrimaryImage?->image_name)),
+            'image_path' => $firstPrimaryImage
+                ? URL::to('image/' . basename($firstPrimaryImage->image_name))
+                : null, // aman kalau tidak ada image
         ];
     }
+
 }

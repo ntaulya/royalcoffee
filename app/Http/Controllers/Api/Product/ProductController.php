@@ -122,31 +122,40 @@ class ProductController extends Controller
         if (isset($value['kategori_id']) && (int)$value['kategori_id'] <= 1) {
             return response()->json(['message' => "Category harus di atas 2"], 422);
         }
-        if (!empty($value['varian_product'])) {
+       if (!empty($value['varian_product'])) {
             foreach ($value['varian_product'] as $varian) {
-            if (!empty($varian['varian_id'])) {
-                // Update varian lama
-                $this->varianController->update(
-                    varian_id:$varian['varian_id'],
-                    nama_varian:$varian['nama_varian'],
-                    harga_tambahan:$varian['harga_varian'],
-                );
-                $this->varianController->deleteImage($varian['varian_id']);
-                $this->varianController->createImage($varian['varian_id'],$varian['image_varian'],$varian['is_primary']);
-            } else {
-                // Tambah varian baru
-                $this->varianController->create(
-                    product_id:$value['product_id'],
-                    nama_varian:$varian['nama_varian'],
-                    harga_tambahan:$varian['harga_varian'],
-                    stock:$varian['stock'],
-                    is_primary:$varian['is_primary'],
-                    image_file:$varian['image_varian'],
-                    user_id:Auth::user()->id,
-                );
-            }
-        }
+                if (!empty($varian['varian_id'])) {
+                    // Update varian lama
+                    if (!empty($varian['nama_varian']) || !empty($varian['harga_varian']) || isset($varian['stock'])) {
+                        $this->varianController->update(
+                            varian_id: $varian['varian_id'],
+                            nama_varian: $varian['nama_varian'] ?? null,
+                            harga_tambahan: $varian['harga_varian'] ?? null,
+                            stock: $varian['stock'] ?? null,
+                        );
+                    }
 
+                    // Kalau ada gambar baru
+                    if (!empty($varian['image_varian'])) {
+                        $this->varianController->deleteImage($varian['varian_id']);
+                        $this->varianController->createImage(
+                            $varian['varian_id'],
+                            $varian['image_varian'],
+                            $varian['is_primary'] ?? false
+                        );
+                    }
+                } else {
+                    $this->varianController->create(
+                        product_id: $value['product_id'],
+                        nama_varian: $varian['nama_varian'],
+                        harga_tambahan: $varian['harga_varian'],
+                        stock: $varian['stock'],
+                        is_primary: $varian['is_primary'] ?? false,
+                        image_file: $varian['image_varian'] ?? null,
+                        user_id: Auth::user()->id,
+                    );
+                }
+            }
         }
         $value = [
             'product_id' => $value['product_id'],

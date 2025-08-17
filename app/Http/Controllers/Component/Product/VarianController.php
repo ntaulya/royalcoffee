@@ -71,7 +71,7 @@ class VarianController extends Controller
 
 
     public function deleteImage($varian_id){
-        $image = ProductImage::findOrFail($varian_id);
+        $image = ProductImage::where('variant_id','=',$varian_id)->first();
         if ($image->image_path && Storage::disk('private')->exists($image->image_path)) {
             Storage::disk('private')->delete($image->image_path);
             $image->delete();
