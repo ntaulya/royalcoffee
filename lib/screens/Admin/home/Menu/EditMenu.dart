@@ -314,13 +314,17 @@ Widget _buildVariantCard(int index) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lengkapi data varian ke-${i + 1}')));
       return;
     }
+
+    // Jika ini varian pertama (primary), gunakan _mainImage jika ada
+    File? imageFile = i == 0 ? (_mainImage ?? v.image) : v.image;
+
     variantList.add({
-      'vairan_id' : v.idVarian,
+      'vairan_id': v.idVarian,
       "nama_varian": v.name,
       "harga_varian": int.parse(v.price),
       "stock_varian": int.parse(v.stock),
       "is_primary": i == 0,
-      "image_varian": v.image ?? null, // hanya kirim file jika ada gambar baru
+      "image_varian": imageFile, // kirim file primary dari _mainImage jika ada
     });
   }
 
@@ -334,21 +338,19 @@ Widget _buildVariantCard(int index) {
     oldProduct: _product,
   );
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data berhasil disimpan')),
-      );
-      Navigator.pop(context, true); // balik ke halaman sebelumnya
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            _productController.errorMessage ?? 'Gagal update produk',
-          ),
-        ),
-      );
-    }
+  if (success) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Data berhasil disimpan')),
+    );
+    Navigator.pop(context, true);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_productController.errorMessage ?? 'Gagal update produk'),
+      ),
+    );
   }
+}
 
 
   @override
