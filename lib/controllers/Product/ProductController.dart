@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/Api/product/ProductServices.dart';
 import '../../models/Product/Product.dart';
 import '../../models/Product/Variant.dart';
+import 'dart:io';
 
 class ProductController with ChangeNotifier {
   final ProductServices _productService = ProductServices();
@@ -152,7 +153,7 @@ class ProductController with ChangeNotifier {
   }
 
 
-  Future<bool> updateProduct({
+Future<bool> updateProduct({
   required String productId,
   required String namaProduct,
   required String hargaProduct,
@@ -165,37 +166,29 @@ class ProductController with ChangeNotifier {
   String? newHarga = hargaProduct;
   String? newDeskripsi = descriptionProduct;
   String? newKategori = kategoriId;
-  List<Map<String, dynamic>>? newVarianList = varianProductList;
+
+  final filteredVarian = _filterVariantChanges(
+    oldProduct?.variants ?? [],
+    varianProductList,
+  );
 
   if (oldProduct != null) {
-    // Per field comparison
-    if (oldProduct.name == namaProduct) {
-      newNama = null;
-    }
-    if (oldProduct.price == hargaProduct) {
-      newHarga = null;
-    }
-    if ((oldProduct.description ?? '') == descriptionProduct) {
-      newDeskripsi = null;
-    }
-    if (oldProduct.categories == kategoriId) {
-      newKategori = null;
-    }
-    if (_isSameVariants(oldProduct.variants, varianProductList)) {
-      newVarianList = null;
-    }
+    if (oldProduct.name == namaProduct) newNama = null;
+    if (oldProduct.price == hargaProduct) newHarga = null;
+    if ((oldProduct.description ?? '') == descriptionProduct) newDeskripsi = null;
+    if (oldProduct.categories == kategoriId) newKategori = null;
   }
 
   _setLoading(true);
   try {
-    await _productService.updateProduct(
-      productId: productId,
-      namaProduct: newNama,
-      hargaProduct: newHarga,
-      descriptionProduct: newDeskripsi,
-      kategoriId: newKategori,
-      varianProductList: newVarianList,
-    );
+    await _productService.updateProduct( 
+      productId: productId, // ✅ selalu dikirim 
+      namaProduct: newNama, // hanya kalau berubah 
+      hargaProduct: newHarga, // hanya kalau berubah 
+      descriptionProduct: newDeskripsi, // hanya kalau berubah 
+      kategoriId: newKategori, // hanya kalau berubah 
+      varianProductList: filteredVarian.isEmpty ? null : filteredVarian,
+      );
     return true;
   } catch (e) {
     errorMessage = e.toString();
@@ -205,21 +198,63 @@ class ProductController with ChangeNotifier {
   }
 }
 
-bool _isSameVariants(List<Variant> oldVariants, List<Map<String, dynamic>> newVariants) {
-  if (oldVariants.length != newVariants.length) return false;
+List<Map<String, dynamic>> _filterVariantChanges(
+  List<Variant> oldVariants,
+  List<Map<String, dynamic>> editedVariants,
+) {
+  final Map<String, Variant> oldById = {
+    for (final v in oldVariants) v.idVarian.toString(): v
+  };
 
-  for (int i = 0; i < oldVariants.length; i++) {
-    final oldV = oldVariants[i];
-    final newV = newVariants[i];
+  final List<Map<String, dynamic>> result = [];
 
-    if (oldV.idVarian.toString() != newV['vairan_id'].toString() ||
-        (oldV.namaVarian ?? '') != newV['nama_varian'] ||
-        oldV.hargaTambahan.toString() != newV['harga_varian'].toString() ||
-        oldV.stock.toString() != newV['stock_varian'].toString()) {
-      return false;
+  for (final edited in editedVariants) {
+    final String id = edited['vairan_id']?.toString() ?? '';
+    if (id.isEmpty) continue;
+
+    final old = oldById[id];
+    final payload = <String, dynamic>{'vairan_id': id}; // ✅ selalu kirim varian_id
+    bool changed = false;
+
+    if (old == null) {
+      // varian baru
+      if (edited['nama_varian'] != null) { payload['nama_varian'] = edited['nama_varian']; changed = true; }
+      if (edited['harga_varian'] != null) { payload['harga_varian'] = edited['harga_varian']; changed = true; }
+      if (edited['stock_varian'] != null) { payload['stock'] = edited['stock_varian']; changed = true; }
+      if (edited['is_primary'] != null) { payload['is_primary'] = edited['is_primary']; }
+      if (edited['image_varian'] is File) {
+        payload['image_varian'] = edited['image_varian'];
+        payload['is_primary'] = edited['is_primary'] ?? 0; // ✅ wajib kirim is_primary jika ada file
+        changed = true;
+      }
+    } else {
+      // bandingkan dengan old
+      if (edited['nama_varian'] != null && edited['nama_varian'] != old.namaVarian) {
+        payload['nama_varian'] = edited['nama_varian'];
+        changed = true;
+      } 
+      if (edited['harga_varian'] != null && edited['harga_varian'].toString() != old.hargaTambahan.toString()) {
+        payload['harga_varian'] = edited['harga_varian']; changed = true;
+      }
+      if (edited['stock_varian'] != null && edited['stock_varian'].toString() != old.stock.toString()) {
+        payload['stock'] = edited['stock_varian']; changed = true;
+      }
+      if (edited['is_primary'] != null && edited['is_primary'].toString() != old.isPrimary.toString()) {
+        payload['is_primary'] = edited['is_primary']; changed = true;
+      }
+
+      // file baru
+      if (edited['image_varian'] is File) {
+        payload['image_varian'] = edited['image_varian'];
+        payload['is_primary'] = edited['is_primary'] ?? (old.isPrimary ? 1 : 0); // ✅ wajib
+        changed = true;
+      }
     }
+
+    if (changed) result.add(payload);
   }
-  return true;
+
+  return result;
 }
 
 

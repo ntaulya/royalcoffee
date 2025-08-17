@@ -21,7 +21,7 @@ class Variant {
       namaVarian: json['nama_varian'] ?? '',
       hargaTambahan: json['harga_tambahan'].toString(),     
       stock: json['stock'].toString(),                     
-      imagePath: json['image_path'] ?? '',
+      imagePath: json['image_path'],
       isPrimary: json['is_primary'] == 1,                  
     );
   }

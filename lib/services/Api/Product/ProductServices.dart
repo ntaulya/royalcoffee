@@ -271,12 +271,9 @@ class ProductServices extends Config {
 
     // Data utama produk
     request.fields['product_id'] = productId;
-
     if (namaProduct != null) request.fields['nama_product'] = namaProduct;
     if (hargaProduct != null) request.fields['harga_product'] = hargaProduct;
-    if (descriptionProduct != null) {
-      request.fields['description_product'] = descriptionProduct;
-    }
+    if (descriptionProduct != null) request.fields['description_product'] = descriptionProduct;
     if (kategoriId != null) request.fields['kategori_id'] = kategoriId;
 
     // Tambah varian (hanya kalau ada)
@@ -284,29 +281,31 @@ class ProductServices extends Config {
       for (int i = 0; i < varianProductList.length; i++) {
         final varian = varianProductList[i];
 
-        if (varian['vairan_id'] != null) {
+        // pastikan key benar
+        if (varian.containsKey('vairan_id') && varian['vairan_id'] != null) {
           request.fields['varian_product[$i][varian_id]'] =
               varian['vairan_id'].toString();
         }
-        if (varian['nama_varian'] != null) {
+
+        if (varian.containsKey('nama_varian') && varian['nama_varian'] != null) {
           request.fields['varian_product[$i][nama_varian]'] =
-              varian['nama_varian'];
+              varian['nama_varian'].toString();
         }
-        if (varian['harga_varian'] != null) {
+
+        if (varian.containsKey('harga_varian') && varian['harga_varian'] != null) {
           request.fields['varian_product[$i][harga_varian]'] =
               varian['harga_varian'].toString();
         }
-        if (varian['is_primary'] != null) {
-          request.fields['varian_product[$i][is_primary]'] =
-              varian['is_primary'].toString();
-        }
-        if (varian['stock_varian'] != null) {
+
+        if (varian.containsKey('stock_varian') && varian['stock_varian'] != null) {
           request.fields['varian_product[$i][stock]'] =
               varian['stock_varian'].toString();
         }
 
-        // Upload gambar kalau ada file baru
-        if (varian['image_varian'] != null && varian['image_varian'] is File) {
+        // File image
+        if (varian.containsKey('image_varian') &&
+            varian['image_varian'] != null &&
+            varian['image_varian'] is File) {
           final File imageFile = varian['image_varian'];
           if (!imageFile.existsSync()) {
             throw Exception('Gambar varian ke-${i + 1} tidak ditemukan');
@@ -324,6 +323,12 @@ class ProductServices extends Config {
             filename: path.basename(imageFile.path),
             contentType: MediaType('image', 'png'),
           ));
+
+          // kirim is_primary hanya kalau ada gambar
+          if (varian.containsKey('is_primary') && varian['is_primary'] != null) {
+            request.fields['varian_product[$i][is_primary]'] =
+                varian['is_primary'].toString();
+          }
         }
       }
     }
@@ -331,7 +336,7 @@ class ProductServices extends Config {
     final response = await request.send();
     final resBody = await response.stream.bytesToString();
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 201) {
       try {
         final json = jsonDecode(resBody);
         throw Exception(json['message'] ?? 'Gagal memperbarui produk');
@@ -342,9 +347,11 @@ class ProductServices extends Config {
   } on SocketException {
     throw Exception('Tidak ada koneksi internet');
   } catch (e) {
+    print(e);
     throw Exception('Gagal memperbarui produk: $e');
   }
 }
+
 
 
 }

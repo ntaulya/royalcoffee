@@ -334,10 +334,19 @@ Widget _buildVariantCard(int index) {
     oldProduct: _product,
   );
 
-  if (success) {
-      Navigator.pop(context, true);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data berhasil disimpan')),
+      );
+      Navigator.pop(context, true); // balik ke halaman sebelumnya
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_productController.errorMessage ?? 'Gagal update produk')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _productController.errorMessage ?? 'Gagal update produk',
+          ),
+        ),
+      );
     }
   }
 
