@@ -141,7 +141,6 @@ class _EditMenuState extends State<EditMenu> {
       }
     }
   }
-
 Widget _buildVariantCard(int index) {
   final v = _variants[index];
   final isFirst = index == 0;
@@ -204,7 +203,7 @@ Widget _buildVariantCard(int index) {
             ],
           ),
           const SizedBox(height: 8),
-          // Stock + tombol tambah sejajar
+          // Stock
           Row(
             children: [
               Expanded(
@@ -219,19 +218,30 @@ Widget _buildVariantCard(int index) {
                       const Icon(Iconsax.archive, size: 20),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
-                          "Stock: ${v.stock}",
-                          style: const TextStyle(fontSize: 14),
-                        ),
+                        child: v.idVarian.isEmpty
+                            ? TextFormField(
+                                initialValue: v.stock,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Stock",
+                                ),
+                                onChanged: (val) => v.stock = val,
+                              )
+                            : Text(
+                                "Stock: ${v.stock}",
+                                style: const TextStyle(fontSize: 14),
+                              ),
                       ),
                     ],
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: () => _showAddStockDialog(index),
-                icon: const Icon(Icons.add_circle, color: Colors.green),
-              ),
+              if (v.idVarian.isNotEmpty)
+                IconButton(
+                  onPressed: () => _showAddStockDialog(index),
+                  icon: const Icon(Icons.add_circle, color: Colors.green),
+                ),
             ],
           ),
         ],
