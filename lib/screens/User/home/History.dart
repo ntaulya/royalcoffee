@@ -25,7 +25,7 @@ class History extends StatelessWidget {
         ),
       ),
       body: FutureBuilder<List<Order>>(
-        future: _orderService.getOrder(), // ambil data dari API
+        future: _orderService.getOrder(), 
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

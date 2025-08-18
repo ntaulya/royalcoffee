@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:royalcoffee/screens/User/home/History.dart';
 
 // Import semua screen tujuan di sini
 import '../home/PesananSaya.dart';
@@ -10,10 +11,7 @@ import '../home/NotificationPage.dart';
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
 
-  const BottomNavBar({
-    Key? key,
-    required this.selectedIndex,
-  }) : super(key: key);
+  const BottomNavBar({Key? key, required this.selectedIndex}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +36,36 @@ class BottomNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildNavItem(context, Iconsax.home, "Home", 0, const Dashboard()),
-              _buildNavItem(context, Iconsax.shopping_cart, "Order", 1, const CekProses()),
-              //_buildNavItem(context, Iconsax.wallet, "History", 2, const Notification()),
-              _buildNavItem(context, Iconsax.notification, "Notification", 3,  NotificationPage()),
+              _buildNavItem(
+                context,
+                Iconsax.home,
+                "Home",
+                0,
+                const Dashboard(),
+              ),
+              _buildNavItem(
+                context,
+                Iconsax.shopping_cart,
+                "Order",
+                1,
+                const CekProses(),
+              ),
+              _buildNavItem(
+                context,
+                Iconsax.notification,
+                "History",
+                2,
+                History(
+                  onItemSelected: (index) {
+                    if (index == 0) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const Dashboard()),
+                      );
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         ),
