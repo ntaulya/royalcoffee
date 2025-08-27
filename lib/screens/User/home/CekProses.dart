@@ -51,7 +51,10 @@ class _CekProsesState extends State<CekProses> {
                 child: Container(
                   width: double.infinity,
                   color: const Color(0xFF7A491F),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
@@ -78,29 +81,32 @@ class _CekProsesState extends State<CekProses> {
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFF9F9F9),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(30),
+                    ),
                   ),
-                  child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : _error != null
+                  child:
+                      _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _error != null
                           ? Center(child: Text('❌ $_error'))
                           : _antreanList.isEmpty
-                              ? const Center(child: Text('Belum ada antrian'))
-                              : ListView.builder(
-                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
-                                  itemCount: _antreanList.length,
-                                  itemBuilder: (context, index) {
-                                    final item = _antreanList[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 20),
-                                      child: _buildAntrianItem(
-                                        nomor: (index + 1).toString(),
-                                        nama: item.namaUser,
-                                        status: item.proces,
-                                      ),
-                                    );
-                                  },
+                          ? const Center(child: Text('Belum ada antrian'))
+                          : ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+                            itemCount: _antreanList.length,
+                            itemBuilder: (context, index) {
+                              final item = _antreanList[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: _buildAntrianItem(
+                                  nomor: (index + 1).toString(),
+                                  nama: item.namaUser,
+                                  status: item.proces,
                                 ),
+                              );
+                            },
+                          ),
                 ),
               ),
             ],
@@ -136,7 +142,9 @@ class _CekProsesState extends State<CekProses> {
     final mappedStatus = mapStatus(status);
 
     Color getColor(String step) =>
-        (mappedStatus == step) ? const Color(0xFF7A491F) : const Color(0xFFE0DFDF);
+        (mappedStatus == step)
+            ? const Color(0xFF7A491F)
+            : const Color(0xFFE0DFDF);
 
     Color getTextColor(String step) =>
         (mappedStatus == step) ? Colors.white : Colors.black;
@@ -183,36 +191,49 @@ class _CekProsesState extends State<CekProses> {
           const SizedBox(height: 12),
 
           // Status
-          Row(
-            children: ['menunggu', 'proses', 'selesai'].map((step) {
-              return Row(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: getColor(step),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      step == 'menunggu' ? 'Menunggu diproses' : step.capitalize(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: getTextColor(step),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children:
+                ['menunggu', 'proses', 'selesai'].map((step) {
+                  return Row(
+                    mainAxisSize:
+                        MainAxisSize.min, // biar item gak maksa full width
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: getColor(step),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          step == 'menunggu'
+                              ? 'Menunggu diproses'
+                              : step.capitalize(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: getTextColor(step),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  if (step != 'selesai')
-                    const Icon(Icons.arrow_right_alt, size: 18, color: Colors.black45),
-                ],
-              );
-            }).toList(),
+                      if (step != 'selesai')
+                        const Icon(
+                          Icons.arrow_right_alt,
+                          size: 18,
+                          color: Colors.black45,
+                        ),
+                    ],
+                  );
+                }).toList(),
           ),
         ],
       ),
     );
   }
-
 }
 
 // EXTENSION: CAPITALIZE
