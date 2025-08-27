@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../Config.dart';
 import '../../SecureStorageService.dart';
 import '../../../models/Antrian/Antrian.dart';
+import '../../../models/LogHistory.dart';
 
 class AntrianService extends Config {
   final Config _config = Config();
@@ -30,6 +31,40 @@ class AntrianService extends Config {
         final data = json.decode(response.body);
         final List<dynamic> antreanJson = data['data']['data'];
         return antreanJson.map((json) => Antrian.fromJson(json)).toList();
+      } else {
+        throw Exception(_config.getErrorMessage(response, 'getAntreanList'));
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } on http.ClientException {
+      throw Exception('Gagal menghubungi server');
+    } catch (e) {
+      throw Exception('Terjadi kesalahan: $e');
+    }
+  }
+
+  Future<List<LogHistory>> getListNotification({String? section}) async{
+     try {
+      String url = '${_config.baseUrl}/product/checkOrder/history';
+      String? token = await _storageService.getToken();
+      final queryParams = <String, String>{};
+      final headers = {
+        ..._config.defaultHeaders,
+        'Authorization': 'Bearer $token',
+      };
+
+      if (section != null) {
+        queryParams['id_checkout'] = section;
+      }
+
+      final uri = Uri.parse(url).replace(queryParameters: queryParams);
+
+      final response = await http.get(uri, headers: headers).timeout(_config.timeout);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> antreanJson = data['data']['data'];
+        print(antreanJson);
+        return antreanJson.map((json) => LogHistory.fromJson(json)).toList();
       } else {
         throw Exception(_config.getErrorMessage(response, 'getAntreanList'));
       }
