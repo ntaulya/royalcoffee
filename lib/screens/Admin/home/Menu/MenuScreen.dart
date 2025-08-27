@@ -20,6 +20,7 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   final ProductController controller = ProductController();
   final ScrollController _scrollController = ScrollController();
+
   String selectedCategoryId = '';
   Map<String, Uint8List?> _productImages = {};
   bool _isImageLoading = false;
@@ -39,6 +40,8 @@ class _MenuScreenState extends State<MenuScreen> {
       }
     });
   }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
@@ -47,6 +50,7 @@ class _MenuScreenState extends State<MenuScreen> {
       _isFirstLoad = false;
     }
   }
+
   Future<void> _refreshMenu() async {
     await controller.fetchInitialProducts(categoryId: selectedCategoryId);
     await _loadImages(controller.products);
@@ -116,20 +120,29 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  Widget _buildStatusButton(String text, Color color,
-      {Color? textColor, VoidCallback? onPressed}) {
+  Widget _buildStatusButton(
+    String text,
+    Color color, {
+    Color? textColor,
+    VoidCallback? onPressed,
+  }) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: textColor ?? Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         elevation: 0,
       ),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -171,8 +184,13 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(product.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(
+                  product.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Text(
                   "Harga ${formatRupiah(product.price)}, Stok ${getPrimaryVariantStock(product)}",
@@ -197,7 +215,9 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ),
                 const SizedBox(height: 8),
-                Row(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
                   children: [
                     _buildStatusButton(
                       "⛔ Nonaktifkan",
@@ -213,13 +233,14 @@ class _MenuScreenState extends State<MenuScreen> {
                               await _loadImages(controller.products);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('${product.name} berhasil dinonaktifkan'),
+                                  content: Text(
+                                    '${product.name} berhasil dinonaktifkan',
+                                  ),
                                 ),
                               );
                             }
                           : null,
                     ),
-                    const SizedBox(width: 6),
                     _buildStatusButton(
                       "✅ Aktif",
                       isActive ? Colors.grey.shade300 : const Color(0xFF4B1D0D),
@@ -235,12 +256,13 @@ class _MenuScreenState extends State<MenuScreen> {
                               await _loadImages(controller.products);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('${product.name} berhasil diaktifkan'),
+                                  content: Text(
+                                    '${product.name} berhasil diaktifkan',
+                                  ),
                                 ),
                               );
                             },
                     ),
-                    const SizedBox(width: 6),
                     _buildStatusButton(
                       "✏️ Edit",
                       const Color(0xFF4B1D0D),
@@ -249,7 +271,10 @@ class _MenuScreenState extends State<MenuScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditMenu(categoryId: selectedCategoryId,productId: product.id),
+                            builder: (context) => EditMenu(
+                              categoryId: selectedCategoryId,
+                              productId: product.id,
+                            ),
                           ),
                         );
                       },
@@ -279,7 +304,9 @@ class _MenuScreenState extends State<MenuScreen> {
                   selectedCategory: selectedCategoryId,
                   onInitialCategoryReady: (initialId) async {
                     setState(() => selectedCategoryId = initialId);
-                    await controller.fetchInitialProducts(categoryId: initialId);
+                    await controller.fetchInitialProducts(
+                      categoryId: initialId,
+                    );
                     await _loadImages(controller.products);
                     _savedScrollOffset = 0.0;
                     _shouldRestoreScroll = true;
@@ -296,7 +323,9 @@ class _MenuScreenState extends State<MenuScreen> {
                         ? _scrollController.offset
                         : 0.0;
                     setState(() => selectedCategoryId = newCategoryId);
-                    await controller.fetchInitialProducts(categoryId: newCategoryId);
+                    await controller.fetchInitialProducts(
+                      categoryId: newCategoryId,
+                    );
                     await _loadImages(controller.products);
                     _shouldRestoreScroll = true;
                     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -318,20 +347,31 @@ class _MenuScreenState extends State<MenuScreen> {
                         return Center(child: Text(controller.errorMessage!));
                       }
                       if (controller.products.isEmpty) {
-                        return const Center(child: Text("Tidak ada data menu."));
+                        return const Center(
+                          child: Text("Tidak ada data menu."),
+                        );
                       }
 
                       return ListView.builder(
                         controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        itemCount: controller.products.length + (_isLoadingMore ? 1 : 0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        itemCount: controller.products.length +
+                            (_isLoadingMore ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index < controller.products.length) {
-                            return _buildMenuItem(controller.products[index], controller);
+                            return _buildMenuItem(
+                              controller.products[index],
+                              controller,
+                            );
                           } else {
                             return const Padding(
                               padding: EdgeInsets.all(16),
-                              child: Center(child: CircularProgressIndicator()),
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
                             );
                           }
                         },
@@ -354,7 +394,9 @@ class _MenuScreenState extends State<MenuScreen> {
               _savedScrollOffset = _scrollController.hasClients
                   ? _scrollController.offset
                   : 0.0;
-              await controller.fetchInitialProducts(categoryId: selectedCategoryId);
+              await controller.fetchInitialProducts(
+                categoryId: selectedCategoryId,
+              );
               await _loadImages(controller.products);
               _shouldRestoreScroll = true;
               WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -366,7 +408,10 @@ class _MenuScreenState extends State<MenuScreen> {
               });
             }
           },
-          child: const Icon(Icons.receipt_long_outlined, color: Colors.white),
+          child: const Icon(
+            Icons.receipt_long_outlined,
+            color: Colors.white,
+          ),
         ),
       ),
     );

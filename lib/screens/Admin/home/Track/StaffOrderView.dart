@@ -219,7 +219,9 @@ class _StaffOrderViewState extends State<StaffOrderView> {
                                             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
                                           ),
                                         ),
-                                      Row(
+                                      Wrap(
+                                        spacing: 10,
+                                        runSpacing: 6,
                                         children: [
                                           ElevatedButton(
                                             onPressed: () {},
@@ -232,7 +234,6 @@ class _StaffOrderViewState extends State<StaffOrderView> {
                                             ),
                                             child: Text("Pesanan ${index + 1}", style: const TextStyle(color: Colors.white)),
                                           ),
-                                          const SizedBox(width: 10),
                                           OutlinedButton(
                                             onPressed: index == 0
                                                 ? () async {

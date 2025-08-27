@@ -34,36 +34,41 @@ class BottomNavBar extends StatelessWidget {
             ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildNavItem(
-                context,
-                Iconsax.home,
-                "Home",
-                0,
-                const Dashboard(),
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  Iconsax.home,
+                  "Home",
+                  0,
+                  const Dashboard(),
+                ),
               ),
-              _buildNavItem(
-                context,
-                Iconsax.shopping_cart,
-                "Order",
-                1,
-                const CekProses(),
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  Iconsax.shopping_cart,
+                  "Order",
+                  1,
+                  const CekProses(),
+                ),
               ),
-              _buildNavItem(
-                context,
-                Iconsax.notification,
-                "History",
-                2,
-                History(
-                  onItemSelected: (index) {
-                    if (index == 0) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const Dashboard()),
-                      );
-                    }
-                  },
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  Iconsax.notification,
+                  "History",
+                  2,
+                  History(
+                    onItemSelected: (index) {
+                      if (index == 0) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => const Dashboard()),
+                        );
+                      }
+                    },
+                  ),
                 ),
               ),
             ],
@@ -86,10 +91,7 @@ class BottomNavBar extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (!isSelected) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => screen),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
         }
       },
       child: Column(
@@ -97,10 +99,7 @@ class BottomNavBar extends StatelessWidget {
         children: [
           Icon(icon, color: color),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: color),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: color)),
         ],
       ),
     );
