@@ -14,7 +14,7 @@ class GambarController extends Controller
         if(!Auth::check()){
             return abort(404);
         }
-        $user = auth('api')->user();
+        $user = auth()->guard('api')->user();
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }

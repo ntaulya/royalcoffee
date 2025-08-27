@@ -61,6 +61,7 @@ class CheckoutController extends Controller
         $value = $request->validate([
             'id_checkout' => ['nullable','string','exists:carts,id'],
         ]);
+        $value['id_checkout'] = (empty($value['id_checkout'])) ? null  :$value['id_checkout'];
         $data = $this->checkoutController->buktiPembayaran($value['id_checkout']);
         return new R_D_Success(['data' => $data]) ;
     }

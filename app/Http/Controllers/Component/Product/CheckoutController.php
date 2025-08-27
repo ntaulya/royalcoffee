@@ -195,13 +195,14 @@ class CheckoutController extends Controller
         return true;
     }
 
-    public function buktiPembayaran($id_checkout , $limit = 10){
+    public function buktiPembayaran($id_checkout = null , $limit = 10){
         $carts =  Carts::query();
         if(!empty($id_checkout)){
             $carts->where('id','=',$id_checkout);
         }else{
             $user = Auth::user();
             $carts->where('user_id','=',$user->id);
+            
         }
 
         $data = $carts->paginate($limit);
