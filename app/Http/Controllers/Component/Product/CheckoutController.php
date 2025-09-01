@@ -238,7 +238,6 @@ class CheckoutController extends Controller
                 'nama_varian' => $varian->product->nama_product,
                 'harga_tambahan' => $varian->price_at_that_time,
                 'qty' => $varian->qty,
-                'image_name' => $varian->varian->images->image_name,
                 'image_path' => URL::to('image/' . basename($varian->varian->images->image_name)),
             ];
        }
