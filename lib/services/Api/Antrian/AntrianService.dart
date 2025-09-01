@@ -6,6 +6,7 @@ import '../Config.dart';
 import '../../SecureStorageService.dart';
 import '../../../models/Antrian/Antrian.dart';
 import '../../../models/LogHistory.dart';
+import '../../../models/LogHistoryDetail.dart';
 
 class AntrianService extends Config {
   final Config _config = Config();
@@ -43,7 +44,7 @@ class AntrianService extends Config {
     }
   }
 
-  Future<List<LogHistory>> getListNotification({String? section}) async{
+  Future<List<LogHistory>> getListNotification({String? page}) async{
      try {
       String url = '${_config.baseUrl}/product/checkOrder/history';
       String? token = await _storageService.getToken();
@@ -53,8 +54,8 @@ class AntrianService extends Config {
         'Authorization': 'Bearer $token',
       };
 
-      if (section != null) {
-        queryParams['id_checkout'] = section;
+      if (page != null) {
+        queryParams['page'] = page;
       }
 
       final uri = Uri.parse(url).replace(queryParameters: queryParams);
@@ -63,8 +64,38 @@ class AntrianService extends Config {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> antreanJson = data['data']['data'];
-        print(antreanJson);
         return antreanJson.map((json) => LogHistory.fromJson(json)).toList();
+      } else {
+        throw Exception(_config.getErrorMessage(response, 'getAntreanList'));
+      }
+    } on SocketException {
+      throw Exception('Tidak ada koneksi internet');
+    } on http.ClientException {
+      throw Exception('Gagal menghubungi server');
+    } catch (e) {
+      throw Exception('Terjadi kesalahan: $e');
+    }
+  }
+
+ Future<List<LogHistoryDetail>> getListNotificationDetail({required String idCheckout}) async {
+    try {
+      String url = '${_config.baseUrl}/product/checkOrder/history';
+      String? token = await _storageService.getToken();
+
+      final queryParams = {'id_checkout': idCheckout};
+      final headers = {
+        ..._config.defaultHeaders,
+        'Authorization': 'Bearer $token',
+      };
+
+      final uri = Uri.parse(url).replace(queryParameters: queryParams);
+      final response = await http.get(uri, headers: headers).timeout(_config.timeout);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> antreanJson = data['data']['data'];
+        print(antreanJson);
+        return antreanJson.map((json) => LogHistoryDetail.fromJson(json)).toList();
       } else {
         throw Exception(_config.getErrorMessage(response, 'getAntreanList'));
       }

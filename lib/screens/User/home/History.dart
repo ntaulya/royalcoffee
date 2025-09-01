@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../controllers/HistoryController.dart';
 import '../../../models/LogHistory.dart';
+import './HistoryPage.dart';
 
 class History extends StatefulWidget {
   final Function(int) onItemSelected;
@@ -15,23 +16,23 @@ class History extends StatefulWidget {
 
 class _HistoryState extends State<History> {
   final HistoryController _controller = HistoryController();
-  Timer? _refreshTimer; // ⏳ Timer untuk auto refresh
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
-    _controller.getHistory(); // ✅ ambil data pas init
+    _controller.getHistory(); 
 
-    // 🔄 Auto reload setiap 30 menit
+    
     _refreshTimer = Timer.periodic(const Duration(minutes: 30), (timer) {
       _controller.getHistory();
-      setState(() {}); // supaya widget rebuild
+      setState(() {}); 
     });
   }
 
   @override
   void dispose() {
-    _refreshTimer?.cancel(); // ❌ hentikan timer kalau halaman ditutup
+    _refreshTimer?.cancel(); 
     super.dispose();
   }
 
@@ -159,9 +160,14 @@ class _HistoryState extends State<History> {
                   ),
                   isThreeLine: true,
                   trailing: const Icon(Icons.arrow_forward_ios,
-                      size: 16, color: Colors.grey),
-                  onTap: () {
-                    // TODO: navigasi ke detail pesanan
+                  size: 16, color: Colors.grey),
+                 onTap: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => HistoryPage(idCheckout: order.idCheckout), // ⬅️ passing list
+                        ),
+                      );
                   },
                 ),
               );

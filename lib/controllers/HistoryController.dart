@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../models/LogHistory.dart';
+import '../models/LogHistoryDetail.dart'; // ⬅️ model detail
 import '../services/Api/Antrian/AntrianService.dart';
 
 class HistoryController {
@@ -9,7 +10,7 @@ class HistoryController {
 
   final List<LogHistory> _items = [];
   final StreamController<List<LogHistory>> _antrianStreamController =
-    StreamController<List<LogHistory>>.broadcast();
+      StreamController<List<LogHistory>>.broadcast();
 
   final _service = AntrianService();
 
@@ -26,26 +27,43 @@ class HistoryController {
     _antrianStreamController.sink.add(List.unmodifiable(_items));
   }
 
-  /// Ambil data dari API dan simpan di _items
-  Future<void> getHistory({String? section}) async {
+  /// Ambil list history (ringkasan)
+  Future<void> getHistory({String? page}) async {
     _isLoading = true;
     _error = null;
     _notify();
 
     try {
-        final List<LogHistory> historyList =
-            await _service.getListNotification(section: section);
+      final List<LogHistory> historyList =
+          await _service.getListNotification(page: page);
 
-        _items
+      _items
         ..clear()
         ..addAll(historyList);
-
     } catch (e) {
-        _error = e.toString();
+      _error = e.toString();
     } finally {
-        _isLoading = false;
-        _notify();
+      _isLoading = false;
+      _notify();
     }
-    }
-}
+  }
 
+  /// Ambil detail history
+  Future<List<LogHistoryDetail>> getDetailHistory({required String id}) async {
+    _isLoading = true;
+    _error = null;
+    _notify();
+
+    try {
+      final List<LogHistoryDetail> detailHistory =
+          await _service.getListNotificationDetail(idCheckout: id);
+      return detailHistory;
+    } catch (e) {
+      _error = e.toString();
+      rethrow;
+    } finally {
+      _isLoading = false;
+      _notify();
+    }
+  }
+}
