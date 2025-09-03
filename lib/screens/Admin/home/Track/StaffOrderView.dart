@@ -227,63 +227,62 @@ class _StaffOrderViewState extends State<StaffOrderView> {
 
                                 // 🔑 Tombol dipindah ke bawah (row baru)
 // Bagian tombol SELALU di bawah (rata sejajar dengan image + penuh layar)
-Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Expanded(
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4B1D0D),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-        ),
-        child: Text(
-          "Pesanan ${index + 1}",
-          style: const TextStyle(color: Colors.white),
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    ),
-    const SizedBox(width: 8),
-    Expanded(
-      child: OutlinedButton(
-        onPressed: index == 0
-            ? () async {
-                if (isBarista) {
-                  await _baristaController.updatePesananStatus(
-                    item.idCheckout,
-                    item.idVarian,
-                  );
-                } else {
-                  await _waiterController.updatePesananStatus(
-                    item.idCheckout,
-                    item.idVarian,
-                  );
-                }
-                await _fetchDataAndImages();
-              }
-            : null,
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.grey),
-          backgroundColor: index != 0 ? Colors.grey[300] : null,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-        ),
-        child: const Text(
-          "Sudah Beres",
-          style: TextStyle(color: Colors.black87),
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    ),
-  ],
-)
-
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        onPressed: () {},
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF4B1D0D),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                        ),
+                                        child: Text(
+                                          "Pesanan ${index + 1}",
+                                          style: const TextStyle(color: Colors.white),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: index == 0
+                                            ? () async {
+                                                if (isBarista) {
+                                                  await _baristaController.updatePesananStatus(
+                                                    item.idCheckout,
+                                                    item.idVarian,
+                                                  );
+                                                } else {
+                                                  await _waiterController.updatePesananStatus(
+                                                    item.idCheckout,
+                                                    item.idVarian,
+                                                  );
+                                                }
+                                                await _fetchDataAndImages();
+                                              }
+                                            : null,
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(color: Colors.grey),
+                                          backgroundColor: index != 0 ? Colors.grey[300] : null,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                        ),
+                                        child: const Text(
+                                          "Sudah Beres",
+                                          style: TextStyle(color: Colors.black87),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
                               ],
                             ),
                           ),

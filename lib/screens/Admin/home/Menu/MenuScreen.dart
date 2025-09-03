@@ -134,160 +134,178 @@ class _MenuScreenState extends State<MenuScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        minimumSize: const Size(0, 36),
         elevation: 0,
       ),
       child: Text(
         text,
         style: const TextStyle(
-          fontSize: 12,
+          fontSize: 8,
           fontWeight: FontWeight.w600,
         ),
       ),
     );
   }
 
-  Widget _buildMenuItem(Product product, ProductController controller) {
-    final imageBytes = _productImages[product.id];
-    final isActive = product.status.toLowerCase() == "aktif";
+Widget _buildMenuItem(Product product, ProductController controller) {
+  final imageBytes = _productImages[product.id];
+  final isActive = product.status.toLowerCase() == "aktif";
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.brown.shade200)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          imageBytes != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.memory(
-                    imageBytes,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+    decoration: BoxDecoration(
+      border: Border(bottom: BorderSide(color: Colors.brown.shade200)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Bagian atas: gambar kiri + detail kanan
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Gambar di kiri
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: imageBytes != null
+                  ? Image.memory(
+                      imageBytes,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey.shade300,
+                      child: const Icon(Icons.broken_image, size: 30),
+                    ),
+            ),
+            const SizedBox(width: 12),
+
+            // Detail di kanan
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                )
-              : Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Harga ${formatRupiah(product.price)}, Stok ${getPrimaryVariantStock(product)}",
+                    style: const TextStyle(fontSize: 13),
                   ),
-                  child: const Icon(Icons.broken_image),
-                ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Harga ${formatRupiah(product.price)}, Stok ${getPrimaryVariantStock(product)}",
-                  style: const TextStyle(fontSize: 13),
-                ),
-                if ((product.variants?.length ?? 0) > 1)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: product.variants!
-                          .asMap()
-                          .entries
-                          .skip(1)
-                          .map((entry) {
-                        final variant = entry.value;
-                        return Text(
-                          "- Varian Tambahan: ${variant.namaVarian} (+${variant.hargaTambahan}K), Stok ${variant.stock}",
-                          style: const TextStyle(fontSize: 12),
+                  if ((product.variants?.length ?? 0) > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: product.variants!
+                            .asMap()
+                            .entries
+                            .skip(1)
+                            .map((entry) {
+                          final variant = entry.value;
+                          return Text(
+                            "- ${variant.namaVarian} (+${variant.hargaTambahan}K), Stok ${variant.stock}",
+                            style: const TextStyle(fontSize: 12),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 8),
+
+        // Tombol full width di bawah gambar + teks
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: _buildStatusButton(
+                "⛔ Nonaktifkan",
+                isActive ? const Color(0xFF4B1D0D) : Colors.grey.shade300,
+                textColor: Colors.white,
+                onPressed: isActive
+                    ? () async {
+                        await controller.toggleProductStatus(
+                          productId: product.id,
+                          currentStatus: product.status,
+                          categoryId: selectedCategoryId,
                         );
-                      }).toList(),
-                    ),
-                  ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    _buildStatusButton(
-                      "⛔ Nonaktifkan",
-                      isActive ? const Color(0xFF4B1D0D) : Colors.grey.shade300,
-                      textColor: Colors.white,
-                      onPressed: isActive
-                          ? () async {
-                              await controller.toggleProductStatus(
-                                productId: product.id,
-                                currentStatus: product.status,
-                                categoryId: selectedCategoryId,
-                              );
-                              await _loadImages(controller.products);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${product.name} berhasil dinonaktifkan',
-                                  ),
-                                ),
-                              );
-                            }
-                          : null,
-                    ),
-                    _buildStatusButton(
-                      "✅ Aktif",
-                      isActive ? Colors.grey.shade300 : const Color(0xFF4B1D0D),
-                      textColor: Colors.white,
-                      onPressed: isActive
-                          ? null
-                          : () async {
-                              await controller.toggleProductStatus(
-                                productId: product.id,
-                                currentStatus: product.status,
-                                categoryId: selectedCategoryId,
-                              );
-                              await _loadImages(controller.products);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${product.name} berhasil diaktifkan',
-                                  ),
-                                ),
-                              );
-                            },
-                    ),
-                    _buildStatusButton(
-                      "✏️ Edit",
-                      const Color(0xFF4B1D0D),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditMenu(
-                              categoryId: selectedCategoryId,
-                              productId: product.id,
-                            ),
+                        await _loadImages(controller.products);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${product.name} berhasil dinonaktifkan'),
+                          ),
+                        );
+                      }
+                    : null,
+              ),
+            ),
+            const SizedBox(width: 2),
+            Expanded(
+              child: _buildStatusButton(
+                "✅ Aktif",
+                isActive ? Colors.grey.shade300 : const Color(0xFF4B1D0D),
+                textColor: Colors.white,
+                onPressed: isActive
+                    ? null
+                    : () async {
+                        await controller.toggleProductStatus(
+                          productId: product.id,
+                          currentStatus: product.status,
+                          categoryId: selectedCategoryId,
+                        );
+                        await _loadImages(controller.products);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${product.name} berhasil diaktifkan'),
                           ),
                         );
                       },
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(width: 2),
+            Expanded(
+              child: _buildStatusButton(
+                "✏️ Edit",
+                const Color(0xFF4B1D0D),
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditMenu(
+                        categoryId: selectedCategoryId,
+                        productId: product.id,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
