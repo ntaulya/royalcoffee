@@ -132,143 +132,158 @@ class _StaffOrderViewState extends State<StaffOrderView> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                            child: Row(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(
-                                  radius: 13,
-                                  backgroundColor: const Color(0xFF4B1D0D),
-                                  child: Text(
-                                    '${index + 1}',
-                                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: imageBytes != null
-                                      ? Image.memory(imageBytes, width: 80, height: 100, fit: BoxFit.cover)
-                                      : Container(
-                                          width: 80,
-                                          height: 100,
-                                          color: Colors.grey[300],
-                                          child: const Icon(Icons.broken_image),
-                                        ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 13,
+                                      backgroundColor: const Color(0xFF4B1D0D),
+                                      child: Text(
+                                        '${index + 1}',
+                                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: imageBytes != null
+                                          ? Image.memory(imageBytes, width: 80, height: 100, fit: BoxFit.cover)
+                                          : Container(
+                                              width: 80,
+                                              height: 100,
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.broken_image),
+                                            ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Expanded(
+                                      child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              "${item.namaProduct} - ${item.namaVarian}",
-                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
+                                              Expanded(
+                                                child: Text(
+                                                  "${item.namaProduct} - ${item.namaVarian}",
+                                                  style: const TextStyle(
+                                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
                                               _getTipePemesananIcon(item.tipePemesanan),
-                                              const SizedBox(height: 4),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                      Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text("${item.namaPemesan}", style: const TextStyle(fontSize: 13)),
-                                                  const SizedBox(height: 2),
-                                                  Text(formatTanggal(item.createAt), style: const TextStyle(fontSize: 13)),
-                                                ],
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("${item.namaPemesan}",
+                                                        style: const TextStyle(fontSize: 13)),
+                                                    const SizedBox(height: 2),
+                                                    Text(formatTanggal(item.createAt),
+                                                        style: const TextStyle(fontSize: 13)),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: Column(
+                                              const SizedBox(width: 10),
+                                              Column(
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  const Text(
-                                                    "Jumlah",
-                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                                  ),
+                                                  const Text("Jumlah",
+                                                      style: TextStyle(
+                                                          fontSize: 14, fontWeight: FontWeight.w500)),
                                                   const SizedBox(height: 2),
-                                                  Text(
-                                                    "${item.item}",
-                                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                  ),
+                                                  Text("${item.item}",
+                                                      style: const TextStyle(
+                                                          fontSize: 16, fontWeight: FontWeight.bold)),
                                                 ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      if ((item.pesan ?? '').trim().isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 4),
-                                          child: Text(
-                                            "Catatan: ${item.pesan}",
-                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                                            ],
                                           ),
-                                        ),
-                                      Wrap(
-                                        spacing: 10,
-                                        runSpacing: 6,
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () {},
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(0xFF4B1D0D),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(20),
+                                          if ((item.pesan ?? '').trim().isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 4),
+                                              child: Text(
+                                                "Catatan: ${item.pesan}",
+                                                style: const TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black87),
                                               ),
-                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                             ),
-                                            child: Text("Pesanan ${index + 1}", style: const TextStyle(color: Colors.white)),
-                                          ),
-                                          OutlinedButton(
-                                            onPressed: index == 0
-                                                ? () async {
-                                                    if (isBarista) {
-                                                      await _baristaController.updatePesananStatus(
-                                                        item.idCheckout,
-                                                        item.idVarian,
-                                                      );
-                                                    } else {
-                                                      await _waiterController.updatePesananStatus(
-                                                        item.idCheckout,
-                                                        item.idVarian,
-                                                      );
-                                                    }
-                                                    await _fetchDataAndImages();
-                                                  }
-                                                : null,
-                                            style: OutlinedButton.styleFrom(
-                                              side: const BorderSide(color: Colors.grey),
-                                              backgroundColor: index != 0 ? Colors.grey[300] : null,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(20),
-                                              ),
-                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                            ),
-                                            child: const Text(
-                                              "Sudah Beres",
-                                              style: TextStyle(color: Colors.black87),
-                                            ),
-                                          ),
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                )
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+
+                                // 🔑 Tombol dipindah ke bawah (row baru)
+// Bagian tombol SELALU di bawah (rata sejajar dengan image + penuh layar)
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Expanded(
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF4B1D0D),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+        ),
+        child: Text(
+          "Pesanan ${index + 1}",
+          style: const TextStyle(color: Colors.white),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    ),
+    const SizedBox(width: 8),
+    Expanded(
+      child: OutlinedButton(
+        onPressed: index == 0
+            ? () async {
+                if (isBarista) {
+                  await _baristaController.updatePesananStatus(
+                    item.idCheckout,
+                    item.idVarian,
+                  );
+                } else {
+                  await _waiterController.updatePesananStatus(
+                    item.idCheckout,
+                    item.idVarian,
+                  );
+                }
+                await _fetchDataAndImages();
+              }
+            : null,
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.grey),
+          backgroundColor: index != 0 ? Colors.grey[300] : null,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+        ),
+        child: const Text(
+          "Sudah Beres",
+          style: TextStyle(color: Colors.black87),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    ),
+  ],
+)
+
                               ],
                             ),
                           ),

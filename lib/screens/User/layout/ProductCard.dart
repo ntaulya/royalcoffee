@@ -144,7 +144,7 @@ class _ProductCardState extends State<ProductCard> {
                         const SizedBox(height: 6),
                         SizedBox(
                           width: double.infinity,
-                          height: 32,
+                          height: 20,
                           child: ElevatedButton(
                             onPressed: widget.onTap,
                             style: ElevatedButton.styleFrom(

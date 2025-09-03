@@ -192,8 +192,8 @@ class _CekProsesState extends State<CekProses> {
 
           // Status
           Wrap(
-            spacing: 6,
-            runSpacing: 6,
+            spacing: 5,
+            runSpacing: 5,
             crossAxisAlignment: WrapCrossAlignment.center,
             children:
                 ['menunggu', 'proses', 'selesai'].map((step) {
@@ -204,7 +204,7 @@ class _CekProsesState extends State<CekProses> {
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
-                          vertical: 6,
+                          vertical: 5,
                         ),
                         decoration: BoxDecoration(
                           color: getColor(step),
@@ -215,7 +215,7 @@ class _CekProsesState extends State<CekProses> {
                               ? 'Menunggu diproses'
                               : step.capitalize(),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 8,
                             color: getTextColor(step),
                           ),
                         ),
