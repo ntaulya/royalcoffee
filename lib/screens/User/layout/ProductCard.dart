@@ -99,7 +99,7 @@ class _ProductCardState extends State<ProductCard> {
               children: [
                 // Image Section
                 Expanded(
-                  flex: 3,
+                  flex: 2,
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
