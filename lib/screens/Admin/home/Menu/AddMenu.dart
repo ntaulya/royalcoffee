@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mime/mime.dart';
@@ -70,25 +71,35 @@ class _AddMenuState extends State<AddMenu> {
       }
     }
   }
-
-  Widget _buildTextField(String hint, {IconData? icon, TextEditingController? controller, Function(String)? onChanged, String? initialValue}) =>
+Widget _buildTextField(
+  String hint, {
+  IconData? icon,
+  TextEditingController? controller,
+  Function(String)? onChanged,
+  String? initialValue,
+  bool isNumber = false,
+}) =>
     Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: TextFormField(
         controller: controller,
         initialValue: controller == null ? initialValue : null,
         onChanged: onChanged,
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        inputFormatters: isNumber ? [FilteringTextInputFormatter.digitsOnly] : [],
         decoration: InputDecoration(
           hintText: hint,
           prefixIcon: icon != null ? Icon(icon) : null,
           filled: true,
           fillColor: Colors.grey.shade200,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
-
-  Widget _buildImageBox(File? image, VoidCallback onTap, {double size = 100, String? caption}) =>
+    Widget _buildImageBox(File? image, VoidCallback onTap, {double size = 100, String? caption}) =>
     GestureDetector(
       onTap: onTap,
       child: Column(
@@ -131,8 +142,8 @@ class _AddMenuState extends State<AddMenu> {
             Expanded(child: Column(children: [
               _buildTextField("Nama Varian", icon: Iconsax.edit, initialValue: v.name, onChanged: (val) => v.name = val),
               if (!isFirst)
-                _buildTextField("Harga Penambahan", icon: Iconsax.money_2, initialValue: v.price, onChanged: (val) => v.price = val),
-              _buildTextField("Stock", icon: Iconsax.archive, initialValue: v.stock, onChanged: (val) => v.stock = val),
+                _buildTextField("Harga Penambahan", icon: Iconsax.money_2, initialValue: v.price, onChanged: (val) => v.price = val, isNumber: true),
+                _buildTextField("Stock", icon: Iconsax.archive, initialValue: v.stock, onChanged: (val) => v.stock = val, isNumber: true),
             ])),
             IconButton(onPressed: () => setState(() => _variants.removeAt(index)), icon: const Icon(Icons.delete, color: Colors.red)),
           ],
@@ -199,7 +210,7 @@ class _AddMenuState extends State<AddMenu> {
           const SizedBox(height: 20),
           _buildSectionTitle("Informasi Menu"),
           _buildTextField("Nama Menu", icon: Iconsax.coffee, controller: _nameController),
-          _buildTextField("Harga Menu", icon: Iconsax.money, controller: _priceController),
+          _buildTextField("Harga Menu", icon: Iconsax.money, controller: _priceController, isNumber: true),
           _buildTextField("Deskripsi Menu", icon: Iconsax.document, controller: _descriptionController),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 6.0),

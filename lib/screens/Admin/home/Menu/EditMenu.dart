@@ -196,6 +196,7 @@ Widget _buildVariantCard(int index) {
                         icon: Iconsax.money_2,
                         initialValue: v.price,
                         onChanged: (val) => v.price = val,
+                        isNumber: true,
                       ),
                   ],
                 ),
@@ -225,8 +226,10 @@ Widget _buildVariantCard(int index) {
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Stock",
+                                  
                                 ),
                                 onChanged: (val) => v.stock = val,
+
                               )
                             : Text(
                                 "Stock: ${v.stock}",
@@ -390,7 +393,7 @@ Widget _buildVariantCard(int index) {
           const SizedBox(height: 20),
           _buildSectionTitle("Informasi Menu"),
           FormTextField(hint: "Nama Menu", icon: Iconsax.coffee, controller: _nameController),
-          FormTextField(hint: "Harga Menu", icon: Iconsax.money, controller: _priceController),
+          FormTextField(hint: "Harga Menu", icon: Iconsax.money, controller: _priceController,isNumber:true),
           FormTextField(hint: "Deskripsi Menu", icon: Iconsax.document, controller: _descriptionController),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 6.0),

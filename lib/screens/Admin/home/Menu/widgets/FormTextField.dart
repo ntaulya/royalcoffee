@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FormTextField extends StatelessWidget {
   final String hint;
@@ -6,6 +7,7 @@ class FormTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? initialValue;
   final Function(String)? onChanged;
+  final bool isNumber; // 🔥 tambahan
 
   const FormTextField({
     super.key,
@@ -14,6 +16,7 @@ class FormTextField extends StatelessWidget {
     this.controller,
     this.initialValue,
     this.onChanged,
+    this.isNumber = false, // default false
   });
 
   @override
@@ -24,12 +27,17 @@ class FormTextField extends StatelessWidget {
         controller: controller,
         initialValue: controller == null ? initialValue : null,
         onChanged: onChanged,
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        inputFormatters: isNumber ? [FilteringTextInputFormatter.digitsOnly] : [],
         decoration: InputDecoration(
           hintText: hint,
           prefixIcon: icon != null ? Icon(icon) : null,
           filled: true,
           fillColor: Colors.grey.shade200,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
