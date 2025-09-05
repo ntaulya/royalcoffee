@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../screens/User/home/Dashboard.dart';
 import '../../../controllers/AuthController.dart';
 import '../../Admin/home/DashboardAdmin.dart';
@@ -89,7 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildTextField(emailController, enabled: false),
                   const SizedBox(height: 16),
                   _buildLabel('Nomor Telepon'),
-                  _buildTextField(phoneController),
+                  _buildTextField(phoneController,isNumber: true),
                   const Spacer(),
 
                   // Tombol full width
@@ -149,11 +150,16 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+
   Widget _buildTextField(TextEditingController controller,
-      {bool enabled = true}) {
+      {bool enabled = true, bool isNumber = false}) {
     return TextField(
       controller: controller,
       enabled: enabled,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      inputFormatters: isNumber
+          ? [FilteringTextInputFormatter.digitsOnly]
+          : [],
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
         filled: true,
@@ -165,6 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+
 
   Widget _buildButton({
     required String label,
